@@ -1,0 +1,2005 @@
+# 생성 파일. 재생성: python3 tools/gen_semtleos_text.py
+
+
+
+# app_syscall_runtime_llvm
+함수 앱텍스트시스템호출런타임은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define void @_start() noredzone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %result = call i32 @main()"를 추가한다.
+    줄들에 "  %code = sext i32 %result to i64"를 추가한다.
+    줄들에 "  %ignored = call i64 @hmje_arch_syscall1(i64 0, i64 %code)"를 추가한다.
+    줄들에 "  br label %halt"를 추가한다.
+    줄들에 "halt:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pause\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  br label %halt"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_syscall0(i64 %number) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"movq %rdi, %rax\\0A\\09xorq %rdi, %rdi\\0A\\09xorq %rsi, %rsi\\0A\\09xorq %rdx, %rdx\\0A\\09xorq %r10, %r10\\0A\\09xorq %r8, %r8\\0A\\09xorq %r9, %r9\\0A\\09syscall\\0A\\09retq\", \"~{rax},~{rdi},~{rsi},~{rdx},~{r8},~{r9},~{r10},~{rcx},~{r11},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_syscall1(i64 %number, i64 %arg1) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"movq %rdi, %rax\\0A\\09movq %rsi, %rdi\\0A\\09xorq %rsi, %rsi\\0A\\09xorq %rdx, %rdx\\0A\\09xorq %r10, %r10\\0A\\09xorq %r8, %r8\\0A\\09xorq %r9, %r9\\0A\\09syscall\\0A\\09retq\", \"~{rax},~{rdi},~{rsi},~{rdx},~{r8},~{r9},~{r10},~{rcx},~{r11},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_syscall3(i64 %number, i64 %arg1, i64 %arg2, i64 %arg3) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"movq %rdi, %rax\\0A\\09movq %rsi, %rdi\\0A\\09movq %rdx, %rsi\\0A\\09movq %rcx, %rdx\\0A\\09xorq %r10, %r10\\0A\\09xorq %r8, %r8\\0A\\09xorq %r9, %r9\\0A\\09syscall\\0A\\09retq\", \"~{rax},~{rdi},~{rsi},~{rdx},~{r8},~{r9},~{r10},~{rcx},~{r11},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_syscall6(i64 %number, i64 %arg1, i64 %arg2, i64 %arg3, i64 %arg4, i64 %arg5, i64 %arg6) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"movq %rdi, %rax\\0A\\09movq %r8, %r10\\0A\\09movq %r9, %r8\\0A\\09movq 8(%rsp), %r9\\0A\\09movq %rsi, %rdi\\0A\\09movq %rdx, %rsi\\0A\\09movq %rcx, %rdx\\0A\\09syscall\\0A\\09retq\", \"~{rax},~{rdi},~{rsi},~{rdx},~{rcx},~{r8},~{r9},~{r10},~{r11},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_app_thread_runtime_llvm
+함수 앱텍스트스레드런타임은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_platform_performance_cpu_count() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %count = call i64 @hmje_arch_syscall0(i64 82)"를 추가한다.
+    줄들에 "  %valid = icmp sge i64 %count, 1"를 추가한다.
+    줄들에 "  %result = select i1 %valid, i64 %count, i64 1"를 추가한다.
+    줄들에 "  ret i64 %result"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @pthread_create(i64 %thread, i64 %attributes, i64 %start_function, i64 %argument) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %stack_base = call i64 @hmje_arch_syscall1(i64 4, i64 1048576)"를 추가한다.
+    줄들에 "  %allocated = icmp sgt i64 %stack_base, 0"를 추가한다.
+    줄들에 "  br i1 %allocated, label %prepare, label %failed"를 추가한다.
+    줄들에 "prepare:"를 추가한다.
+    줄들에 "  %record = add i64 %stack_base, 1048544"를 추가한다.
+    줄들에 "  %start_slot = inttoptr i64 %record to ptr"를 추가한다.
+    줄들에 "  store i64 %start_function, ptr %start_slot, align 8"를 추가한다.
+    줄들에 "  %argument_address = add i64 %record, 8"를 추가한다.
+    줄들에 "  %argument_slot = inttoptr i64 %argument_address to ptr"를 추가한다.
+    줄들에 "  store i64 %argument, ptr %argument_slot, align 8"를 추가한다.
+    줄들에 "  %stack_address = add i64 %record, 16"를 추가한다.
+    줄들에 "  %stack_slot = inttoptr i64 %stack_address to ptr"를 추가한다.
+    줄들에 "  store i64 %stack_base, ptr %stack_slot, align 8"를 추가한다.
+    줄들에 "  %entry_address = ptrtoint ptr @hmje_x86_64_thread_start to i64"를 추가한다.
+    줄들에 "  %thread_id = call i64 @hmje_arch_syscall3(i64 77, i64 %entry_address, i64 %record, i64 %record)"를 추가한다.
+    줄들에 "  %created = icmp sgt i64 %thread_id, 0"를 추가한다.
+    줄들에 "  br i1 %created, label %success, label %free_failed_stack"를 추가한다.
+    줄들에 "success:"를 추가한다.
+    줄들에 "  %thread_slot = inttoptr i64 %thread to ptr"를 추가한다.
+    줄들에 "  store i64 %thread_id, ptr %thread_slot, align 8"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "free_failed_stack:"를 추가한다.
+    줄들에 "  %free_result = call i64 @hmje_arch_syscall1(i64 6, i64 %stack_base)"를 추가한다.
+    줄들에 "  br label %failed"를 추가한다.
+    줄들에 "failed:"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @pthread_join(i64 %thread, i64 %result_address) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %result = call i64 @hmje_arch_syscall1(i64 79, i64 %thread)"를 추가한다.
+    줄들에 "  %has_result = icmp ne i64 %result_address, 0"를 추가한다.
+    줄들에 "  br i1 %has_result, label %store_result, label %done"를 추가한다.
+    줄들에 "store_result:"를 추가한다.
+    줄들에 "  %result_slot = inttoptr i64 %result_address to ptr"를 추가한다.
+    줄들에 "  store i64 %result, ptr %result_slot, align 8"를 추가한다.
+    줄들에 "  br label %done"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @pthread_detach(i64 %thread) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %ignored = call i64 @hmje_arch_syscall1(i64 80, i64 %thread)"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_x86_64_thread_start() noreturn {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %record = call i64 @hmje_arch_syscall0(i64 81)"를 추가한다.
+    줄들에 "  %valid = icmp sgt i64 %record, 0"를 추가한다.
+    줄들에 "  br i1 %valid, label %invoke, label %exit"를 추가한다.
+    줄들에 "invoke:"를 추가한다.
+    줄들에 "  %start_slot = inttoptr i64 %record to ptr"를 추가한다.
+    줄들에 "  %start_address = load i64, ptr %start_slot, align 8"를 추가한다.
+    줄들에 "  %argument_address = add i64 %record, 8"를 추가한다.
+    줄들에 "  %argument_slot = inttoptr i64 %argument_address to ptr"를 추가한다.
+    줄들에 "  %argument = load i64, ptr %argument_slot, align 8"를 추가한다.
+    줄들에 "  %start_function = inttoptr i64 %start_address to ptr"를 추가한다.
+    줄들에 "  %result = call i64 %start_function(i64 %argument)"를 추가한다.
+    줄들에 "  br label %exit_with_result"를 추가한다.
+    줄들에 "exit:"를 추가한다.
+    줄들에 "  br label %exit_with_result"를 추가한다.
+    줄들에 "exit_with_result:"를 추가한다.
+    줄들에 "  %return_value = phi i64 [ %result, %invoke ], [ 0, %exit ]"를 추가한다.
+    줄들에 "  %ignored = call i64 @hmje_arch_syscall1(i64 78, i64 %return_value)"를 추가한다.
+    줄들에 "  br label %halt"를 추가한다.
+    줄들에 "halt:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pause\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  br label %halt"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# semtleos_async_runtime_llvm
+함수 앱텍스트비동기런타임은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "@hmje_async_lock = internal global i32 0, align 4"를 추가한다.
+    줄들에 "@hmje_async_next_token = internal global i64 1, align 8"를 추가한다.
+    줄들에 "@hmje_async_wake_flag = internal global i64 0, align 8"를 추가한다.
+    줄들에 "@hmje_async_blocking_wait_count = internal global i64 0, align 8"를 추가한다.
+    줄들에 "@hmje_async_event_state = internal global [128 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_event_token = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_event_value = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_event_status = internal global [128 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_handle_value = internal global [512 x i8*] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_handle_blocked = internal global [512 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_handle_cancelled = internal global [512 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_handle_cancellation_shield_depth = internal global [512 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_handle_failure_status = internal global [512 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_deadline_state = internal global [64 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_deadline_token = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_deadline_expiry = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_deadline_handle = internal global [64 x i8*] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_timer_state = internal global [128 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_timer_token = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_timer_expiry = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_group_state = internal global [64 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_group_child_group = internal global [512 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_group_child_handle = internal global [512 x i8*] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_unstructured_state = internal global [128 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_unstructured_handle = internal global [128 x i8*] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_unstructured_context = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_unstructured_release = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_next_limit_identifier = internal global i64 1, align 8"를 추가한다.
+    줄들에 "@hmje_async_next_permit_identifier = internal global i64 1, align 8"를 추가한다.
+    줄들에 "@hmje_async_limit_state = internal global [64 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_identifier = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_capacity = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_in_use = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_wait_head = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_wait_tail = internal global [64 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_permit_state = internal global [512 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_permit_identifier = internal global [512 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_permit_limit = internal global [512 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_waiter_state = internal global [512 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_waiter_token = internal global [512 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_limit_waiter_next = internal global [512 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_channel_waiter_state = internal global [128 x i32] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_channel_waiter_channel = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_channel_waiter_operation = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 "@hmje_async_channel_waiter_token = internal global [128 x i64] zeroinitializer, align 16"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal void @hmje_async_lock_acquire() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %try"를 추가한다.
+    줄들에 "try:"를 추가한다.
+    줄들에 "  %old = atomicrmw xchg i32* @hmje_async_lock, i32 1 acquire"를 추가한다.
+    줄들에 "  %owned = icmp eq i32 %old, 0"를 추가한다.
+    줄들에 "  br i1 %owned, label %done, label %yield"를 추가한다.
+    줄들에 "yield:"를 추가한다.
+    줄들에 "  %ignored = call i64 @hmje_arch_syscall0(i64 15)"를 추가한다.
+    줄들에 "  br label %try"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal void @hmje_async_lock_release() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  store atomic i32 0, i32* @hmje_async_lock release, align 4"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal void @hmje_async_channel_control_lock(i64 %channel) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %lock = inttoptr i64 %channel to i64*"를 추가한다.
+    줄들에 "  br label %try"를 추가한다.
+    줄들에 "try:"를 추가한다.
+    줄들에 "  %old = atomicrmw xchg i64* %lock, i64 1 acquire"를 추가한다.
+    줄들에 "  %owned = icmp eq i64 %old, 0"를 추가한다.
+    줄들에 "  br i1 %owned, label %done, label %yield"를 추가한다.
+    줄들에 "yield:"를 추가한다.
+    줄들에 "  %ignored = call i64 @hmje_arch_syscall0(i64 15)"를 추가한다.
+    줄들에 "  br label %try"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal void @hmje_async_channel_control_unlock(i64 %channel) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %lock = inttoptr i64 %channel to i64*"를 추가한다.
+    줄들에 "  store atomic i64 0, i64* %lock release, align 8"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i1 @hmje_async_channel_ready_locked(i64 %channel, i64 %operation) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %base = inttoptr i64 %channel to i8*"를 추가한다.
+    줄들에 "  %capacity_i8 = getelementptr i8, i8* %base, i64 8"를 추가한다.
+    줄들에 "  %stride_i8 = getelementptr i8, i8* %base, i64 24"를 추가한다.
+    줄들에 "  %head_i8 = getelementptr i8, i8* %base, i64 32"를 추가한다.
+    줄들에 "  %occupied_i8 = getelementptr i8, i8* %base, i64 48"를 추가한다.
+    줄들에 "  %senders_i8 = getelementptr i8, i8* %base, i64 56"를 추가한다.
+    줄들에 "  %receivers_i8 = getelementptr i8, i8* %base, i64 64"를 추가한다.
+    줄들에 "  %capacity_ptr = bitcast i8* %capacity_i8 to i64*"를 추가한다.
+    줄들에 "  %stride_ptr = bitcast i8* %stride_i8 to i64*"를 추가한다.
+    줄들에 "  %head_ptr = bitcast i8* %head_i8 to i64*"를 추가한다.
+    줄들에 "  %occupied_ptr = bitcast i8* %occupied_i8 to i64*"를 추가한다.
+    줄들에 "  %senders_ptr = bitcast i8* %senders_i8 to i64*"를 추가한다.
+    줄들에 "  %receivers_ptr = bitcast i8* %receivers_i8 to i64*"를 추가한다.
+    줄들에 "  %capacity = load i64, i64* %capacity_ptr, align 8"를 추가한다.
+    줄들에 "  %stride = load i64, i64* %stride_ptr, align 8"를 추가한다.
+    줄들에 "  %head = load i64, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  %occupied = load i64, i64* %occupied_ptr, align 8"를 추가한다.
+    줄들에 "  %senders = load i64, i64* %senders_ptr, align 8"를 추가한다.
+    줄들에 "  %receivers = load i64, i64* %receivers_ptr, align 8"를 추가한다.
+    줄들에 "  %reading = icmp eq i64 %operation, 1"를 추가한다.
+    줄들에 "  br i1 %reading, label %read, label %write"를 추가한다.
+    줄들에 "read:"를 추가한다.
+    줄들에 "  %closed_read = icmp eq i64 %senders, 0"를 추가한다.
+    줄들에 "  br i1 %closed_read, label %ready, label %read_nonempty"를 추가한다.
+    줄들에 "read_nonempty:"를 추가한다.
+    줄들에 "  %has_items = icmp ne i64 %occupied, 0"를 추가한다.
+    줄들에 "  %head_valid = icmp ult i64 %head, %capacity"를 추가한다.
+    줄들에 "  %can_read_head = and i1 %has_items, %head_valid"를 추가한다.
+    줄들에 "  br i1 %can_read_head, label %read_state, label %not_ready"를 추가한다.
+    줄들에 "read_state:"를 추가한다.
+    줄들에 "  %slot_offset = mul i64 %head, %stride"를 추가한다.
+    줄들에 "  %slot_start = add i64 152, %slot_offset"를 추가한다.
+    줄들에 "  %slot_i8 = getelementptr i8, i8* %base, i64 %slot_start"를 추가한다.
+    줄들에 "  %slot_ptr = bitcast i8* %slot_i8 to i64*"를 추가한다.
+    줄들에 "  %slot_state = load i64, i64* %slot_ptr, align 8"를 추가한다.
+    줄들에 "  %slot_ready = icmp eq i64 %slot_state, 3"를 추가한다.
+    줄들에 "  br i1 %slot_ready, label %ready, label %not_ready"를 추가한다.
+    줄들에 "write:"를 추가한다.
+    줄들에 "  %closed_write = icmp eq i64 %receivers, 0"를 추가한다.
+    줄들에 "  %has_space = icmp ult i64 %occupied, %capacity"를 추가한다.
+    줄들에 "  %write_ready = or i1 %closed_write, %has_space"를 추가한다.
+    줄들에 "  br i1 %write_ready, label %ready, label %not_ready"를 추가한다.
+    줄들에 "ready:"를 추가한다.
+    줄들에 "  ret i1 true"를 추가한다.
+    줄들에 "not_ready:"를 추가한다.
+    줄들에 "  ret i1 false"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_channel_wait(i64 %channel, i64 %operation, i64 %token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %bad_channel = icmp eq i64 %channel, 0"를 추가한다.
+    줄들에 "  %is_read = icmp eq i64 %operation, 1"를 추가한다.
+    줄들에 "  %is_write = icmp eq i64 %operation, 2"를 추가한다.
+    줄들에 "  %valid_operation = or i1 %is_read, %is_write"를 추가한다.
+    줄들에 "  %bad_operation = xor i1 %valid_operation, true"를 추가한다.
+    줄들에 "  %invalid = or i1 %bad_channel, %bad_operation"를 추가한다.
+    줄들에 "  br i1 %invalid, label %reject, label %check"를 추가한다.
+    줄들에 "reject:"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_void(i64 %token, i32 22)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "check:"를 추가한다.
+    줄들에 "  call void @hmje_async_channel_control_lock(i64 %channel)"를 추가한다.
+    줄들에 "  %ready_now = call i1 @hmje_async_channel_ready_locked(i64 %channel, i64 %operation)"를 추가한다.
+    줄들에 "  br i1 %ready_now, label %complete_now, label %register"를 추가한다.
+    줄들에 "complete_now:"를 추가한다.
+    줄들에 "  call void @hmje_async_channel_control_unlock(i64 %channel)"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_void(i64 %token, i32 0)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "register:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %register ], [ %next, %occupied_slot ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_channel_waiter_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied_slot"를 추가한다.
+    줄들에 "occupied_slot:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %channel_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_channel_waiter_channel, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %operation_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_channel_waiter_operation, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_channel_waiter_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i64 %channel, i64* %channel_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %operation, i64* %operation_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %token, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @hmje_async_channel_control_unlock(i64 %channel)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @hmje_async_channel_control_unlock(i64 %channel)"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_channel_notify(i64 %channel, i64 %operation) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %again"를 추가한다.
+    줄들에 "again:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %again ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_channel_waiter_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %used = icmp ne i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %used, label %check_channel, label %miss"를 추가한다.
+    줄들에 "check_channel:"를 추가한다.
+    줄들에 "  %channel_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_channel_waiter_channel, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate_channel = load i64, i64* %channel_ptr, align 8"를 추가한다.
+    줄들에 "  %same_channel = icmp eq i64 %candidate_channel, %channel"를 추가한다.
+    줄들에 "  br i1 %same_channel, label %check_operation, label %miss"를 추가한다.
+    줄들에 "check_operation:"를 추가한다.
+    줄들에 "  %operation_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_channel_waiter_operation, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate_operation = load i64, i64* %operation_ptr, align 8"를 추가한다.
+    줄들에 "  %operation_overlap = and i64 %candidate_operation, %operation"를 추가한다.
+    줄들에 "  %matches = icmp ne i64 %operation_overlap, 0"를 추가한다.
+    줄들에 "  br i1 %matches, label %wake, label %miss"를 추가한다.
+    줄들에 "wake:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_channel_waiter_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %token = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %channel_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %operation_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_void(i64 %token, i32 0)"를 추가한다.
+    줄들에 "  br label %again"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %done, label %scan"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_channel_destroy(i64 %channel) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_channel_notify(i64 %channel, i64 3)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_event_create() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %token = atomicrmw add i64* @hmje_async_next_token, i64 1 monotonic"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i64 %token, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 %token"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_complete_u64(i64 %token, i32 %status, i64 %value) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %used = icmp ne i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %used, label %check_token, label %miss"를 추가한다.
+    줄들에 "check_token:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %candidate, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %publish_check, label %miss"를 추가한다.
+    줄들에 "publish_check:"를 추가한다.
+    줄들에 "  %pending = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  br i1 %pending, label %publish, label %check_abandoned"를 추가한다.
+    줄들에 "check_abandoned:"를 추가한다.
+    줄들에 "  %abandoned = icmp eq i32 %state, 3"를 추가한다.
+    줄들에 "  br i1 %abandoned, label %discard, label %fail"를 추가한다.
+    줄들에 "discard:"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "publish:"를 추가한다.
+    줄들에 "  %value_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %status_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_status, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i64 %value, i64* %value_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 %status, i32* %status_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 2, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store atomic i64 1, i64* @hmje_async_wake_flag release, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  %woken = call i64 @hmje_arch_syscall0(i64 97)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %fail, label %scan"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_complete_void(i64 %token, i32 %status) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_u64(i64 %token, i32 %status, i64 0)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_event_is_ready(i64 %token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %used = icmp ne i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %used, label %check, label %miss"를 추가한다.
+    줄들에 "check:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %candidate, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %ready = icmp eq i32 %state, 2"를 추가한다.
+    줄들에 "  %result = zext i1 %ready to i32"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 %result"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_event_take_u64(i64 %token, i64* %value_out, i32* %status_out) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %ready = icmp eq i32 %state, 2"를 추가한다.
+    줄들에 "  br i1 %ready, label %check, label %miss"를 추가한다.
+    줄들에 "check:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %candidate, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %take, label %miss"를 추가한다.
+    줄들에 "take:"를 추가한다.
+    줄들에 "  %value_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %status_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_status, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %value = load i64, i64* %value_ptr, align 8"를 추가한다.
+    줄들에 "  %status = load i32, i32* %status_ptr, align 4"를 추가한다.
+    줄들에 "  %has_value_out = icmp ne i64* %value_out, null"를 추가한다.
+    줄들에 "  br i1 %has_value_out, label %store_value, label %maybe_status"를 추가한다.
+    줄들에 "store_value:"를 추가한다.
+    줄들에 "  store i64 %value, i64* %value_out, align 8"를 추가한다.
+    줄들에 "  br label %maybe_status"를 추가한다.
+    줄들에 "maybe_status:"를 추가한다.
+    줄들에 "  %has_status_out = icmp ne i32* %status_out, null"를 추가한다.
+    줄들에 "  br i1 %has_status_out, label %store_status, label %release"를 추가한다.
+    줄들에 "store_status:"를 추가한다.
+    줄들에 "  store i32 %status, i32* %status_out, align 4"를 추가한다.
+    줄들에 "  br label %release"를 추가한다.
+    줄들에 "release:"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_event_abandon(i64 %token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %used = icmp ne i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %used, label %check, label %miss"를 추가한다.
+    줄들에 "check:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %candidate, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %abandon, label %miss"를 추가한다.
+    줄들에 "abandon:"를 추가한다.
+    줄들에 "  %ready = icmp eq i32 %state, 2"를 추가한다.
+    줄들에 "  br i1 %ready, label %release_ready, label %mark"를 추가한다.
+    줄들에 "release_ready:"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "mark:"를 추가한다.
+    줄들에 "  store i32 3, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_event_is_abandoned(i64 %token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %used = icmp ne i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %used, label %check, label %miss"를 추가한다.
+    줄들에 "check:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %candidate, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %abandoned = icmp eq i32 %state, 3"를 추가한다.
+    줄들에 "  %result = zext i1 %abandoned to i32"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 %result"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_handle_set_blocked(i8* %handle, i32 %blocked) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %find"를 추가한다.
+    줄들에 "find:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %find_miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %set, label %find_miss"를 추가한다.
+    줄들에 "find_miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %find_free_entry, label %find"를 추가한다.
+    줄들에 "find_free_entry:"를 추가한다.
+    줄들에 "  br label %find_free"를 추가한다.
+    줄들에 "find_free:"를 추가한다.
+    줄들에 "  %free_index = phi i64 [ 0, %find_free_entry ], [ %free_next, %occupied ]"를 추가한다.
+    줄들에 "  %free_handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %free_candidate = load i8*, i8** %free_handle_ptr, align 8"를 추가한다.
+    줄들에 "  %is_free = icmp eq i8* %free_candidate, null"를 추가한다.
+    줄들에 "  br i1 %is_free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %free_next = add i64 %free_index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %free_next, 512"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %find_free"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  store i8* %handle, i8** %free_handle_ptr, align 8"를 추가한다.
+    줄들에 "  %claim_blocked_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_blocked, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %claim_cancelled_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancelled, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %claim_shield_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancellation_shield_depth, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %claim_failure_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_handle_failure_status, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  store i32 %blocked, i32* %claim_blocked_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 0, i32* %claim_cancelled_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 0, i32* %claim_shield_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %claim_failure_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "set:"를 추가한다.
+    줄들에 "  %blocked_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_blocked, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i32 %blocked, i32* %blocked_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_handle_is_blocked(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %blocked_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_blocked, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %blocked = load i32, i32* %blocked_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 %blocked"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_handle_request_cancel(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %missing_handle = icmp eq i8* %handle, null"를 추가한다.
+    줄들에 "  br i1 %missing_handle, label %done_without_lock, label %lock"를 추가한다.
+    줄들에 "lock:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %find"를 추가한다.
+    줄들에 "find:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %lock ], [ %next, %find_miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %mark, label %find_miss"를 추가한다.
+    줄들에 "find_miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %find_free_entry, label %find"를 추가한다.
+    줄들에 "find_free_entry:"를 추가한다.
+    줄들에 "  br label %find_free"를 추가한다.
+    줄들에 "find_free:"를 추가한다.
+    줄들에 "  %free_index = phi i64 [ 0, %find_free_entry ], [ %free_next, %occupied ]"를 추가한다.
+    줄들에 "  %free_handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %free_candidate = load i8*, i8** %free_handle_ptr, align 8"를 추가한다.
+    줄들에 "  %is_free = icmp eq i8* %free_candidate, null"를 추가한다.
+    줄들에 "  br i1 %is_free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %free_next = add i64 %free_index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %free_next, 512"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %find_free"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  store i8* %handle, i8** %free_handle_ptr, align 8"를 추가한다.
+    줄들에 "  %claim_blocked_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_blocked, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %claim_cancelled_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancelled, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %claim_shield_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancellation_shield_depth, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  %claim_failure_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_handle_failure_status, i64 0, i64 %free_index"를 추가한다.
+    줄들에 "  store i32 0, i32* %claim_blocked_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 1, i32* %claim_cancelled_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 0, i32* %claim_shield_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %claim_failure_ptr, align 8"를 추가한다.
+    줄들에 "  br label %wake"를 추가한다.
+    줄들에 "mark:"를 추가한다.
+    줄들에 "  %cancelled_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancelled, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %was_cancelled = load i32, i32* %cancelled_ptr, align 4"를 추가한다.
+    줄들에 "  %already_cancelled = icmp ne i32 %was_cancelled, 0"를 추가한다.
+    줄들에 "  br i1 %already_cancelled, label %done_locked, label %mark_new"를 추가한다.
+    줄들에 "mark_new:"를 추가한다.
+    줄들에 "  store i32 1, i32* %cancelled_ptr, align 4"를 추가한다.
+    줄들에 "  br label %wake"를 추가한다.
+    줄들에 "wake:"를 추가한다.
+    줄들에 "  store atomic i64 1, i64* @hmje_async_wake_flag release, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  %woken = call i64 @hmje_arch_syscall0(i64 97)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "done_locked:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "done_without_lock:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_handle_request_cancel_address(i64 %handle_address) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %handle = inttoptr i64 %handle_address to i8*"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_request_cancel(i8* %handle)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_handle_is_cancelled(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %cancelled_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancelled, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %cancelled = load i32, i32* %cancelled_ptr, align 4"를 추가한다.
+    줄들에 "  %shield_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancellation_shield_depth, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %shield = load i32, i32* %shield_ptr, align 4"를 추가한다.
+    줄들에 "  %unshielded = icmp eq i32 %shield, 0"를 추가한다.
+    줄들에 "  %visible_cancelled = select i1 %unshielded, i32 %cancelled, i32 0"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 %visible_cancelled"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_cancellation_shield_enter(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %shield_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancellation_shield_depth, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %depth = load i32, i32* %shield_ptr, align 4"를 추가한다.
+    줄들에 "  %overflow = icmp eq i32 %depth, -1"를 추가한다.
+    줄들에 "  br i1 %overflow, label %fail, label %store"를 추가한다.
+    줄들에 "store:"를 추가한다.
+    줄들에 "  %next_depth = add i32 %depth, 1"를 추가한다.
+    줄들에 "  store i32 %next_depth, i32* %shield_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %fail, label %scan"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_cancellation_shield_exit(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %shield_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancellation_shield_depth, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %depth = load i32, i32* %shield_ptr, align 4"를 추가한다.
+    줄들에 "  %empty = icmp eq i32 %depth, 0"를 추가한다.
+    줄들에 "  br i1 %empty, label %fail, label %store"를 추가한다.
+    줄들에 "store:"를 추가한다.
+    줄들에 "  %next_depth = sub i32 %depth, 1"를 추가한다.
+    줄들에 "  store i32 %next_depth, i32* %shield_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %fail, label %scan"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_handle_set_failure(i8* %handle, i64 %status) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %missing_handle = icmp eq i8* %handle, null"를 추가한다.
+    줄들에 "  %zero_status = icmp eq i64 %status, 0"를 추가한다.
+    줄들에 "  %skip = or i1 %missing_handle, %zero_status"를 추가한다.
+    줄들에 "  br i1 %skip, label %done, label %normalize"를 추가한다.
+    줄들에 "normalize:"를 추가한다.
+    줄들에 "  %positive = icmp sgt i64 %status, 0"를 추가한다.
+    줄들에 "  %negated = sub i64 0, %status"를 추가한다.
+    줄들에 "  %normalized = select i1 %positive, i64 %negated, i64 %status"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_set_blocked(i8* %handle, i32 0)"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %normalize ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %failure_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_handle_failure_status, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %old = load i64, i64* %failure_ptr, align 8"를 추가한다.
+    줄들에 "  %unset = icmp eq i64 %old, 0"를 추가한다.
+    줄들에 "  br i1 %unset, label %store, label %unlock"를 추가한다.
+    줄들에 "store:"를 추가한다.
+    줄들에 "  store i64 %normalized, i64* %failure_ptr, align 8"를 추가한다.
+    줄들에 "  store atomic i64 1, i64* @hmje_async_wake_flag release, align 8"를 추가한다.
+    줄들에 "  br label %unlock_and_wake"를 추가한다.
+    줄들에 "unlock_and_wake:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  %woken = call i64 @hmje_arch_syscall0(i64 97)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "unlock:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %trap, label %scan"를 추가한다.
+    줄들에 "trap:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_handle_failure(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %failure_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_handle_failure_status, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %failure = load i64, i64* %failure_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 %failure"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_handle_take_failure(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %failure_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_handle_failure_status, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %failure = load i64, i64* %failure_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %failure_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 %failure"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_handle_forget(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_handle_value, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %blocked_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_blocked, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %cancelled_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancelled, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %shield_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_handle_cancellation_shield_depth, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %failure_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_handle_failure_status, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i32 0, i32* %blocked_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 0, i32* %cancelled_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 0, i32* %shield_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %failure_ptr, align 8"를 추가한다.
+    줄들에 "  store i8* null, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %done, label %scan"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_handle_poll_once(i64 %handle_addr) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  ; HMJE 외부 선언의 `주소`는 i64로 내려온다(UI의 비동기핸들한프레임). i8*로"를 추가한다.
+    줄들에 "  ; 정의하면 방출된 declare (i64)와 타입이 갈려 redefinition으로 깨진다."를 추가한다.
+    줄들에 "  %handle = inttoptr i64 %handle_addr to i8*"를 추가한다.
+    줄들에 "  %header = bitcast i8* %handle to i8**"를 추가한다.
+    줄들에 "  %resume = load i8*, i8** %header, align 8"를 추가한다.
+    줄들에 "  %done = icmp eq i8* %resume, null"를 추가한다.
+    줄들에 "  br i1 %done, label %finished, label %run"를 추가한다.
+    줄들에 "run:"를 추가한다.
+    줄들에 "  %resume_fn = bitcast i8* %resume to void (i8*)*"를 추가한다.
+    줄들에 "  call void %resume_fn(i8* %handle)"를 추가한다.
+    줄들에 "  %resume_after = load i8*, i8** %header, align 8"를 추가한다.
+    줄들에 "  %done_after = icmp eq i8* %resume_after, null"를 추가한다.
+    줄들에 "  %result = zext i1 %done_after to i32"를 추가한다.
+    줄들에 "  ret i32 %result"를 추가한다.
+    줄들에 "finished:"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_handle_destroy(i64 %handle_addr) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %handle = inttoptr i64 %handle_addr to i8*"를 추가한다.
+    줄들에 "  %header = bitcast i8* %handle to i8**"를 추가한다.
+    줄들에 "  %destroy_slot = getelementptr i8*, i8** %header, i64 1"를 추가한다.
+    줄들에 "  %destroy = load i8*, i8** %destroy_slot, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_forget(i8* %handle)"를 추가한다.
+    줄들에 "  %missing = icmp eq i8* %destroy, null"를 추가한다.
+    줄들에 "  br i1 %missing, label %done, label %run"를 추가한다.
+    줄들에 "run:"를 추가한다.
+    줄들에 "  %destroy_fn = bitcast i8* %destroy to void (i8*)*"를 추가한다.
+    줄들에 "  call void %destroy_fn(i8* %handle)"를 추가한다.
+    줄들에 "  br label %done"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "; Native-style timer adapter for semtleOS.  The root executor owns this fixed"를 추가한다.
+    줄들에 "; timer queue, so no callback thread may resume a coroutine or touch ARC state."를 추가한다.
+    줄들에 "define void @hmje_async_timer_wait(i64 %delay_milliseconds, i64 %token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %now = call i64 @hmje_arch_syscall0(i64 2)"를 추가한다.
+    줄들에 "  %room = sub i64 -1, %now"를 추가한다.
+    줄들에 "  %overflows = icmp ugt i64 %delay_milliseconds, %room"를 추가한다.
+    줄들에 "  %sum = add i64 %now, %delay_milliseconds"를 추가한다.
+    줄들에 "  %expiry = select i1 %overflows, i64 -1, i64 %sum"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_timer_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_timer_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %expiry_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_timer_expiry, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i64 %token, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %expiry, i64* %expiry_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_void(i64 %token, i32 12)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_deadline_begin(i64 %delay_milliseconds, i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %missing = icmp eq i8* %handle, null"를 추가한다.
+    줄들에 "  br i1 %missing, label %trap, label %prepare"를 추가한다.
+    줄들에 "prepare:"를 추가한다.
+    줄들에 "  %now = call i64 @hmje_arch_syscall0(i64 2)"를 추가한다.
+    줄들에 "  %room = sub i64 -1, %now"를 추가한다.
+    줄들에 "  %overflows = icmp ugt i64 %delay_milliseconds, %room"를 추가한다.
+    줄들에 "  %sum = add i64 %now, %delay_milliseconds"를 추가한다.
+    줄들에 "  %expiry = select i1 %overflows, i64 -1, i64 %sum"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %prepare ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_deadline_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %full, label %unlock_trap, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %token = atomicrmw add i64* @hmje_async_next_token, i64 1 monotonic"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_deadline_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %expiry_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_deadline_expiry, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [64 x i8*], [64 x i8*]* @hmje_async_deadline_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i64 %token, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %expiry, i64* %expiry_ptr, align 8"를 추가한다.
+    줄들에 "  store i8* %handle, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 %token"를 추가한다.
+    줄들에 "unlock_trap:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  br label %trap"를 추가한다.
+    줄들에 "trap:"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_deadline_end(i64 %deadline_token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_deadline_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_deadline_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %token = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  %same = icmp eq i64 %token, %deadline_token"를 추가한다.
+    줄들에 "  %found = and i1 %active, %same"를 추가한다.
+    줄들에 "  br i1 %found, label %clear, label %miss"를 추가한다.
+    줄들에 "clear:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [64 x i8*], [64 x i8*]* @hmje_async_deadline_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i8* null, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %last, label %done, label %scan"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_deadline_cancel_for_handle(i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %continue ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_deadline_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [64 x i8*], [64 x i8*]* @hmje_async_deadline_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %candidate = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %same = icmp eq i8* %candidate, %handle"를 추가한다.
+    줄들에 "  %found = and i1 %active, %same"를 추가한다.
+    줄들에 "  br i1 %found, label %clear, label %continue"를 추가한다.
+    줄들에 "clear:"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i8* null, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  br label %continue"를 추가한다.
+    줄들에 "continue:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %last, label %done, label %scan"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i32 @hmje_async_timer_poll() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %now = call i64 @hmje_arch_syscall0(i64 2)"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_timer_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  %expiry_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_timer_expiry, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %expiry = load i64, i64* %expiry_ptr, align 8"를 추가한다.
+    줄들에 "  %reached = icmp uge i64 %now, %expiry"를 추가한다.
+    줄들에 "  %due = and i1 %active, %reached"를 추가한다.
+    줄들에 "  br i1 %due, label %expire, label %miss"를 추가한다.
+    줄들에 "expire:"를 추가한다.
+    줄들에 "  %token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_timer_token, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %token = load i64, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %token_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %expiry_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_void(i64 %token, i32 0)"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %none, label %scan"를 추가한다.
+    줄들에 "none:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i32 @hmje_async_deadline_poll() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %now = call i64 @hmje_arch_syscall0(i64 2)"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_deadline_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  %expiry_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_deadline_expiry, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %expiry = load i64, i64* %expiry_ptr, align 8"를 추가한다.
+    줄들에 "  %reached = icmp uge i64 %now, %expiry"를 추가한다.
+    줄들에 "  %due = and i1 %active, %reached"를 추가한다.
+    줄들에 "  br i1 %due, label %expire, label %miss"를 추가한다.
+    줄들에 "expire:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [64 x i8*], [64 x i8*]* @hmje_async_deadline_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %handle = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i8* null, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ; Failure publication wakes the suspended scope.  Its generated"를 추가한다.
+    줄들에 "  ; `비동기실패정리` cancels the currently awaited child.  Marking the scope"를 추가한다.
+    줄들에 "  ; itself cancelled would leak past `실패하면` and silently cancel its caller."를 추가한다.
+    줄들에 "  call void @hmje_async_handle_set_failure(i8* %handle, i64 -110)"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %last, label %none, label %scan"를 추가한다.
+    줄들에 "none:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i32 @hmje_async_deadline_has_active() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_deadline_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  br i1 %active, label %found, label %miss"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 1"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %last, label %none, label %scan"를 추가한다.
+    줄들에 "none:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i32 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i64 @hmje_async_nearest_expiry() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %deadline_scan"를 추가한다.
+    줄들에 "deadline_scan:"를 추가한다.
+    줄들에 "  %deadline_index = phi i64 [ 0, %entry ], [ %deadline_next, %deadline_advance ]"를 추가한다.
+    줄들에 "  %nearest = phi i64 [ 0, %entry ], [ %deadline_next_nearest, %deadline_advance ]"를 추가한다.
+    줄들에 "  %deadline_state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_deadline_state, i64 0, i64 %deadline_index"를 추가한다.
+    줄들에 "  %deadline_state = load i32, i32* %deadline_state_ptr, align 4"를 추가한다.
+    줄들에 "  %deadline_active = icmp eq i32 %deadline_state, 1"를 추가한다.
+    줄들에 "  br i1 %deadline_active, label %deadline_consider, label %deadline_advance"를 추가한다.
+    줄들에 "deadline_consider:"를 추가한다.
+    줄들에 "  %deadline_expiry_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_deadline_expiry, i64 0, i64 %deadline_index"를 추가한다.
+    줄들에 "  %deadline_expiry = load i64, i64* %deadline_expiry_ptr, align 8"를 추가한다.
+    줄들에 "  %deadline_none = icmp eq i64 %nearest, 0"를 추가한다.
+    줄들에 "  %deadline_earlier = icmp ult i64 %deadline_expiry, %nearest"를 추가한다.
+    줄들에 "  %deadline_take = or i1 %deadline_none, %deadline_earlier"를 추가한다.
+    줄들에 "  %deadline_considered = select i1 %deadline_take, i64 %deadline_expiry, i64 %nearest"를 추가한다.
+    줄들에 "  br label %deadline_advance"를 추가한다.
+    줄들에 "deadline_advance:"를 추가한다.
+    줄들에 "  %deadline_next_nearest = phi i64 [ %nearest, %deadline_scan ], [ %deadline_considered, %deadline_consider ]"를 추가한다.
+    줄들에 "  %deadline_next = add i64 %deadline_index, 1"를 추가한다.
+    줄들에 "  %deadline_last = icmp eq i64 %deadline_next, 64"를 추가한다.
+    줄들에 "  br i1 %deadline_last, label %timer_entry, label %deadline_scan"를 추가한다.
+    줄들에 "timer_entry:"를 추가한다.
+    줄들에 "  br label %timer_scan"를 추가한다.
+    줄들에 "timer_scan:"를 추가한다.
+    줄들에 "  %timer_index = phi i64 [ 0, %timer_entry ], [ %timer_next, %timer_advance ]"를 추가한다.
+    줄들에 "  %timer_nearest = phi i64 [ %deadline_next_nearest, %timer_entry ], [ %timer_next_nearest, %timer_advance ]"를 추가한다.
+    줄들에 "  %timer_state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_timer_state, i64 0, i64 %timer_index"를 추가한다.
+    줄들에 "  %timer_state = load i32, i32* %timer_state_ptr, align 4"를 추가한다.
+    줄들에 "  %timer_active = icmp eq i32 %timer_state, 1"를 추가한다.
+    줄들에 "  br i1 %timer_active, label %timer_consider, label %timer_advance"를 추가한다.
+    줄들에 "timer_consider:"를 추가한다.
+    줄들에 "  %timer_expiry_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_timer_expiry, i64 0, i64 %timer_index"를 추가한다.
+    줄들에 "  %timer_expiry = load i64, i64* %timer_expiry_ptr, align 8"를 추가한다.
+    줄들에 "  %timer_none = icmp eq i64 %timer_nearest, 0"를 추가한다.
+    줄들에 "  %timer_earlier = icmp ult i64 %timer_expiry, %timer_nearest"를 추가한다.
+    줄들에 "  %timer_take = or i1 %timer_none, %timer_earlier"를 추가한다.
+    줄들에 "  %timer_considered = select i1 %timer_take, i64 %timer_expiry, i64 %timer_nearest"를 추가한다.
+    줄들에 "  br label %timer_advance"를 추가한다.
+    줄들에 "timer_advance:"를 추가한다.
+    줄들에 "  %timer_next_nearest = phi i64 [ %timer_nearest, %timer_scan ], [ %timer_considered, %timer_consider ]"를 추가한다.
+    줄들에 "  %timer_next = add i64 %timer_index, 1"를 추가한다.
+    줄들에 "  %timer_last = icmp eq i64 %timer_next, 128"를 추가한다.
+    줄들에 "  br i1 %timer_last, label %done, label %timer_scan"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 %timer_next_nearest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i8* @hmje_async_group_create() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_group_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %token = add i64 %index, 1"를 추가한다.
+    줄들에 "  %group = inttoptr i64 %token to i8*"를 추가한다.
+    줄들에 "  ret i8* %group"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_group_add(i8* %group, i8* %handle) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %token = ptrtoint i8* %group to i64"를 추가한다.
+    줄들에 "  %nonzero = icmp ne i64 %token, 0"를 추가한다.
+    줄들에 "  %slot = sub i64 %token, 1"를 추가한다.
+    줄들에 "  %in_range = icmp ult i64 %slot, 64"를 추가한다.
+    줄들에 "  %valid_token = and i1 %nonzero, %in_range"를 추가한다.
+    줄들에 "  br i1 %valid_token, label %check_group, label %fail"를 추가한다.
+    줄들에 "check_group:"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_group_state, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  %handle_valid = icmp ne i8* %handle, null"를 추가한다.
+    줄들에 "  %valid = and i1 %active, %handle_valid"를 추가한다.
+    줄들에 "  br i1 %valid, label %scan, label %fail"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %check_group ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %group_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_group_child_group, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %owner = load i64, i64* %group_ptr, align 8"를 추가한다.
+    줄들에 "  %free = icmp eq i64 %owner, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_group_child_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i8* %handle, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %token, i64* %group_ptr, align 8"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_unstructured_add(i8* %handle, i64 %context, i64 %release) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %valid = icmp ne i8* %handle, null"를 추가한다.
+    줄들에 "  br i1 %valid, label %scan, label %fail"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_unstructured_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [128 x i8*], [128 x i8*]* @hmje_async_unstructured_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %context_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_unstructured_context, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %release_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_unstructured_release, i64 0, i64 %index"를 추가한다.
+    줄들에 "  store i8* %handle, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %context, i64* %context_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %release, i64* %release_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_unstructured_poll() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %advance ]"를 추가한다.
+    줄들에 "  %any_pending = phi i1 [ false, %entry ], [ %next_any_pending, %advance ]"를 추가한다.
+    줄들에 "  %all_blocked = phi i1 [ true, %entry ], [ %next_all_blocked, %advance ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_unstructured_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %active = icmp eq i32 %state, 1"를 추가한다.
+    줄들에 "  br i1 %active, label %visit, label %skip"를 추가한다.
+    줄들에 "visit:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [128 x i8*], [128 x i8*]* @hmje_async_unstructured_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %handle = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %handle_address = ptrtoint i8* %handle to i64"를 추가한다.
+    줄들에 "  %done_raw = call i32 @hmje_async_handle_poll_once(i64 %handle_address)"를 추가한다.
+    줄들에 "  %done = icmp ne i32 %done_raw, 0"를 추가한다.
+    줄들에 "  br i1 %done, label %release_done, label %pending"를 추가한다.
+    줄들에 "release_done:"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_destroy(i64 %handle_address)"를 추가한다.
+    줄들에 "  %context_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_unstructured_context, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %release_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_unstructured_release, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %context = load i64, i64* %context_ptr, align 8"를 추가한다.
+    줄들에 "  %release = load i64, i64* %release_ptr, align 8"를 추가한다.
+    줄들에 "  %has_context = icmp ne i64 %context, 0"를 추가한다.
+    줄들에 "  %has_release = icmp ne i64 %release, 0"를 추가한다.
+    줄들에 "  %should_release = and i1 %has_context, %has_release"를 추가한다.
+    줄들에 "  br i1 %should_release, label %call_release, label %clear"를 추가한다.
+    줄들에 "call_release:"를 추가한다.
+    줄들에 "  %release_fn = inttoptr i64 %release to void (i64)*"를 추가한다.
+    줄들에 "  call void %release_fn(i64 %context)"를 추가한다.
+    줄들에 "  br label %clear"를 추가한다.
+    줄들에 "clear:"를 추가한다.
+    줄들에 "  store i8* null, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %context_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %release_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "pending:"를 추가한다.
+    줄들에 "  %blocked_raw = call i32 @hmje_async_handle_is_blocked(i8* %handle)"를 추가한다.
+    줄들에 "  %blocked = icmp ne i32 %blocked_raw, 0"를 추가한다.
+    줄들에 "  %pending_all_blocked = and i1 %all_blocked, %blocked"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "skip:"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "advance:"를 추가한다.
+    줄들에 "  %next_any_pending = phi i1 [ %any_pending, %clear ], [ true, %pending ], [ %any_pending, %skip ]"를 추가한다.
+    줄들에 "  %next_all_blocked = phi i1 [ %all_blocked, %clear ], [ %pending_all_blocked, %pending ], [ %all_blocked, %skip ]"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %result, label %scan"를 추가한다.
+    줄들에 "result:"를 추가한다.
+    줄들에 "  br i1 %next_any_pending, label %pending_result, label %empty_result"를 추가한다.
+    줄들에 "pending_result:"를 추가한다.
+    줄들에 "  %status = select i1 %next_all_blocked, i32 1, i32 0"를 추가한다.
+    줄들에 "  ret i32 %status"를 추가한다.
+    줄들에 "empty_result:"를 추가한다.
+    줄들에 "  ret i32 2"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_unstructured_tick() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %status = call i32 @hmje_async_unstructured_poll()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_async_group_poll(i8* %group, i8* %parent) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %token = ptrtoint i8* %group to i64"를 추가한다.
+    줄들에 "  %parent_cancelled_raw = call i32 @hmje_async_handle_is_cancelled(i8* %parent)"를 추가한다.
+    줄들에 "  %parent_cancelled = icmp ne i32 %parent_cancelled_raw, 0"를 추가한다.
+    줄들에 "  %parent_failure = call i64 @hmje_async_handle_failure(i8* %parent)"를 추가한다.
+    줄들에 "  %parent_failed = icmp ne i64 %parent_failure, 0"를 추가한다.
+    줄들에 "  %parent_exiting = or i1 %parent_cancelled, %parent_failed"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %advance ]"를 추가한다.
+    줄들에 "  %all_done = phi i1 [ true, %entry ], [ %next_all_done, %advance ]"를 추가한다.
+    줄들에 "  %all_blocked = phi i1 [ true, %entry ], [ %next_all_blocked, %advance ]"를 추가한다.
+    줄들에 "  %failure_seen = phi i1 [ false, %entry ], [ %next_failure_seen, %advance ]"를 추가한다.
+    줄들에 "  %group_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_group_child_group, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %owner = load i64, i64* %group_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %owner, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %visit, label %skip"를 추가한다.
+    줄들에 "visit:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_group_child_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %handle = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %failure = call i64 @hmje_async_handle_failure(i8* %handle)"를 추가한다.
+    줄들에 "  %failed = icmp ne i64 %failure, 0"를 추가한다.
+    줄들에 "  %cancel_for_failure = or i1 %failure_seen, %failed"를 추가한다.
+    줄들에 "  %cancel = or i1 %parent_exiting, %cancel_for_failure"를 추가한다.
+    줄들에 "  br i1 %cancel, label %request_cancel, label %poll"를 추가한다.
+    줄들에 "request_cancel:"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_request_cancel(i8* %handle)"를 추가한다.
+    줄들에 "  br label %poll"를 추가한다.
+    줄들에 "poll:"를 추가한다.
+    줄들에 "  %handle_address = ptrtoint i8* %handle to i64"를 추가한다.
+    줄들에 "  %done_raw = call i32 @hmje_async_handle_poll_once(i64 %handle_address)"를 추가한다.
+    줄들에 "  %done = icmp ne i32 %done_raw, 0"를 추가한다.
+    줄들에 "  %blocked_raw = call i32 @hmje_async_handle_is_blocked(i8* %handle)"를 추가한다.
+    줄들에 "  %blocked = icmp ne i32 %blocked_raw, 0"를 추가한다.
+    줄들에 "  %done_or_blocked = or i1 %done, %blocked"를 추가한다.
+    줄들에 "  %visited_all_done = and i1 %all_done, %done"를 추가한다.
+    줄들에 "  %visited_all_blocked = and i1 %all_blocked, %done_or_blocked"를 추가한다.
+    줄들에 "  %visited_failure = or i1 %failure_seen, %failed"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "skip:"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "advance:"를 추가한다.
+    줄들에 "  %next_all_done = phi i1 [ %visited_all_done, %poll ], [ %all_done, %skip ]"를 추가한다.
+    줄들에 "  %next_all_blocked = phi i1 [ %visited_all_blocked, %poll ], [ %all_blocked, %skip ]"를 추가한다.
+    줄들에 "  %next_failure_seen = phi i1 [ %visited_failure, %poll ], [ %failure_seen, %skip ]"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %result, label %scan"를 추가한다.
+    줄들에 "result:"를 추가한다.
+    줄들에 "  br i1 %next_all_done, label %done_result, label %pending"를 추가한다.
+    줄들에 "done_result:"를 추가한다.
+    줄들에 "  ret i32 2"를 추가한다.
+    줄들에 "pending:"를 추가한다.
+    줄들에 "  %status = select i1 %next_all_blocked, i32 1, i32 0"를 추가한다.
+    줄들에 "  ret i32 %status"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_group_finish(i8* %group, i8* %parent) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %token = ptrtoint i8* %group to i64"를 추가한다.
+    줄들에 "  %slot = sub i64 %token, 1"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %entry ], [ %next, %advance ]"를 추가한다.
+    줄들에 "  %first_failure = phi i64 [ 0, %entry ], [ %next_failure, %advance ]"를 추가한다.
+    줄들에 "  %any_cancelled = phi i1 [ false, %entry ], [ %next_cancelled, %advance ]"를 추가한다.
+    줄들에 "  %group_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_group_child_group, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %owner = load i64, i64* %group_ptr, align 8"를 추가한다.
+    줄들에 "  %matches = icmp eq i64 %owner, %token"를 추가한다.
+    줄들에 "  br i1 %matches, label %release, label %skip"를 추가한다.
+    줄들에 "release:"를 추가한다.
+    줄들에 "  %handle_ptr = getelementptr [512 x i8*], [512 x i8*]* @hmje_async_group_child_handle, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %handle = load i8*, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  %failure = call i64 @hmje_async_handle_failure(i8* %handle)"를 추가한다.
+    줄들에 "  %failure_empty = icmp eq i64 %first_failure, 0"를 추가한다.
+    줄들에 "  %failure_present = icmp ne i64 %failure, 0"를 추가한다.
+    줄들에 "  %take_failure = and i1 %failure_empty, %failure_present"를 추가한다.
+    줄들에 "  %released_failure = select i1 %take_failure, i64 %failure, i64 %first_failure"를 추가한다.
+    줄들에 "  %cancelled_raw = call i32 @hmje_async_handle_is_cancelled(i8* %handle)"를 추가한다.
+    줄들에 "  %cancelled = icmp ne i32 %cancelled_raw, 0"를 추가한다.
+    줄들에 "  %released_cancelled = or i1 %any_cancelled, %cancelled"를 추가한다.
+    줄들에 "  %handle_address = ptrtoint i8* %handle to i64"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_destroy(i64 %handle_address)"를 추가한다.
+    줄들에 "  store i8* null, i8** %handle_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %group_ptr, align 8"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "skip:"를 추가한다.
+    줄들에 "  br label %advance"를 추가한다.
+    줄들에 "advance:"를 추가한다.
+    줄들에 "  %next_failure = phi i64 [ %released_failure, %release ], [ %first_failure, %skip ]"를 추가한다.
+    줄들에 "  %next_cancelled = phi i1 [ %released_cancelled, %release ], [ %any_cancelled, %skip ]"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %last, label %clear_group, label %scan"를 추가한다.
+    줄들에 "clear_group:"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_group_state, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %failed = icmp ne i64 %next_failure, 0"를 추가한다.
+    줄들에 "  br i1 %failed, label %publish_failure, label %maybe_cancel"를 추가한다.
+    줄들에 "publish_failure:"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_set_failure(i8* %parent, i64 %next_failure)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "maybe_cancel:"를 추가한다.
+    줄들에 "  ; A deadline/failure on the parent cancels unfinished children as cleanup."를 추가한다.
+    줄들에 "  ; That derived child cancellation must not be written back onto the parent:"를 추가한다.
+    줄들에 "  ; doing so leaks past a surrounding `실패하면` after the failure is handled."를 추가한다.
+    줄들에 "  %parent_failure = call i64 @hmje_async_handle_failure(i8* %parent)"를 추가한다.
+    줄들에 "  %parent_failed = icmp ne i64 %parent_failure, 0"를 추가한다.
+    줄들에 "  br i1 %parent_failed, label %done, label %maybe_publish_cancel"를 추가한다.
+    줄들에 "maybe_publish_cancel:"를 추가한다.
+    줄들에 "  br i1 %next_cancelled, label %publish_cancel, label %done"를 추가한다.
+    줄들에 "publish_cancel:"를 추가한다.
+    줄들에 "  call void @hmje_async_handle_request_cancel(i8* %parent)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i64 @hmje_async_permit_allocate_locked(i64 %limit_index) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %slot = phi i64 [ 0, %entry ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_permit_state, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %slot, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 512"를 추가한다.
+    줄들에 "  br i1 %full, label %fail, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %raw_identifier = atomicrmw add i64* @hmje_async_next_permit_identifier, i64 1 monotonic"를 추가한다.
+    줄들에 "  %raw_zero = icmp eq i64 %raw_identifier, 0"를 추가한다.
+    줄들에 "  br i1 %raw_zero, label %claim_second, label %store"를 추가한다.
+    줄들에 "claim_second:"를 추가한다.
+    줄들에 "  %second_identifier = atomicrmw add i64* @hmje_async_next_permit_identifier, i64 1 monotonic"를 추가한다.
+    줄들에 "  br label %store"를 추가한다.
+    줄들에 "store:"를 추가한다.
+    줄들에 "  %identifier = phi i64 [ %raw_identifier, %claim ], [ %second_identifier, %claim_second ]"를 추가한다.
+    줄들에 "  %identifier_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_permit_identifier, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %limit_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_permit_limit, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  store i64 %identifier, i64* %identifier_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %limit_index, i64* %limit_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %in_use_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_in_use, i64 0, i64 %limit_index"를 추가한다.
+    줄들에 "  %in_use = load i64, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  %next_in_use = add i64 %in_use, 1"를 추가한다.
+    줄들에 "  store i64 %next_in_use, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  ret i64 %identifier"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  ret i64 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_limit_create(i64 %capacity) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %invalid = icmp eq i64 %capacity, 0"를 추가한다.
+    줄들에 "  br i1 %invalid, label %fail_without_lock, label %lock"를 추가한다.
+    줄들에 "lock:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %slot = phi i64 [ 0, %lock ], [ %next, %occupied ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_limit_state, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %free = icmp eq i32 %state, 0"를 추가한다.
+    줄들에 "  br i1 %free, label %claim, label %occupied"를 추가한다.
+    줄들에 "occupied:"를 추가한다.
+    줄들에 "  %next = add i64 %slot, 1"를 추가한다.
+    줄들에 "  %full = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %full, label %fail_locked, label %scan"를 추가한다.
+    줄들에 "claim:"를 추가한다.
+    줄들에 "  %raw_identifier = atomicrmw add i64* @hmje_async_next_limit_identifier, i64 1 monotonic"를 추가한다.
+    줄들에 "  %raw_zero = icmp eq i64 %raw_identifier, 0"를 추가한다.
+    줄들에 "  br i1 %raw_zero, label %claim_second, label %store"를 추가한다.
+    줄들에 "claim_second:"를 추가한다.
+    줄들에 "  %second_identifier = atomicrmw add i64* @hmje_async_next_limit_identifier, i64 1 monotonic"를 추가한다.
+    줄들에 "  br label %store"를 추가한다.
+    줄들에 "store:"를 추가한다.
+    줄들에 "  %identifier = phi i64 [ %raw_identifier, %claim ], [ %second_identifier, %claim_second ]"를 추가한다.
+    줄들에 "  %identifier_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_identifier, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %capacity_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_capacity, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %in_use_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_in_use, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %head_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_head, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %tail_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_tail, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  store i64 %identifier, i64* %identifier_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %capacity, i64* %capacity_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %tail_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 %identifier"를 추가한다.
+    줄들에 "fail_locked:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 0"를 추가한다.
+    줄들에 "fail_without_lock:"를 추가한다.
+    줄들에 "  ret i64 0"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_limit_acquire(i64 %identifier, i64 %token) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %find_limit"를 추가한다.
+    줄들에 "find_limit:"를 추가한다.
+    줄들에 "  %limit_slot = phi i64 [ 0, %entry ], [ %limit_next, %limit_miss ]"를 추가한다.
+    줄들에 "  %limit_state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_limit_state, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %limit_state = load i32, i32* %limit_state_ptr, align 4"를 추가한다.
+    줄들에 "  %limit_used = icmp ne i32 %limit_state, 0"를 추가한다.
+    줄들에 "  %limit_identifier_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_identifier, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %limit_identifier_ptr, align 8"를 추가한다.
+    줄들에 "  %identifier_match = icmp eq i64 %candidate, %identifier"를 추가한다.
+    줄들에 "  %limit_match = and i1 %limit_used, %identifier_match"를 추가한다.
+    줄들에 "  br i1 %limit_match, label %found_limit, label %limit_miss"를 추가한다.
+    줄들에 "limit_miss:"를 추가한다.
+    줄들에 "  %limit_next = add i64 %limit_slot, 1"를 추가한다.
+    줄들에 "  %limit_last = icmp eq i64 %limit_next, 64"를 추가한다.
+    줄들에 "  br i1 %limit_last, label %invalid, label %find_limit"를 추가한다.
+    줄들에 "found_limit:"를 추가한다.
+    줄들에 "  %capacity_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_capacity, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %in_use_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_in_use, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %capacity = load i64, i64* %capacity_ptr, align 8"를 추가한다.
+    줄들에 "  %in_use = load i64, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  %available = icmp ult i64 %in_use, %capacity"를 추가한다.
+    줄들에 "  br i1 %available, label %grant, label %queue_scan"를 추가한다.
+    줄들에 "grant:"를 추가한다.
+    줄들에 "  %permit = call i64 @hmje_async_permit_allocate_locked(i64 %limit_slot)"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  %grant_failed = icmp eq i64 %permit, 0"를 추가한다.
+    줄들에 "  br i1 %grant_failed, label %complete_nomem, label %complete_grant"를 추가한다.
+    줄들에 "complete_grant:"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_u64(i64 %token, i32 0, i64 %permit)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "queue_scan:"를 추가한다.
+    줄들에 "  %waiter_slot = phi i64 [ 0, %found_limit ], [ %waiter_next, %waiter_occupied ]"를 추가한다.
+    줄들에 "  %waiter_state_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_limit_waiter_state, i64 0, i64 %waiter_slot"를 추가한다.
+    줄들에 "  %waiter_state = load i32, i32* %waiter_state_ptr, align 4"를 추가한다.
+    줄들에 "  %waiter_free = icmp eq i32 %waiter_state, 0"를 추가한다.
+    줄들에 "  br i1 %waiter_free, label %queue_store, label %waiter_occupied"를 추가한다.
+    줄들에 "waiter_occupied:"를 추가한다.
+    줄들에 "  %waiter_next = add i64 %waiter_slot, 1"를 추가한다.
+    줄들에 "  %waiter_full = icmp eq i64 %waiter_next, 512"를 추가한다.
+    줄들에 "  br i1 %waiter_full, label %queue_full, label %queue_scan"를 추가한다.
+    줄들에 "queue_store:"를 추가한다.
+    줄들에 "  %waiter_token_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_limit_waiter_token, i64 0, i64 %waiter_slot"를 추가한다.
+    줄들에 "  %waiter_link_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_limit_waiter_next, i64 0, i64 %waiter_slot"를 추가한다.
+    줄들에 "  store i64 %token, i64* %waiter_token_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %waiter_link_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 1, i32* %waiter_state_ptr, align 4"를 추가한다.
+    줄들에 "  %encoded_slot = add i64 %waiter_slot, 1"를 추가한다.
+    줄들에 "  %head_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_head, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %tail_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_tail, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %tail = load i64, i64* %tail_ptr, align 8"를 추가한다.
+    줄들에 "  %empty = icmp eq i64 %tail, 0"를 추가한다.
+    줄들에 "  br i1 %empty, label %queue_first, label %queue_append"를 추가한다.
+    줄들에 "queue_first:"를 추가한다.
+    줄들에 "  store i64 %encoded_slot, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  br label %queue_done"를 추가한다.
+    줄들에 "queue_append:"를 추가한다.
+    줄들에 "  %tail_slot = sub i64 %tail, 1"를 추가한다.
+    줄들에 "  %tail_next_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_limit_waiter_next, i64 0, i64 %tail_slot"를 추가한다.
+    줄들에 "  store i64 %encoded_slot, i64* %tail_next_ptr, align 8"를 추가한다.
+    줄들에 "  br label %queue_done"를 추가한다.
+    줄들에 "queue_done:"를 추가한다.
+    줄들에 "  store i64 %encoded_slot, i64* %tail_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "invalid:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_u64(i64 %token, i32 22, i64 0)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "queue_full:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  br label %complete_nomem"를 추가한다.
+    줄들에 "complete_nomem:"를 추가한다.
+    줄들에 "  call void @hmje_async_complete_u64(i64 %token, i32 12, i64 0)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_permit_release(i64 %identifier) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %find_permit"를 추가한다.
+    줄들에 "find_permit:"를 추가한다.
+    줄들에 "  %permit_slot = phi i64 [ 0, %entry ], [ %permit_next, %permit_miss ]"를 추가한다.
+    줄들에 "  %permit_state_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_permit_state, i64 0, i64 %permit_slot"를 추가한다.
+    줄들에 "  %permit_state = load i32, i32* %permit_state_ptr, align 4"를 추가한다.
+    줄들에 "  %permit_used = icmp ne i32 %permit_state, 0"를 추가한다.
+    줄들에 "  %permit_identifier_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_permit_identifier, i64 0, i64 %permit_slot"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %permit_identifier_ptr, align 8"를 추가한다.
+    줄들에 "  %identifier_match = icmp eq i64 %candidate, %identifier"를 추가한다.
+    줄들에 "  %permit_match = and i1 %permit_used, %identifier_match"를 추가한다.
+    줄들에 "  br i1 %permit_match, label %found_permit, label %permit_miss"를 추가한다.
+    줄들에 "permit_miss:"를 추가한다.
+    줄들에 "  %permit_next = add i64 %permit_slot, 1"를 추가한다.
+    줄들에 "  %permit_last = icmp eq i64 %permit_next, 512"를 추가한다.
+    줄들에 "  br i1 %permit_last, label %invalid, label %find_permit"를 추가한다.
+    줄들에 "found_permit:"를 추가한다.
+    줄들에 "  %permit_limit_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_permit_limit, i64 0, i64 %permit_slot"를 추가한다.
+    줄들에 "  %limit_slot = load i64, i64* %permit_limit_ptr, align 8"를 추가한다.
+    줄들에 "  br label %pop_waiter"를 추가한다.
+    줄들에 "pop_waiter:"를 추가한다.
+    줄들에 "  %head_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_head, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %tail_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_tail, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %head = load i64, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  %no_waiter = icmp eq i64 %head, 0"를 추가한다.
+    줄들에 "  br i1 %no_waiter, label %done, label %take_waiter"를 추가한다.
+    줄들에 "take_waiter:"를 추가한다.
+    줄들에 "  %waiter_slot = sub i64 %head, 1"를 추가한다.
+    줄들에 "  %waiter_state_ptr = getelementptr [512 x i32], [512 x i32]* @hmje_async_limit_waiter_state, i64 0, i64 %waiter_slot"를 추가한다.
+    줄들에 "  %waiter_token_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_limit_waiter_token, i64 0, i64 %waiter_slot"를 추가한다.
+    줄들에 "  %waiter_next_ptr = getelementptr [512 x i64], [512 x i64]* @hmje_async_limit_waiter_next, i64 0, i64 %waiter_slot"를 추가한다.
+    줄들에 "  %token = load i64, i64* %waiter_token_ptr, align 8"를 추가한다.
+    줄들에 "  %next_head = load i64, i64* %waiter_next_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 %next_head, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  %became_empty = icmp eq i64 %next_head, 0"를 추가한다.
+    줄들에 "  br i1 %became_empty, label %clear_tail, label %waiter_detached"를 추가한다.
+    줄들에 "clear_tail:"를 추가한다.
+    줄들에 "  store i64 0, i64* %tail_ptr, align 8"를 추가한다.
+    줄들에 "  br label %waiter_detached"를 추가한다.
+    줄들에 "waiter_detached:"를 추가한다.
+    줄들에 "  store i32 0, i32* %waiter_state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %waiter_token_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %waiter_next_ptr, align 8"를 추가한다.
+    줄들에 "  br label %find_event"를 추가한다.
+    줄들에 "find_event:"를 추가한다.
+    줄들에 "  %event_slot = phi i64 [ 0, %waiter_detached ], [ %event_next, %event_miss ]"를 추가한다.
+    줄들에 "  %event_state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %event_slot"를 추가한다.
+    줄들에 "  %event_state = load i32, i32* %event_state_ptr, align 4"를 추가한다.
+    줄들에 "  %event_used = icmp ne i32 %event_state, 0"를 추가한다.
+    줄들에 "  %event_token_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_token, i64 0, i64 %event_slot"를 추가한다.
+    줄들에 "  %event_token = load i64, i64* %event_token_ptr, align 8"를 추가한다.
+    줄들에 "  %event_token_match = icmp eq i64 %event_token, %token"를 추가한다.
+    줄들에 "  %event_match = and i1 %event_used, %event_token_match"를 추가한다.
+    줄들에 "  br i1 %event_match, label %found_event, label %event_miss"를 추가한다.
+    줄들에 "event_miss:"를 추가한다.
+    줄들에 "  %event_next = add i64 %event_slot, 1"를 추가한다.
+    줄들에 "  %event_last = icmp eq i64 %event_next, 128"를 추가한다.
+    줄들에 "  br i1 %event_last, label %pop_waiter, label %find_event"를 추가한다.
+    줄들에 "found_event:"를 추가한다.
+    줄들에 "  %abandoned = icmp eq i32 %event_state, 3"를 추가한다.
+    줄들에 "  br i1 %abandoned, label %drop_abandoned, label %grant_waiter"를 추가한다.
+    줄들에 "drop_abandoned:"를 추가한다.
+    줄들에 "  store i32 0, i32* %event_state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %event_token_ptr, align 8"를 추가한다.
+    줄들에 "  br label %pop_waiter"를 추가한다.
+    줄들에 "grant_waiter:"를 추가한다.
+    줄들에 "  %pending = icmp eq i32 %event_state, 1"를 추가한다.
+    줄들에 "  br i1 %pending, label %publish, label %invalid"를 추가한다.
+    줄들에 "publish:"를 추가한다.
+    줄들에 "  %raw_identifier = atomicrmw add i64* @hmje_async_next_permit_identifier, i64 1 monotonic"를 추가한다.
+    줄들에 "  %raw_zero = icmp eq i64 %raw_identifier, 0"를 추가한다.
+    줄들에 "  br i1 %raw_zero, label %publish_second, label %publish_store"를 추가한다.
+    줄들에 "publish_second:"를 추가한다.
+    줄들에 "  %second_identifier = atomicrmw add i64* @hmje_async_next_permit_identifier, i64 1 monotonic"를 추가한다.
+    줄들에 "  br label %publish_store"를 추가한다.
+    줄들에 "publish_store:"를 추가한다.
+    줄들에 "  %new_permit = phi i64 [ %raw_identifier, %publish ], [ %second_identifier, %publish_second ]"를 추가한다.
+    줄들에 "  store i64 %new_permit, i64* %permit_identifier_ptr, align 8"를 추가한다.
+    줄들에 "  %event_value_ptr = getelementptr [128 x i64], [128 x i64]* @hmje_async_event_value, i64 0, i64 %event_slot"를 추가한다.
+    줄들에 "  %event_status_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_status, i64 0, i64 %event_slot"를 추가한다.
+    줄들에 "  store i64 %new_permit, i64* %event_value_ptr, align 8"를 추가한다.
+    줄들에 "  store i32 0, i32* %event_status_ptr, align 4"를 추가한다.
+    줄들에 "  store i32 2, i32* %event_state_ptr, align 4"를 추가한다.
+    줄들에 "  store atomic i64 1, i64* @hmje_async_wake_flag release, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  %woken = call i64 @hmje_arch_syscall0(i64 97)"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  store i32 0, i32* %permit_state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %permit_identifier_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %permit_limit_ptr, align 8"를 추가한다.
+    줄들에 "  %in_use_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_in_use, i64 0, i64 %limit_slot"를 추가한다.
+    줄들에 "  %in_use = load i64, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  %next_in_use = sub i64 %in_use, 1"를 추가한다.
+    줄들에 "  store i64 %next_in_use, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "invalid:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_limit_destroy(i64 %identifier) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %slot = phi i64 [ 0, %entry ], [ %next, %miss ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [64 x i32], [64 x i32]* @hmje_async_limit_state, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %used = icmp ne i32 %state, 0"를 추가한다.
+    줄들에 "  %identifier_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_identifier, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %candidate = load i64, i64* %identifier_ptr, align 8"를 추가한다.
+    줄들에 "  %identifier_match = icmp eq i64 %candidate, %identifier"를 추가한다.
+    줄들에 "  %matches = and i1 %used, %identifier_match"를 추가한다.
+    줄들에 "  br i1 %matches, label %found, label %miss"를 추가한다.
+    줄들에 "miss:"를 추가한다.
+    줄들에 "  %next = add i64 %slot, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 64"를 추가한다.
+    줄들에 "  br i1 %last, label %not_found, label %scan"를 추가한다.
+    줄들에 "found:"를 추가한다.
+    줄들에 "  %in_use_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_in_use, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %head_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_head, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %in_use = load i64, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  %head = load i64, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  %using = icmp ne i64 %in_use, 0"를 추가한다.
+    줄들에 "  %waiting = icmp ne i64 %head, 0"를 추가한다.
+    줄들에 "  %busy = or i1 %using, %waiting"를 추가한다.
+    줄들에 "  br i1 %busy, label %busy_result, label %clear"를 추가한다.
+    줄들에 "clear:"를 추가한다.
+    줄들에 "  %capacity_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_capacity, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  %tail_ptr = getelementptr [64 x i64], [64 x i64]* @hmje_async_limit_wait_tail, i64 0, i64 %slot"를 추가한다.
+    줄들에 "  store i32 0, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  store i64 0, i64* %identifier_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %capacity_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %in_use_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %head_ptr, align 8"를 추가한다.
+    줄들에 "  store i64 0, i64* %tail_ptr, align 8"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 0"를 추가한다.
+    줄들에 "busy_result:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 -16"를 추가한다.
+    줄들에 "not_found:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret i64 -22"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_async_wait_for_wake() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %timer_completed = call i32 @hmje_async_timer_poll()"를 추가한다.
+    줄들에 "  %timer_ready = icmp ne i32 %timer_completed, 0"를 추가한다.
+    줄들에 "  br i1 %timer_ready, label %deadline_ready, label %deadline_poll_entry"를 추가한다.
+    줄들에 "deadline_poll_entry:"를 추가한다.
+    줄들에 "  %expired = call i32 @hmje_async_deadline_poll()"를 추가한다.
+    줄들에 "  %did_expire = icmp ne i32 %expired, 0"를 추가한다.
+    줄들에 "  br i1 %did_expire, label %deadline_ready, label %event_scan_entry"를 추가한다.
+    줄들에 "deadline_ready:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "event_scan_entry:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_acquire()"를 추가한다.
+    줄들에 "  br label %scan"를 추가한다.
+    줄들에 "scan:"를 추가한다.
+    줄들에 "  %index = phi i64 [ 0, %event_scan_entry ], [ %next, %not_ready ]"를 추가한다.
+    줄들에 "  %state_ptr = getelementptr [128 x i32], [128 x i32]* @hmje_async_event_state, i64 0, i64 %index"를 추가한다.
+    줄들에 "  %state = load i32, i32* %state_ptr, align 4"를 추가한다.
+    줄들에 "  %ready = icmp eq i32 %state, 2"를 추가한다.
+    줄들에 "  br i1 %ready, label %already_ready, label %not_ready"를 추가한다.
+    줄들에 "not_ready:"를 추가한다.
+    줄들에 "  %next = add i64 %index, 1"를 추가한다.
+    줄들에 "  %last = icmp eq i64 %next, 128"를 추가한다.
+    줄들에 "  br i1 %last, label %prepare_wait, label %scan"를 추가한다.
+    줄들에 "already_ready:"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "prepare_wait:"를 추가한다.
+    줄들에 "  store atomic i64 0, i64* @hmje_async_wake_flag release, align 8"를 추가한다.
+    줄들에 "  %old_count = atomicrmw add i64* @hmje_async_blocking_wait_count, i64 1 monotonic"를 추가한다.
+    줄들에 "  call void @hmje_async_lock_release()"를 추가한다.
+    줄들에 "  %nearest_expiry = call i64 @hmje_async_nearest_expiry()"를 추가한다.
+    줄들에 "  %has_expiry = icmp ne i64 %nearest_expiry, 0"를 추가한다.
+    줄들에 "  %flag_address = ptrtoint i64* @hmje_async_wake_flag to i64"를 추가한다.
+    줄들에 "  br i1 %has_expiry, label %timed_wait, label %conditional_wait"를 추가한다.
+    줄들에 "timed_wait:"를 추가한다.
+    줄들에 "  %timed_wait_result = call i64 @hmje_arch_syscall3(i64 102, i64 %flag_address, i64 %nearest_expiry, i64 0)"를 추가한다.
+    줄들에 "  %timed_failed = icmp slt i64 %timed_wait_result, 0"를 추가한다.
+    줄들에 "  br i1 %timed_failed, label %fail, label %timed_poll"를 추가한다.
+    줄들에 "timed_poll:"를 추가한다.
+    줄들에 "  %timer_after_wait = call i32 @hmje_async_timer_poll()"를 추가한다.
+    줄들에 "  %expired_after_sleep = call i32 @hmje_async_deadline_poll()"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "conditional_wait:"를 추가한다.
+    줄들에 "  %wait_result = call i64 @hmje_arch_syscall1(i64 96, i64 %flag_address)"를 추가한다.
+    줄들에 "  %failed = icmp slt i64 %wait_result, 0"를 추가한다.
+    줄들에 "  br i1 %failed, label %fail, label %done"를 추가한다.
+    줄들에 "fail:"를 추가한다.
+    줄들에 "  call void @llvm.trap()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret void"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_async_debug_blocking_wait_count() {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %count = load atomic i64, i64* @hmje_async_blocking_wait_count monotonic, align 8"를 추가한다.
+    줄들에 "  ret i64 %count"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# emit_app_llvm_ir가 지우는 syscall 선언 줄
+함수 앱제거줄인가은 (줄: 문자열)를 받아
+    상수 다듬은줄은 문자열다듬기(줄)이고, 문자열이다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_syscall0(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_syscall1(i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_syscall3(i64, i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_syscall6(i64, i64, i64, i64, i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_platform_performance_cpu_count()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @pthread_create(i64, i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @pthread_join(i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @pthread_detach(i64)"이면
+        참을 참거짓으로 반환한다.
+    거짓을 참거짓으로 반환한다.
+
+# strip_semtleos_async_runtime_declarations가 지우는 선언 줄
+함수 앱비동기런타임선언인가은 (줄: 문자열)를 받아
+    상수 다듬은줄은 문자열다듬기(줄)이고, 문자열이다.
+    만약 다듬은줄이 "declare i32 @hmje_async_event_abandon(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_event_is_abandoned(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_event_is_ready(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_event_take_u64(i64, i64*, i32*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_group_poll(i8*, i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_handle_is_blocked(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_handle_is_cancelled(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_handle_poll_once(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i32 @hmje_async_unstructured_poll()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_deadline_begin(i64, i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_debug_blocking_wait_count()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_event_create()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_handle_failure(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_handle_take_failure(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_limit_create(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_async_limit_destroy(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i8* @hmje_async_group_create()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_cancellation_shield_enter(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_cancellation_shield_exit(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_channel_destroy(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_channel_notify(i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_channel_wait(i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_complete_u64(i64, i32, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_complete_void(i64, i32)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_deadline_cancel_for_handle(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_deadline_end(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_group_add(i8*, i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_group_finish(i8*, i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_handle_destroy(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_handle_forget(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_handle_request_cancel(i8*)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_handle_request_cancel_address(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_handle_set_blocked(i8*, i32)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_handle_set_failure(i8*, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_limit_acquire(i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_permit_release(i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_timer_wait(i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_unstructured_add(i8*, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_unstructured_tick()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare void @hmje_async_wait_for_wake()"이면
+        참을 참거짓으로 반환한다.
+    거짓을 참거짓으로 반환한다.

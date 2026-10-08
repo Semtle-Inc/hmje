@@ -1,0 +1,137 @@
+프로젝트 hmje-network의
+    버전은 "0.1.0"이다.
+
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+
+모듈 HmjeNetwork의
+    원본 경로는 "Sources/HmjeNetwork"이고,
+    외부 구현은 NetworkNative이고,
+    의존 라이브러리는 기반이다.
+
+외부 구현 NetworkNative의
+    원본 경로는 "Native"이고,
+    필요 기능은 네트워크이다.
+
+    macOS 설정의
+        원본 파일은
+            "network_random_apple.c"와,
+            "network_trust_apple.c"와,
+            "network_async_posix.c"이고,
+        시스템 프레임워크는
+            Security과,
+            CoreFoundation이다.
+
+    iOS 설정의
+        원본 파일은
+            "network_random_apple.c"와,
+            "network_trust_apple.c"와,
+            "network_async_posix.c"이고,
+        시스템 프레임워크는
+            Security과,
+            CoreFoundation이다.
+
+    Linux 설정의
+        원본 파일은
+            "network_random_linux.c"와,
+            "network_trust_openssl.c"와,
+            "network_async_posix.c"이고,
+        시스템 라이브러리는
+            ssl과,
+            crypto이다.
+
+    Android 설정의
+        원본 파일은
+            "network_random_linux.c"와,
+            "network_trust_android.c"와,
+            "network_async_posix.c"이다.
+
+    Windows 설정의
+        원본 파일은
+            "network_random_windows.c"와,
+            "network_trust_windows.c"와,
+            "network_async_windows.c"이고,
+        시스템 라이브러리는
+            bcrypt과,
+            crypt32이다.
+
+라이브러리 HmjeNetwork의
+    내보내는 모듈은 HmjeNetwork이다.
+
+모듈 HmjeNetworkTests의
+    원본 경로는 "Sources/HmjeNetworkTests"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkTests의
+    시작 모듈은 HmjeNetworkTests이다.
+
+모듈 HmjeNetworkHTTPSIntegration의
+    원본 경로는 "Sources/HmjeNetworkHTTPSIntegration"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkHTTPSIntegration의
+    시작 모듈은 HmjeNetworkHTTPSIntegration이다.
+
+모듈 HmjeNetworkHTTPIntegration의
+    원본 경로는 "Sources/HmjeNetworkHTTPIntegration"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkHTTPIntegration의
+    시작 모듈은 HmjeNetworkHTTPIntegration이다.
+
+모듈 HmjeNetworkConnectFailure의
+    원본 경로는 "Sources/HmjeNetworkConnectFailure"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkConnectFailure의
+    시작 모듈은 HmjeNetworkConnectFailure이다.
+
+모듈 HmjeNetworkAsyncIntegration의
+    원본 경로는 "Sources/HmjeNetworkAsyncIntegration"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkAsyncIntegration의
+    시작 모듈은 HmjeNetworkAsyncIntegration이다.
+
+모듈 HmjeNetworkSessionBenchmark의
+    원본 경로는 "Sources/HmjeNetworkSessionBenchmark"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkSessionBenchmark의
+    시작 모듈은 HmjeNetworkSessionBenchmark이다.
+
+모듈 HmjeNetworkLargeResponseBenchmark의
+    원본 경로는 "Sources/HmjeNetworkLargeResponseBenchmark"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkLargeResponseBenchmark의
+    시작 모듈은 HmjeNetworkLargeResponseBenchmark이다.
+
+모듈 HmjeNetworkProxyHTTPSIntegration의
+    원본 경로는 "Sources/HmjeNetworkProxyHTTPSIntegration"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkProxyHTTPSIntegration의
+    시작 모듈은 HmjeNetworkProxyHTTPSIntegration이다.
+
+모듈 HmjeNetworkWebSocketTests의
+    원본 경로는 "Sources/HmjeNetworkWebSocketTests"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkWebSocketTests의
+    시작 모듈은 HmjeNetworkWebSocketTests이다.
+
+모듈 HmjeNetworkLocalServerTests의
+    원본 경로는 "Sources/HmjeNetworkLocalServerTests"이고,
+    의존 모듈은 HmjeNetwork이고,
+    의존 라이브러리는 기반이다.
+
+실행 파일 NetworkLocalServerTests의
+    시작 모듈은 HmjeNetworkLocalServerTests이다.
+
+모듈 HmjeNetworkBinaryTests의
+    원본 경로는 "Sources/HmjeNetworkBinaryTests"이고,
+    의존 모듈은 HmjeNetwork이다.
+
+실행 파일 NetworkBinaryTests의
+    시작 모듈은 HmjeNetworkBinaryTests이다.

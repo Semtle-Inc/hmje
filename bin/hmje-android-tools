@@ -1,0 +1,144 @@
+#!/bin/sh
+# Android NDK/SDK 도구 해석. `.`으로 읽어 들여 쓴다(단독 실행 아님).
+#
+# 정본 platforms/tools/targets/android.py의 android_min_sdk/android_ndk_root/
+# android_host_tag/android_clang_command/android_sdk_root와 같은 규칙을 그대로
+# 따른다: 환경변수 먼저, 없으면 기본 경로, 여러 버전이 있으면 이름 안의 숫자열을
+# 사전식으로 비교해 가장 높은 것.
+#
+# 채우는 변수(제품조정기가 아니라 자립 Android 타깃 코드가 환경변수로 읽는다):
+#   HMJE_ANDROID_MIN_SDK HMJE_ANDROID_CLANG HMJE_ANDROID_SYSROOT_INCLUDE
+#   HMJE_ANDROID_AAPT2 HMJE_ANDROID_D8 HMJE_ANDROID_ZIPALIGN
+#   HMJE_ANDROID_APKSIGNER HMJE_ANDROID_PLATFORM_JAR
+# APK 전용 도구는 android-apk에서만 요구한다(첫 인자가 apk일 때).
+
+hmje_android_fail() {
+    echo "error: $1" >&2
+    exit 2
+}
+
+# 이름 안의 숫자열을 0으로 채워 비교 키로 만든다(정본 _version_key와 같은 순서).
+hmje_android_latest_dir() {
+    _base=$1
+    [ -d "$_base" ] || return 1
+    _pick=$(
+        for _entry in "$_base"/*; do
+            [ -d "$_entry" ] || continue
+            _name=${_entry##*/}
+            printf '%s\t%s\n' "$(printf '%s' "$_name" | awk '{
+                key = ""
+                n = ""
+                for (i = 1; i <= length($0); i++) {
+                    c = substr($0, i, 1)
+                    if (c >= "0" && c <= "9") { n = n c }
+                    else if (n != "") { key = key sprintf("%020d.", n + 0); n = "" }
+                }
+                if (n != "") { key = key sprintf("%020d.", n + 0) }
+                printf "%s", key
+            }')" "$_name"
+        done | sort | tail -1
+    )
+    [ -n "$_pick" ] || return 1
+    printf '%s' "${_pick#*	}"
+}
+
+hmje_android_resolve() {
+    _want_apk=${1:-exe}
+
+    # ---- minSdk ----
+    _min=${HMJE_ANDROID_MIN_SDK:-33}
+    case "$_min" in
+        ''|*[!0-9]*) hmje_android_fail "올바르지 않은 Android minSdk입니다: $_min" ;;
+    esac
+    [ "$_min" -ge 21 ] || hmje_android_fail "Android arm64 타깃은 minSdk 21 이상이 필요합니다: $_min"
+    HMJE_ANDROID_MIN_SDK=$_min
+    HMJE_ANDROID_TARGET_SDK=${HMJE_ANDROID_TARGET_SDK:-$_min}
+    case "$HMJE_ANDROID_TARGET_SDK" in
+        ''|*[!0-9]*) hmje_android_fail "올바르지 않은 Android targetSdk입니다" ;;
+    esac
+    [ "$HMJE_ANDROID_TARGET_SDK" -ge "$_min" ] || hmje_android_fail "targetSdk는 minSdk 이상이어야 합니다"
+    HMJE_ANDROID_VERSION_CODE=${HMJE_ANDROID_VERSION_CODE:-1}
+    case "$HMJE_ANDROID_VERSION_CODE" in
+        ''|*[!0-9]*|0) hmje_android_fail "Android versionCode는 양의 정수여야 합니다" ;;
+    esac
+    case "${HMJE_ANDROID_SIGNING:-debug}" in
+        debug) ;;
+        release)
+            [ -n "${HMJE_ANDROID_KEYSTORE:-}" ] && [ -n "${HMJE_ANDROID_KEY_ALIAS:-}" ] && [ -n "${HMJE_ANDROID_KEYSTORE_PASSWORD:-}" ] || hmje_android_fail "release signing needs HMJE_ANDROID_KEYSTORE, HMJE_ANDROID_KEY_ALIAS and HMJE_ANDROID_KEYSTORE_PASSWORD" ;;
+        *) hmje_android_fail "HMJE_ANDROID_SIGNING must be debug or release" ;;
+    esac
+    export HMJE_ANDROID_TARGET_SDK HMJE_ANDROID_VERSION_CODE
+
+    # ---- SDK 뿌리 ----
+    if [ -n "${ANDROID_SDK_ROOT:-}" ]; then
+        _sdk=$ANDROID_SDK_ROOT
+    elif [ -n "${ANDROID_HOME:-}" ]; then
+        _sdk=$ANDROID_HOME
+    elif [ "$(uname -s)" = Darwin ]; then
+        _sdk=$HOME/Library/Android/sdk
+    else
+        _sdk=$HOME/Android/Sdk
+    fi
+
+    # ---- NDK 뿌리 ----
+    _ndk=
+    for _name in ANDROID_NDK_ROOT ANDROID_NDK_HOME; do
+        eval "_configured=\${$_name:-}"
+        if [ -n "$_configured" ]; then
+            [ -d "$_configured" ] || hmje_android_fail "$_name 경로에 Android NDK가 없습니다: $_configured"
+            _ndk=$_configured
+            break
+        fi
+    done
+    if [ -z "$_ndk" ]; then
+        _ndk_base=$_sdk/ndk
+        [ -d "$_ndk_base" ] || hmje_android_fail "Android NDK가 안 보입니다($_ndk_base). sdkmanager로 먼저 설치하세요."
+        _ndk_name=$(hmje_android_latest_dir "$_ndk_base") \
+            || hmje_android_fail "$_ndk_base 밑에 설치된 NDK 버전이 없습니다."
+        _ndk=$_ndk_base/$_ndk_name
+    fi
+
+    # ---- 호스트 태그 ----
+    _system=$(uname -s)
+    _machine=$(uname -m)
+    case "$_system:$_machine" in
+        # NDK는 Apple Silicon에서도 호스트 도구 디렉터리 이름으로 darwin-x86_64를 쓴다.
+        Darwin:*) _tag=darwin-x86_64 ;;
+        Linux:x86_64|Linux:amd64) _tag=linux-x86_64 ;;
+        *) hmje_android_fail "지원하지 않는 Android NDK 빌드 호스트입니다: $_system $_machine" ;;
+    esac
+
+    _prebuilt=$_ndk/toolchains/llvm/prebuilt/$_tag
+    HMJE_ANDROID_CLANG=$_prebuilt/bin/aarch64-linux-android$_min-clang
+    [ -x "$HMJE_ANDROID_CLANG" ] || hmje_android_fail "NDK clang 래퍼가 없습니다: $HMJE_ANDROID_CLANG"
+    HMJE_ANDROID_SYSROOT_INCLUDE=$_prebuilt/sysroot/usr/include
+
+    HMJE_ANDROID_AAPT2=
+    HMJE_ANDROID_D8=
+    HMJE_ANDROID_ZIPALIGN=
+    HMJE_ANDROID_APKSIGNER=
+    HMJE_ANDROID_PLATFORM_JAR=
+    if [ "$_want_apk" = apk ]; then
+        _build_tools_root=$_sdk/build-tools
+        _platforms_root=$_sdk/platforms
+        [ -d "$_build_tools_root" ] || hmje_android_fail "Android SDK build-tools가 없습니다: $_build_tools_root"
+        [ -d "$_platforms_root" ] || hmje_android_fail "Android SDK platform이 없습니다: $_platforms_root"
+        _build_tools_name=$(hmje_android_latest_dir "$_build_tools_root") \
+            || hmje_android_fail "설치된 Android SDK build-tools 버전이 없습니다: $_build_tools_root"
+        _platform_name=$(hmje_android_latest_dir "$_platforms_root") \
+            || hmje_android_fail "설치된 Android SDK platform 버전이 없습니다: $_platforms_root"
+        _build_tools=$_build_tools_root/$_build_tools_name
+        HMJE_ANDROID_PLATFORM_JAR=$_platforms_root/$_platform_name/android.jar
+        [ -f "$HMJE_ANDROID_PLATFORM_JAR" ] \
+            || hmje_android_fail "Android platform android.jar가 없습니다: $HMJE_ANDROID_PLATFORM_JAR"
+        HMJE_ANDROID_AAPT2=$_build_tools/aapt2
+        HMJE_ANDROID_D8=${HMJE_ANDROID_D8_OVERRIDE:-$_build_tools/d8}
+        [ -x "$HMJE_ANDROID_D8" ] || hmje_android_fail "D8 실행 파일이 없습니다: $HMJE_ANDROID_D8"
+        HMJE_ANDROID_ZIPALIGN=$_build_tools/zipalign
+        HMJE_ANDROID_APKSIGNER=$_build_tools/apksigner
+    fi
+
+    export HMJE_ANDROID_MIN_SDK HMJE_ANDROID_CLANG HMJE_ANDROID_SYSROOT_INCLUDE \
+        HMJE_ANDROID_AAPT2 HMJE_ANDROID_D8 HMJE_ANDROID_ZIPALIGN \
+        HMJE_ANDROID_APKSIGNER HMJE_ANDROID_PLATFORM_JAR
+}

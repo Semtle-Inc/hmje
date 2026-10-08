@@ -1,0 +1,76 @@
+프로젝트 hmje-vault의
+    버전은 "0.1.0"이다.
+
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+
+모듈 HmjeVault의
+    원본 경로는 "Sources/HmjeVault"이고,
+    외부 구현은 VaultNative이고,
+    의존 라이브러리는 기반이다.
+    macOS 설정의
+        원본 경로는 "Sources/ProtectedApple"이다.
+    iOS 설정의
+        원본 경로는 "Sources/ProtectedUnsupported"이다.
+    Android 설정의
+        원본 경로는 "Sources/ProtectedUnsupported"이다.
+    Windows 설정의
+        원본 경로는 "Sources/ProtectedWindows"이다.
+    Linux 설정의
+        원본 경로는 "Sources/ProtectedUnsupported"이다.
+    semtleOS 설정의
+        원본 경로는 "Sources/ProtectedUnsupported"이다.
+
+외부 구현 VaultNative의
+    원본 경로는 "Native"이다.
+
+    macOS 설정의
+        원본 파일은
+            "vault_common.c"와,
+            "vault_apple.m"와,
+            "vault_protected_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            Security와,
+            LocalAuthentication이다.
+
+    iOS 설정의
+        원본 파일은
+            "vault_common.c"와,
+            "vault_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            Security와,
+            LocalAuthentication이다.
+
+    Android 설정의
+        원본 파일은
+            "vault_common.c"와,
+            "vault_android.c"이다.
+
+    Linux 설정의
+        원본 파일은
+            "vault_common.c"와,
+            "vault_linux.c"이다.
+
+    Windows 설정의
+        원본 파일은
+            "vault_common.c"와,
+            "vault_windows.c"와,
+            "vault_windows_scope.c"와,
+            "vault_windows_crypto.c"와,
+            "vault_protected_windows.c"와,
+            "vault_protected_windows_dpapi.c"이고,
+        시스템 라이브러리는
+            bcrypt와,
+            advapi32와,
+            shell32와,
+            ole32와,
+            uuid와,
+            crypt32와,
+            runtimeobject와,
+            windowsapp와,
+            user32이다.
+
+라이브러리 HmjeVault의
+    내보내는 모듈은 HmjeVault이다.

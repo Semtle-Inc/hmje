@@ -1,0 +1,611 @@
+# 운영체제 서비스의 공개 계약 상수: 입력 이벤트, 편집 명령, 프레임버퍼, GPU 명령·장치,
+# 객체 저장소·관계, provenance, 부트 모듈, 오디오 입력, 스케줄러 진단. 커널(semtleOS)과
+# hosted shim이 같은 값을 구현한다. 자유 실행 커널 대상은 컴파일러가 이 파일을 직접 싣는다.
+
+공개 전역 상수 PROVENANCE_EVENT_RECORD_SIZE는 48이고, 자연수이다.
+공개 전역 상수 PROVENANCE_EVENT_V3_RECORD_SIZE는 64이고, 자연수이다.
+공개 전역 상수 PROVENANCE_EVENT_OPEN는 1이고, 자연수이다.
+공개 전역 상수 PROVENANCE_EVENT_READ는 2이고, 자연수이다.
+공개 전역 상수 PROVENANCE_EVENT_WRITE는 3이고, 자연수이다.
+공개 전역 상수 PROVENANCE_EVENT_DERIVE는 4이고, 자연수이다.
+공개 전역 상수 PROVENANCE_EVENT_AGENT_ACTION는 5이고, 자연수이다.
+공개 전역 상수 PROVENANCE_GRADE_DECLARED는 1이고, 자연수이다.
+공개 전역 상수 PROVENANCE_GRADE_KERNEL_OBSERVED는 2이고, 자연수이다.
+공개 전역 상수 PROVENANCE_VISIBILITY_ORIGIN_PRIVATE는 1이고, 자연수이다.
+
+공개 전역 상수 FRAMEBUFFER_DIAG_BLIT_CALLS는 1이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_DIAG_PRESENT_CALLS는 2이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_DIAG_TRANSFER_CALLS는 3이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_DIAG_FLUSH_CALLS는 4이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_DIAG_FLUSH_WAITS는 5이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_DIAG_PRESENT_PIXELS는 6이고, 자연수이다.
+
+공개 전역 상수 OBJECT_STAT_SIZE는 64이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_NODE_ID_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_FEATURES_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_BLOB_ID_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_BLOB_SIZE_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_HANDLE_TYPE_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_EXTENSION_KIND_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_EXTENSION_LEN_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 OBJECT_STAT_RIGHTS_OFFSET는 56이고, 자연수이다.
+
+공개 전역 상수 OBJECT_EDGE_RECORD_SIZE는 96이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_ID_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_TARGET_NODE_ID_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_RELATION_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DIRECTION_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_STRENGTH_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_FLAGS_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_TARGET_NAME_LEN_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_TARGET_FEATURES_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_TARGET_NAME_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_TARGET_NAME_INLINE_MAX는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DIRECTION_DIRECTED는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DIRECTION_UNDIRECTED는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_STRENGTH_WEAK는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_STRENGTH_STRONG는 2이고, 자연수이다.
+
+공개 전역 상수 OBJECT_EDGE_DESCRIPTOR_SIZE는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DESCRIPTOR_RELATION_ID_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DESCRIPTOR_DIRECTION_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DESCRIPTOR_STRENGTH_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_EDGE_DESCRIPTOR_FLAGS_OFFSET는 24이고, 자연수이다.
+
+공개 전역 상수 OBJECT_RELATION_REGISTER_DESCRIPTOR_SIZE는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_REGISTER_NAME_ADDR_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_REGISTER_NAME_LEN_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_REGISTER_DESCRIPTION_ADDR_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_REGISTER_DESCRIPTION_LEN_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_DESCRIPTOR_SIZE는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_NAME_ADDR_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_NAME_LEN_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_OUTPUT_ADDR_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_OUTPUT_LEN_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_RECORD_SIZE는 280이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_ID_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_DESCRIPTION_LEN_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_DESCRIPTION_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_LOOKUP_DESCRIPTION_INLINE_MAX는 256이고, 자연수이다.
+
+공개 전역 상수 OBJECT_QUERY_REQUEST_SIZE는 128이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_MAGIC는 0x484d4a4551473031이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_VERSION는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_MAGIC_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_VERSION_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_START_FD_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_FLAGS_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_TLV_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_TLV_ENTRY_SIZE는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_FLAG_OUTGOING는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_FLAG_INCOMING는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_FLAG_UNDIRECTED는 4이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_TLV_END는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_TLV_RELATION는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_TLV_DIRECTION는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_TLV_LIMIT는 3이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_RECORD_SIZE는 96이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_ID_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_SOURCE_NODE_ID_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_TARGET_NODE_ID_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_RELATION_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_DIRECTION_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_STRENGTH_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_FLAGS_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_TARGET_NAME_LEN_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_TARGET_NAME_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 OBJECT_QUERY_EDGE_TARGET_NAME_INLINE_MAX는 32이고, 자연수이다.
+
+공개 전역 상수 OBJECT_FEATURE_HAS_BLOB는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_FEATURE_HAS_LINKED_EDGES는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_HANDLE_TYPE_NODE는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_HANDLE_TYPE_BLOB_STREAM는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_READ는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_STAT는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_WRITE는 4이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_EDGE_CREATE는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_EDGE_DELETE는 16이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_DELEGATE는 32이고, 자연수이다.
+공개 전역 상수 OBJECT_RIGHT_ALL은 63이고, 자연수이다.
+공개 전역 상수 OBJECT_RELATION_REGISTERED_START는 1024이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_NONE는 0이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_UNKNOWN는 1이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_TXT는 2이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_HMJE는 3이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_MD는 4이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_JSON는 5이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_BIN는 6이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_ELF는 7이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_PNG는 8이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_JPG는 9이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_JPEG는 10이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_GIF는 11이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_PDF는 12이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_HTML는 13이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_CSS는 14이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_JS는 15이고, 자연수이다.
+공개 전역 상수 OBJECT_EXTENSION_CSV는 16이고, 자연수이다.
+
+공개 전역 상수 FRAMEBUFFER_INFO_SIZE는 48이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_WIDTH_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_HEIGHT_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_PITCH_OFFSET는 16이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_PIXEL_BYTES_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_FORMAT_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_FLAGS_OFFSET는 40이고, 자연수이다.
+# v2 확장 레코드(56바이트): 오프셋 48에 배율(정수 스케일 팩터, 예: 레티나=2)이 붙는다.
+# 드라이버는 출력 버퍼가 56바이트 이상이면 56을 쓰고 56을 반환할 수 있고, 레거시 48바이트만
+# 쓰고 48을 반환해도 유효하다(호출자는 반환값으로 구분, 48이면 배율=1로 간주).
+# semtleOS 커널은 배율이 항상 1이므로 기존 48바이트 구현이 그대로 이 계약을 만족한다.
+공개 전역 상수 FRAMEBUFFER_INFO_SCALE_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_SIZE_V2는 56이고, 자연수이다.
+# v3 확장 레코드(88바이트): 표면 안의 콘텐츠가 기본적으로 피해야 하는
+# 플랫폼 안전 영역을 물리 픽셀 단위로 넘긴다. hosted 플랫폼은 자신의
+# native window-insets API를 여기서 흡수하고, semtleOS를 포함한 레거시 드라이버는
+# 48/56만 반환해도 된다(호출자는 나머지를 0으로 간주).
+공개 전역 상수 FRAMEBUFFER_INFO_SAFE_TOP_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_SAFE_RIGHT_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_SAFE_BOTTOM_OFFSET는 72이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_SAFE_LEFT_OFFSET는 80이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_INFO_SIZE_V3는 88이고, 자연수이다.
+# 표면 채널 배치 코드. canonical = HMJE Graphics 가 만드는 0x00RRGGBB(=XRGB8888, 바이트 B,G,R,X).
+# XBGR8888 = 바이트 R,G,B,X (= u32 0x00BBGGRR) → 드라이버가 present 시 R↔B 스위즐로 변환.
+공개 전역 상수 FRAMEBUFFER_FORMAT_XRGB8888는 1이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_FORMAT_XBGR8888는 2이고, 자연수이다.
+공개 전역 상수 FRAMEBUFFER_FLAG_PRESENT는 1이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SCANCODE_MASK는 255이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_PRESSED_FLAG는 256이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KIND_SHIFT는 56이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KIND_MASK는 255이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KIND_KEY는 0이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KIND_POINTER_MOVE는 1이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KIND_POINTER_BUTTON는 2이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KIND_POINTER_SCROLL는 3이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_POINTER_COORD_MASK는 16777215이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_POINTER_X_SHIFT는 0이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_POINTER_Y_SHIFT는 24이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_POINTER_BUTTON_SHIFT는 48이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_POINTER_BUTTON_MASK는 127이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_POINTER_BUTTON_PRESSED_FLAG는 36028797018963968이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SCROLL_AMOUNT_MASK는 16777215이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SCROLL_DOWN_FLAG는 36028797018963968이고, 자연수이다.
+# 표면 크기 변경 이벤트(kind=5): 표면(창)의 픽셀 크기나 배율이 바뀌면 드라이버가 큐에 넣는다.
+# (kind=4는 KIND_TEXT가 사용.)
+# 인코딩(64비트, 부호 비트 미사용): 비트 0-23 = 새 표면 너비(픽셀), 비트 24-47 = 새 높이(픽셀),
+# 비트 48-55 = 새 배율(정수, 최소 1 — 레티나=2), 비트 56-63 = kind(5).
+# 수신 측은 이 이벤트를 "표면이 바뀌었다"는 신호로만 쓰고 정확한 기하는
+# SYS_FRAMEBUFFER_INFO를 다시 읽는 것이 정석이다(이벤트 필드는 진단·중복 제거용).
+# semtleOS 커널 구현은 자명하다: 표면 크기는 부팅 후 고정이고 배율은 항상 1이므로
+# 이 이벤트를 절대 생성하지 않는 것만으로 계약을 만족한다(이벤트가 없으면 기존 크기 유지).
+공개 전역 상수 INPUT_EVENT_KIND_SURFACE_RESIZE는 5이고, 자연수이다.
+# 앱의 주 표면이 닫혀 정상 종료를 요청했다. UI 런타임은 이 이벤트를 받은 뒤
+# 자신의 정리 경로를 끝내고 종료한다. 강제 프로세스 종료 대신 공통 ABI를 쓴다.
+공개 전역 상수 INPUT_EVENT_KIND_APP_CLOSE는 6이고, 자연수이다.
+
+# 플랫폼의 표준 편집 단축키를 스캔코드와 분리한 의미 명령(kind=7).
+# 하위 8비트: 1 전체선택, 2 복사, 3 잘라내기, 4 붙여넣기, 5 실행취소, 6 다시실행.
+공개 전역 상수 INPUT_EVENT_KIND_EDIT_COMMAND는 7이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_COMMAND_MASK는 255이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_SELECT_ALL는 1이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_COPY는 2이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_CUT는 3이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_PASTE는 4이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_UNDO는 5이고, 자연수이다.
+공개 전역 상수 INPUT_EDIT_REDO는 6이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SURFACE_SIZE_MASK는 16777215이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SURFACE_WIDTH_SHIFT는 0이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SURFACE_HEIGHT_SHIFT는 24이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SURFACE_SCALE_SHIFT는 48이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_SURFACE_SCALE_MASK는 255이고, 자연수이다.
+# KIND_KEY 수정자 비트(비트 16~19). 스캔코드(비트 0~7)·눌림(비트 8)과 독립이며,
+# 이벤트가 만들어진 순간의 수정자 상태를 담는다. SUPER = macOS cmd / Windows win 키.
+공개 전역 상수 INPUT_EVENT_KEY_MOD_SHIFT_FLAG는 65536이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KEY_MOD_CTRL_FLAG는 131072이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KEY_MOD_ALT_FLAG는 262144이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KEY_MOD_SUPER_FLAG는 524288이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_KEY_MOD_MASK는 983040이고, 자연수이다.
+# 비트 20: 플랫폼의 주 단축키 수정자(macOS·iOS cmd, Windows·Linux·Android ctrl)가
+# 눌려 있다. 물리 비트(16~19)는 그대로 두고 덧붙인다. 앱 키 블록의 `명령`은 이
+# 비트로 정한다 — Windows의 Ctrl+S가 `명령 S키`와 맞는다. 이 비트를 모르는 호스트
+# (옛 호스트, semtleOS 커널)는 물리 비트만 보낸다.
+공개 전역 상수 INPUT_EVENT_KEY_MOD_PRIMARY_FLAG는 1048576이고, 자연수이다.
+# 조합을 확정한 Return. Enter 사건이 없는 입력은 기존 키 동작을 유지한다.
+공개 전역 상수 INPUT_EVENT_KEY_COMPOSITION_COMMIT_FLAG는 2097152이고, 자연수이다.
+# KIND_TEXT: 확정(committed) 문자 이벤트. 비트 0~20에 유니코드 코드포인트(U+0000~U+10FFFF,
+# 21비트) 하나를 담는다. IME(한글 조합 등)는 조합이 끝난 확정 문자만 이 이벤트로 온다 —
+# 조합 중(preedit) 표시는 아래 KIND_COMPOSITION이 맡는다. 물리 키 상태는 계속 KIND_KEY가 맡는다.
+공개 전역 상수 INPUT_EVENT_KIND_TEXT는 4이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_TEXT_CODEPOINT_MASK는 2097151이고, 자연수이다.
+# 하나의 insertText: 호출이 여러 코드포인트를 확정할 때 두 번째 이후 문자에
+# CONTINUATION을 붙인다. 기존 소비자는 하위 21비트만 읽어 호환된다.
+공개 전역 상수 INPUT_EVENT_TEXT_CONTINUATION_FLAG는 2097152이고, 자연수이다.
+# KIND_COMPOSITION(kind=8): IME가 조합 중인 문자열(preedit, macOS marked text,
+# Windows GCS_COMPSTR, iOS markedTextRange, Android composing span). 한 번의 갱신은
+#   문자 이벤트 0개 이상(비트 0~20 = 코드포인트) + 끝 이벤트 1개(비트 22 = END)
+# 로 오며, 끝 이벤트가 조합 문자열 전체를 받은 문자들로 바꾼다. 끝 이벤트의 비트 0~15는
+# 조합 문자열 안 캐럿 위치(코드포인트 단위)다. 문자 없는 끝 이벤트 = 조합 끝(취소 포함).
+# 확정은 KIND_TEXT로 오고, 확정 문자는 조합 문자열을 대신한다(받는 쪽은 KIND_TEXT를
+# 보면 조합 표시를 지운다). 조합은 문서를 바꾸지 않는 표시일 뿐이며, 큐 포화 시에도
+# 확정 문자처럼 버리지 않는다.
+공개 전역 상수 INPUT_EVENT_KIND_COMPOSITION는 8이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_COMPOSITION_END_FLAG는 4194304이고, 자연수이다.
+공개 전역 상수 INPUT_EVENT_COMPOSITION_CARET_MASK는 65535이고, 자연수이다.
+
+# ── 데스크톱 창(SYS_UI_WINDOW, 117) ─────────────────────────────────────────
+# 창마다 입력 큐·표면·IME 상태가 따로 있다. 표면·입력·텍스트 입력 syscall(54-56,
+# 62, 90, 104, 109, 111, 112)은 그 syscall을 부른 창 흐름에 묶인 창에 적용된다.
+# 여러 창은 한 스레드 안의 협력 흐름(macOS 스택 교환, Windows fiber)으로 돌며,
+# 흐름은 창 연산(WAIT·FINISH·RUN)에서만 바뀐다. 첫 창(주 흐름)은 처음
+# 표면을 쓸 때 생긴다.
+
+# KIND_WINDOW(kind=9): 그 창의 생명주기 사건. 비트 0~7 = 사건 종류.
+# 비트 8(QUIT_FLAG) = 이 닫기 요청은 앱 종료(⌘Q) 과정이다. 앱이 거부하면
+# UI_WINDOW_OP_QUIT_CANCEL로 종료를 되돌린다.
+공개 전역 상수 INPUT_EVENT_KIND_WINDOW는 9이고, 자연수이다.
+공개 전역 상수 INPUT_WINDOW_EVENT_MASK는 255이고, 자연수이다.
+# 사용자가 닫기를 요청했다(닫기 단추, ⌘W/Ctrl+W, Alt+F4, 앱 종료). 앱은 거부할 수 있다.
+공개 전역 상수 INPUT_WINDOW_EVENT_CLOSE_REQUEST는 1이고, 자연수이다.
+# 창이 키 창(키보드 입력을 받는 앞 창)이 됐다 / 키 창에서 물러났다.
+공개 전역 상수 INPUT_WINDOW_EVENT_BECAME_KEY는 2이고, 자연수이다.
+공개 전역 상수 INPUT_WINDOW_EVENT_RESIGNED_KEY는 3이고, 자연수이다.
+# 앱이 UI_WINDOW_OP_CLOSE로 이 창을 닫았다. 거부 없이 창 루프를 끝낸다.
+공개 전역 상수 INPUT_WINDOW_EVENT_CLOSE는 4이고, 자연수이다.
+공개 전역 상수 INPUT_WINDOW_EVENT_QUIT_FLAG는 256이고, 자연수이다.
+
+# SYS_UI_WINDOW의 a1 연산.
+# QUERY: 창 기능 비트(WINDOW_CAPABILITY_*). 창이 없는 플랫폼은 -38.
+공개 전역 상수 UI_WINDOW_OP_QUERY는 0이고, 자연수이다.
+# OPEN(a2=설명 주소, a3=설명 길이): 새 창과 그 창의 흐름을 만든다. 흐름은 설명의
+# 진입 함수(주소를 받아 주소를 반환하는 C 호출 규약 함수)를 인자와 함께 곧장
+# 부르고, 진입 함수가 STARTED를 부르면 OPEN이 돌아온다. 반환: 창 ID(>0) 또는 음수 errno.
+공개 전역 상수 UI_WINDOW_OP_OPEN은 1이고, 자연수이다.
+# CLOSE(a2=창 ID, 0이면 현재 창): 창을 바로 숨기고 그 창 큐에 EVENT_CLOSE를 넣는다.
+공개 전역 상수 UI_WINDOW_OP_CLOSE는 2이고, 자연수이다.
+# CURRENT: 지금 흐름에 묶인 창 ID. 아직 창이 없으면 0.
+공개 전역 상수 UI_WINDOW_OP_CURRENT는 3이고, 자연수이다.
+# POLICY(a2=WINDOW_POLICY_*, 0이면 조회만): 마지막 창이 닫힌 뒤의 앱 정책. 반환: 이전 정책.
+공개 전역 상수 UI_WINDOW_OP_POLICY는 4이고, 자연수이다.
+# COUNT: 아직 닫히지 않은 창 수.
+공개 전역 상수 UI_WINDOW_OP_COUNT는 5이고, 자연수이다.
+# ACTIVATE(a2=창 ID): 창을 앞으로 가져와 키 창으로 만든다.
+공개 전역 상수 UI_WINDOW_OP_ACTIVATE는 6이고, 자연수이다.
+# FINISH: 현재 창의 루프가 끝났다. 네이티브 창을 없앤다. 새 흐름이면 돌아오지 않는다.
+# 주 흐름이면 다른 창이 모두 닫힐 때까지 다른 흐름을 돌리다가 RUN과 같은 결과를 낸다.
+공개 전역 상수 UI_WINDOW_OP_FINISH는 7이고, 자연수이다.
+# RUN: 주 흐름에서 창 흐름들을 돌린다. 창이 모두 닫히면 정책·종료 요청에 따라
+# WINDOW_RUN_QUIT을, 계속 실행 정책에서 Dock 다시 열기가 오면 WINDOW_RUN_REOPEN을 낸다.
+공개 전역 상수 UI_WINDOW_OP_RUN은 8이고, 자연수이다.
+# QUIT_CANCEL: 창이 종료 중 닫기 요청을 거부했다. 진행 중인 앱 종료를 멈춘다.
+공개 전역 상수 UI_WINDOW_OP_QUIT_CANCEL은 9이고, 자연수이다.
+# QUIT: 앱 종료를 요청한다(⌘Q와 같다). 모든 창에 QUIT_FLAG 닫기 요청이 간다.
+공개 전역 상수 UI_WINDOW_OP_QUIT는 10이고, 자연수이다.
+# WAIT(a2=밀리초): SYS_SLEEP_MS와 같은 깨움 비트를 돌려주는 유휴 대기. 기다리는 동안
+# 다른 창의 흐름이 돌 수 있는 유일한 대기다(SYS_SLEEP_MS는 흐름을 바꾸지 않는다 —
+# 앱 코드의 막는 대기가 다른 창의 프레임을 끼워 넣지 않게). 호출자는 창마다 따로인
+# 전역 상태를 앞뒤로 저장·복원한다(HmjeUI ui_window_context.hmje).
+공개 전역 상수 UI_WINDOW_OP_WAIT는 11이고, 자연수이다.
+# STARTED: 새 흐름이 OPEN에서 받은 진입 값을 자기 스택으로 옮겼다. OPEN은 새 흐름으로
+# 곧장 넘어가 진입 함수를 부르고, 새 흐름이 STARTED를 부르면 여는 쪽의 OPEN이 돌아온다.
+# 그 뒤 새 흐름은 여는 쪽이 다음에 기다릴 때 이어서 돈다.
+공개 전역 상수 UI_WINDOW_OP_STARTED는 12이고, 자연수이다.
+# SET_TITLE(a2=창 ID, a3=문자열 주소·길이 자연수64 두 칸의 주소).
+공개 전역 상수 UI_WINDOW_OP_SET_TITLE은 13이고, 자연수이다.
+# APP_STATE: 1=활성, 2=비활성, 3=백그라운드.
+공개 전역 상수 UI_WINDOW_OP_APP_STATE는 14이고, 자연수이다.
+# IS_OPEN(a2=창 ID): 열려 있고 닫는 중이 아니면 1, 아니면 0.
+공개 전역 상수 UI_WINDOW_OP_IS_OPEN은 15이고, 자연수이다.
+공개 전역 상수 UI_WINDOW_OP_FIT_CONTENT은 16이고, 자연수이다.
+# 창별 영속 상태. BIND(a=창 ID, b=자연수64 5칸: 키 주소/길이, 입력 주소/길이,
+# 값 입력이면 1). 호스트는 저장된 프레임을 이때 적용한다. RESTORE(a=자연수64
+# 5칸: 화면 접두 주소/길이, 순서, 출력 주소/용량)는 활성 입력의 바이트 수,
+# 끝이면 -1, 버퍼가 작으면 필요한 바이트 수의 음수를 돌려준다.
+공개 전역 상수 UI_WINDOW_OP_BIND은 17이고, 자연수이다.
+공개 전역 상수 UI_WINDOW_OP_RESTORE은 18이고, 자연수이다.
+# WINDOW_STATE(a2=창 ID): 1=키/포커스 창, 2=비활성. 창 밖에서는 2.
+공개 전역 상수 UI_WINDOW_OP_WINDOW_STATE는 21이고, 자연수이다.
+
+공개 전역 상수 WINDOW_CAPABILITY_MULTIPLE은 1이고, 자연수이다.
+공개 전역 상수 WINDOW_CAPABILITY_KEEP_RUNNING_DEFAULT는 2이고, 자연수이다.
+# QUERY 결과의 상태 비트: 앱 종료(⌘Q·UI_WINDOW_OP_QUIT)가 진행 중이다.
+공개 전역 상수 WINDOW_STATE_QUITTING은 4이고, 자연수이다.
+공개 전역 상수 WINDOW_POLICY_QUIT_ON_LAST_CLOSE는 1이고, 자연수이다.
+공개 전역 상수 WINDOW_POLICY_KEEP_RUNNING은 2이고, 자연수이다.
+공개 전역 상수 WINDOW_RUN_QUIT은 0이고, 자연수이다.
+공개 전역 상수 WINDOW_RUN_REOPEN은 1이고, 자연수이다.
+# 창 종류: 문서 창(크기 조절·전체 화면·최소화) / 보조 창(시작 창 같은 고정 크기, 가운데).
+공개 전역 상수 WINDOW_KIND_DOCUMENT는 1이고, 자연수이다.
+공개 전역 상수 WINDOW_KIND_UTILITY는 2이고, 자연수이다.
+# OPEN 설명(자연수64 10칸 = 80바이트): 종류, 너비, 높이(논리 포인트), X, Y,
+# 제목 주소, 제목 바이트 길이, 진입 함수 주소, 진입 인자, 플래그.
+# X·Y는 플래그 WINDOW_FLAG_POSITION이 있을 때만 쓴다(없으면 플랫폼이 정한다).
+공개 전역 상수 WINDOW_DESCRIPTOR_SIZE는 80이고, 자연수이다.
+공개 전역 상수 WINDOW_FLAG_POSITION은 1이고, 자연수이다.
+
+공개 전역 상수 BOOT_MODULE_STAT_SIZE는 16이고, 자연수이다.
+공개 전역 상수 BOOT_MODULE_STAT_ADDRESS_OFFSET는 0이고, 자연수이다.
+공개 전역 상수 BOOT_MODULE_STAT_SIZE_OFFSET는 8이고, 자연수이다.
+공개 전역 상수 BOOT_MODULE_NAME_MAX는 128이고, 자연수이다.
+
+공개 전역 상수 SCHED_DIAG_DEFERRED_REQUESTS는 0이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_DEFERRED_PREEMPTIONS는 1이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_GUARDED_REQUESTS는 2이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_ENABLE_SCHEDULES는 3이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_UNDERFLOWS는 4이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_MAX_DEPTH는 5이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_CURRENT_DEPTH는 6이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_LAPIC_TIMER_TICKS는 7이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_MIGRATIONS는 8이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_SMP_DETECTED는 9이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_SMP_SUPPORTED는 10이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_SMP_ONLINE는 11이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_WAKEUP_IPI_REQUESTS는 12이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_LAPIC_IPI_SENT는 13이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_LAPIC_IPI_RECEIVED는 14이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_XSAVE_ENABLED는 15이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_AVX2_ENABLED는 16이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_NMI_HANDLED는 17이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_NMI_NESTED는 18이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_NMI_SELF_TEST는 19이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_BLOCK_IO_WAIT_COUNT는 20이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_BLOCK_IO_WAIT_SLEEP_COUNT는 21이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_BLOCK_IO_WAIT_POLL_COUNT는 22이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_BLOCK_IO_WAKEUP_PROCESS_COUNT는 23이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_BLOCK_IO_WAKEUP_NO_WAITER_COUNT는 24이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_BLOCK_IO_COMPLETION_EVENT_COUNT는 25이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_OBJECT_SYNC_STAGE는 26이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_STFS_TX_BEGIN_STAGE는 27이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_STFS_ENSURE_STAGE는 28이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_STFS_MOUNT_STAGE는 29이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_OBJECT_GATE_WRITER_READER_DRAIN_WAITS는 30이고, 자연수이다.
+공개 전역 상수 SCHED_DIAG_OBJECT_GATE_SHARED_WRITER_BLOCKS는 31이고, 자연수이다.
+
+공개 전역 상수 AUDIO_CAPTURE_CONFIG_VERSION은 1이고, 자연수이다.
+공개 전역 상수 AUDIO_CAPTURE_CONFIG_SIZE는 64이고, 자연수이다.
+공개 전역 상수 AUDIO_SAMPLE_FORMAT_F32_INTERLEAVED는 1이고, 자연수이다.
+공개 전역 상수 AUDIO_CAPTURE_CONTROL_START는 1이고, 자연수이다.
+공개 전역 상수 AUDIO_CAPTURE_CONTROL_STOP은 2이고, 자연수이다.
+공개 전역 상수 AUDIO_CAPTURE_CONTROL_CLOSE는 3이고, 자연수이다.
+공개 전역 상수 AUDIO_PERMISSION_ACTION_QUERY는 0이고, 자연수이다.
+공개 전역 상수 AUDIO_PERMISSION_ACTION_REQUEST는 1이고, 자연수이다.
+공개 전역 상수 AUDIO_PERMISSION_UNDETERMINED는 0이고, 자연수이다.
+공개 전역 상수 AUDIO_PERMISSION_DENIED는 1이고, 자연수이다.
+공개 전역 상수 AUDIO_PERMISSION_GRANTED는 2이고, 자연수이다.
+공개 전역 상수 AUDIO_PERMISSION_RESTRICTED는 3이고, 자연수이다.
+공개 전역 상수 AUDIO_CAPTURE_FRAME_METADATA_SIZE는 40이고, 자연수이다.
+# SYS_INPUT_POLL2 고정 레코드(v1, 16 x 8바이트). 기존 SYS_INPUT_POLL의
+# 64비트 키보드/포인터 ABI는 호환성을 위해 그대로 유지한다.
+공개 전역 상수 INPUT_POINTER_RECORD_SIZE는 128이고, 자연수이다.
+공개 전역 상수 INPUT_POINTER_RECORD_VERSION는 1이고, 자연수이다.
+# backend 계약 조회. 쓰기 가능한 자연수64 4칸에
+# [ABI 버전, backend 종류, 지원 명령 bitset, 정책 flags]를 돌려준다.
+# bitset의 bit N은 GPU_COMMAND_N 직접 실행 지원이다. 정책 bit 0이 없으면
+# hosted production의 CPU 전체 surface raster fallback은 금지다.
+공개 전역 상수 GPU_COMMAND_QUERY는 0이고, 자연수이다.
+공개 전역 상수 GPU_BACKEND_ABI_VERSION는 2이고, 자연수이다.
+공개 전역 상수 GPU_BACKEND_METAL는 1이고, 자연수이다.
+공개 전역 상수 GPU_BACKEND_GLES는 2이고, 자연수이다.
+공개 전역 상수 GPU_BACKEND_D3D는 3이고, 자연수이다.
+공개 전역 상수 GPU_BACKEND_HEADLESS는 4이고, 자연수이다.
+공개 전역 상수 GPU_BACKEND_POLICY_CPU_RASTER_ALLOWED는 1이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_BEGIN는 1이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_CLIP는 2이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_UPLOAD_GLYPH는 3이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_DRAW는 4이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_IMAGE_BLIT는 5이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_END_PRESENT는 6이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_ABORT는 7이고, 자연수이다.
+# 세로 스크롤 shift: 같은 persistent 텍스처 안에서 행을 위/아래로 미는 텍스처
+# 내부 blit. 겹치는 영역이라 임시 스크래치 텍스처를 경유한다(네이티브 다리 참고).
+공개 전역 상수 GPU_COMMAND_SCROLL_SHIFT는 8이고, 자연수이다.
+# BEGIN의 대상(target) 식별자. 0=화면(매 프레임 실제 표면에 present), 1=배경
+# (persistent, 앱이 직접 present하지 않고 화면 쪽 합성 소스로만 쓰인다).
+공개 전역 상수 GPU_TARGET_SCREEN는 0이고, 자연수이다.
+공개 전역 상수 GPU_TARGET_BACKGROUND는 1이고, 자연수이다.
+# 다른 persistent target(예: 배경)의 GPU 텍스처를 현재 활성 target으로 그대로
+# 텍스처-투-텍스처 복사한다 — CPU 픽셀을 다시 업로드하는 GPU_COMMAND_IMAGE_BLIT과
+# 달리 소스가 이미 GPU에 있는 다른 target임을 전제한다(hmje-ui의
+# gpu_command_renderer.hmje가 이미지블릿의 소스 주소가 배경 캔버스 자신의 CPU
+# 버퍼 기준주소와 일치하고 배경 GPU 텍스처가 최신 상태일 때만 이 op으로 치환한다).
+공개 전역 상수 GPU_COMMAND_COMPOSITE_TARGET는 9이고, 자연수이다.
+# 배경블러(glassmorphism): 요청 = 자연수64 7개 [x, y, 너비, 높이, 모서리반경,
+# 블러반경, 틴트색상(0xAARRGGBB)] — 현재 활성 target 텍스처의 해당 영역을
+# 읽어 다운샘플 → 3중 박스(≈가우시안) 분리형 블러 → 업샘플 + 틴트를 얹고
+# 둥근 모서리 마스크로 다시 합성한다(hmje-ui core.hmje 캔버스배경블러그리기의
+# CPU 기준과 같은 파이프라인). 미구현 플랫폼은 ENOSYS → CPU 폴백.
+공개 전역 상수 GPU_COMMAND_BACKDROP_BLUR는 10이고, 자연수이다.
+# 그라데이션 채우기: 요청 = 자연수64 15개 [x, y, 너비, 높이, 모서리반경,
+# 방향(1=세로/2=가로/3=대각), 색상수(2..8), 색상1..색상8(0xAARRGGBB)] — 영역을
+# 축 방향 균등 간격 정지점 선형 보간으로 채우고 둥근 모서리 마스크를 알파로
+# 합성한다(hmje-ui core.hmje 캔버스그라데이션채우기의 CPU 기준과 같은 사양,
+# 프래그먼트당 순수 보간 단일 패스). 미구현 플랫폼은 ENOSYS → CPU 폴백.
+공개 전역 상수 GPU_COMMAND_GRADIENT_FILL는 11이고, 자연수이다.
+
+# 이미지 스케일 블릿(이미지 위젯의 늘리기/여백맞춤/채우기): 요청 = 자연수64
+# 12개 [이미지주소, 이미지너비, 이미지높이, 이미지피치, 원본X, 원본Y, 복사너비,
+# 복사높이, 대상X, 대상Y, 대상너비, 대상높이] — GPU_COMMAND_IMAGE_BLIT과 달리
+# 대상 사각형 크기가 원본 영역 크기와 달라도 되며, 텍스처 샘플러(nearest)로
+# 리샘플링한다(hmje-ui core.hmje 캔버스이미지스케일그리기의 CPU 기준과 같은
+# 최근접 이웃 사양). 대상 크기가 원본과 같으면(스케일 없음) 발행자가 여전히
+# 기존 GPU_COMMAND_IMAGE_BLIT을 쓴다 — 이 태그는 실제로 크기가 달라 리샘플링이
+# 필요한 경우에만 쓰인다. 미구현 플랫폼은 ENOSYS → CPU 폴백.
+공개 전역 상수 GPU_COMMAND_IMAGE_SCALE_BLIT는 12이고, 자연수이다.
+
+# 층(그룹 불투명도)의 GPU 합성.
+# LAYER_BEGIN 요청 = [x, y, 너비, 높이, 불투명도(0..255)].
+# 백엔드는 현재 대상의 그 영역을 그대로 뜬 오프스크린 텍스처로 대상을 바꾸고,
+# LAYER_END(페이로드 없음)에서 불투명도로 얹은 뒤 되돌린다. 층을 투명하게
+# 시작하지 않고 바탕을 떠서 시작하므로 알파 채널 없이도 결과가 정확하다 —
+# hmje-ui command_interpreter.hmje의 CPU 재생과 정확히 같은 모델이다.
+공개 전역 상수 GPU_COMMAND_LAYER_BEGIN는 13이고, 자연수이다.
+공개 전역 상수 GPU_COMMAND_LAYER_END는 14이고, 자연수이다.
+# 평면 shift = SCROLL_SHIFT(8)의 두 축 판. 스크롤은 한 축만 움직여 8번으로
+# 충분했지만 캔버스 팬은 가로·세로가 같이 움직인다. 요청 =
+# [x, y, 너비, 높이, 이동X, 이동Y, 오른쪽(0/1), 아래로(0/1)]. 8번과 같은 이유로
+# 스크래치 텍스처를 경유한다(같은 텍스처 안 겹치는 blit).
+공개 전역 상수 GPU_COMMAND_PLANAR_SHIFT는 15이고, 자연수이다.
+
+# ===== 저수준 GPU device ABI v2 (SemtleOS/HmjeGPU) =====
+# 모든 request는 u64 배열이고 첫 세 칸은 [size, version, flags]다.
+# syscall 인자는 [op, request 주소, request byte 길이]이며 중첩 pointer는
+# 커널이 syscall 경계 안에서 별도 사본으로 가져간다. opaque handle은
+# 수명/권한용이고 wire id는 backend command stream 부호화에만 쓴다.
+공개 전역 상수 GPU_DEVICE_ABI_VERSION는 2이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY는 0이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_INFO는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_READ는 2이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_CREATE는 3이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_DESTROY는 4이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE는 5이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE는 6이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_DESTROY는 7이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT는 8이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_WAIT는 9이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT는 10이고, 자연수이다.
+
+공개 전역 상수 GPU_DEVICE_BACKEND_VIRGL는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FEATURE_RESOURCE_WRITE는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FEATURE_TIMELINE는 2이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FEATURE_PRESENT_LEASE는 4이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FEATURE_RAW_VIRGL_SUBMIT는 8이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FEATURE_CAPSET는 16이고, 자연수이다.
+
+공개 전역 상수 GPU_DEVICE_CONTEXT_PRESENT는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_BUFFER는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_IMAGE_2D는 2이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FORMAT_NONE는 0이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FORMAT_R8_UNORM는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FORMAT_BGRA8_UNORM는 2이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_FORMAT_BGRX8_UNORM는 3이고, 자연수이다.
+# 렌더러 내부의 블러/필터 중간 표면용 선형 float 형식. 화면 표시는 여전히
+# BGRX8이며, 이 형식은 sampled/render-target 리소스로만 사용한다.
+공개 전역 상수 GPU_DEVICE_FORMAT_RGBA32_FLOAT는 4이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_VERTEX는 1이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_UNIFORM는 2이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_SAMPLED는 4이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_RENDER_TARGET는 8이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_TRANSFER_SRC는 16이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_TRANSFER_DST는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_USAGE_PRESENT는 64이고, 자연수이다.
+
+# QUERY = [size, version, flags, backend, features, max command bytes,
+# max submit resources, max process contexts, scanout width/height/format,
+# capset count, max resource bytes].
+공개 전역 상수 GPU_DEVICE_QUERY_SIZE는 104이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_BACKEND_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_FEATURES_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_MAX_COMMAND_BYTES_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_MAX_SUBMIT_RESOURCES_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_MAX_CONTEXTS_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_SCANOUT_WIDTH_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_SCANOUT_HEIGHT_OFFSET는 72이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_SCANOUT_FORMAT_OFFSET는 80이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_CAPSET_COUNT_OFFSET는 88이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_QUERY_MAX_RESOURCE_BYTES_OFFSET는 96이고, 자연수이다.
+
+# CAPSET_INFO = [size, version, flags, index, out id, out max version,
+# out max blob bytes, reserved].
+공개 전역 상수 GPU_DEVICE_CAPSET_INFO_SIZE는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_INFO_INDEX_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_INFO_ID_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_INFO_VERSION_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_INFO_MAX_SIZE_OFFSET는 48이고, 자연수이다.
+
+# CAPSET_READ = [size, version, flags, id, wanted version, dst address,
+# dst capacity, out blob bytes].
+공개 전역 상수 GPU_DEVICE_CAPSET_READ_SIZE는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_READ_ID_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_READ_VERSION_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_READ_DST_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_READ_CAPACITY_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CAPSET_READ_OUT_SIZE_OFFSET는 56이고, 자연수이다.
+
+# CONTEXT_CREATE = [size, version, flags, out context, out scanout handle,
+# out scanout wire id, out completed timeline].
+공개 전역 상수 GPU_DEVICE_CONTEXT_CREATE_SIZE는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_CREATE_HANDLE_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_CREATE_SCANOUT_HANDLE_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_CREATE_SCANOUT_WIRE_ID_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_CREATE_COMPLETED_OFFSET는 48이고, 자연수이다.
+
+# CONTEXT_DESTROY = [size, version, flags, context].
+공개 전역 상수 GPU_DEVICE_CONTEXT_DESTROY_SIZE는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_CONTEXT_DESTROY_HANDLE_OFFSET는 24이고, 자연수이다.
+
+# RESOURCE_CREATE = [size, version, flags, context, type, format, width,
+# height, byte size, usage, out handle, out wire id].
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_SIZE는 96이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_CONTEXT_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_TYPE_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_FORMAT_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_WIDTH_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_HEIGHT_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_BYTE_SIZE_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_USAGE_OFFSET는 72이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_HANDLE_OFFSET는 80이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_CREATE_WIRE_ID_OFFSET는 88이고, 자연수이다.
+
+# RESOURCE_WRITE = [size, version, flags, context, resource, src address,
+# src length, src pitch, dst x/y/width/height, dst buffer offset].
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_SIZE는 104이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_CONTEXT_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_HANDLE_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_SRC_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_SRC_LENGTH_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_SRC_PITCH_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_DST_X_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_DST_Y_OFFSET는 72이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_WIDTH_OFFSET는 80이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_HEIGHT_OFFSET는 88이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_WRITE_DST_OFFSET_OFFSET는 96이고, 자연수이다.
+
+# RESOURCE_DESTROY = [size, version, flags, context, resource].
+공개 전역 상수 GPU_DEVICE_RESOURCE_DESTROY_SIZE는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_DESTROY_CONTEXT_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_RESOURCE_DESTROY_HANDLE_OFFSET는 32이고, 자연수이다.
+
+# SUBMIT = [size, version, flags, context, command address/length,
+# resource-handle-list address/count, wait timeline, out signal timeline].
+공개 전역 상수 GPU_DEVICE_SUBMIT_SIZE는 80이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_CONTEXT_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_COMMAND_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_COMMAND_LENGTH_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_HANDLES_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_HANDLE_COUNT_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_WAIT_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_SUBMIT_SIGNAL_OFFSET는 72이고, 자연수이다.
+
+# WAIT = [size, version, flags, context, value, absolute monotonic
+# deadline milliseconds(0 = poll), out completed].
+공개 전역 상수 GPU_DEVICE_WAIT_SIZE는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_WAIT_CONTEXT_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_WAIT_VALUE_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_WAIT_DEADLINE_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_WAIT_COMPLETED_OFFSET는 48이고, 자연수이다.
+
+# PRESENT = [size, version, flags, context, resource, wait timeline,
+# damage x/y/width/height].
+공개 전역 상수 GPU_DEVICE_PRESENT_SIZE는 80이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_CONTEXT_OFFSET는 24이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_RESOURCE_OFFSET는 32이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_WAIT_OFFSET는 40이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_X_OFFSET는 48이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_Y_OFFSET는 56이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_WIDTH_OFFSET는 64이고, 자연수이다.
+공개 전역 상수 GPU_DEVICE_PRESENT_HEIGHT_OFFSET는 72이고, 자연수이다.
+
+# 운영체제 서비스가 음수로 돌려주는 오류 번호(커널 ABI의 ERR_*와 같은 값).
+공개 전역 상수 운영체제오류_없음은 2이고, 정수이다.
+공개 전역 상수 운영체제오류_잘못된핸들은 9이고, 정수이다.
+공개 전역 상수 운영체제오류_메모리부족은 12이고, 정수이다.
+공개 전역 상수 운영체제오류_권한없음은 13이고, 정수이다.
+공개 전역 상수 운영체제오류_잘못된주소는 14이고, 정수이다.
+공개 전역 상수 운영체제오류_사용중은 16이고, 정수이다.
+공개 전역 상수 운영체제오류_이미있음은 17이고, 정수이다.
+공개 전역 상수 운영체제오류_잘못된인자는 22이고, 정수이다.
+공개 전역 상수 운영체제오류_미지원은 38이고, 정수이다.
+공개 전역 상수 운영체제오류_메시지없음은 61이고, 정수이다.
+공개 전역 상수 운영체제오류_조각남은 84이고, 정수이다.
+
+# 커널 진단 서비스(진단.hmje)의 인자.
+공개 전역 상수 DEBUG_USER_COPY_TO는 1이고, 자연수이다.
+공개 전역 상수 DEBUG_USER_COPY_FROM는 2이고, 자연수이다.

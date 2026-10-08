@@ -1,0 +1,11 @@
+# 이름 저장소 원본커밋 경로
+hmje-llm hmje-llm.git 796fdc10c92342070268eb5075d2228b6f960871 .
+hmje-sem hmje-sem.git 9a0986e66342242d57469b17b17428f58075f820 .
+hmje-realtime hmje-realtime.git 3ae56612ec60c49697e0ecf2112e29867abe53e8 .
+hmje-network hmje-network.git 5257cb8d0843e213906cfbab0059427201a04786 .
+hmje-ui hmje-ui.git f86d7421e77349f4c053d25a836862dde89c1358 .
+hmje-crypto hmje-crypto.git e22f5a33c01cc528918125dcb5a7138c3470abca .
+hmje-vault hmje-vault.git d0a9cc3ace78ffbb1d83c50c29b1e0fa10369b19 .
+hmje-jindo hmje-jindo.git 18f7d3c90bd702316aee753ac197c32fc0e40bdd .
+hmje-host hmje-host.git 43400f8b176c3a630c93b55dedb8b8a75823de4f .
+hmje-syntax hmje-syntax.git 43400f8b176c3a630c93b55dedb8b8a75823de4f .

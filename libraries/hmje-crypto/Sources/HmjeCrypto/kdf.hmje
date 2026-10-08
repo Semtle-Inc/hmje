@@ -1,0 +1,8 @@
+# Password and salt are raw bytes. Text callers pass their exact UTF-8 bytes;
+# no Unicode normalization, encoding conversion, persistence or default rounds.
+외부 함수 hmje_crypto_pbkdf2_sha256은 (암호: 주소, 암호길이: 정수, 소금: 주소, 소금길이: 정수, 반복: 정수, 출력: 주소, 용량: 정수, 길이: 정수)를 받아 정수로 반환한다.
+
+공개 위험 함수 PBKDF2SHA256파생은 (암호: 주소, 암호길이: 자연수, 소금: 주소, 소금길이: 자연수, 반복: 자연수, 출력: 주소, 용량: 자연수, 길이: 자연수)를 받아
+    만약 암호길이 > 1048576 또는 소금길이 > 1048576 또는 반복 == 0 또는 반복 > 4294967295 또는 길이 == 0 또는 길이 > 1048576 또는 용량 > 9223372036854775807이면
+        암호결과(정수(1), 자연수(0))를 암호연산결과로 반환한다.
+    암호결과(hmje_crypto_pbkdf2_sha256(암호, 정수(암호길이), 소금, 정수(소금길이), 정수(반복), 출력, 정수(용량), 정수(길이)), 길이)를 암호연산결과로 반환한다.

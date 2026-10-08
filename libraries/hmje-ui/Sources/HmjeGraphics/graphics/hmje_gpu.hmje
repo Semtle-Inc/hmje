@@ -1,0 +1,51 @@
+# HmjeGPU 공통 frontend.
+#
+# HmjeGraphics는 플랫폼이나 native API를 고르지 않고 이 파일의 고정 요청
+# 경계만 부른다. SemtleOS에서는 device ABI v2 위의 VirGL backend를, hosted
+# target에서는 Metal/GLES native adapter를 선택한다. hosted의 평평한
+# GPU_COMMAND syscall bridge는 backend 이행 중의 transport일 뿐 HmjeGraphics
+# 공개 계층에 노출하지 않는다.
+
+"./hmje_gpu_virgl.hmje"를 가져온다.
+운영체제를 가져온다.
+
+전역 상수 HMJEGPU_BACKEND_NONE는 0이고, 자연수이다.
+전역 상수 HMJEGPU_BACKEND_VIRGL는 1이고, 자연수이다.
+전역 상수 HMJEGPU_BACKEND_HOSTED는 2이고, 자연수이다.
+
+# 0=미탐지, 1=없음, 2=VirGL, 3=hosted native adapter.
+전역 변수 HmjeGPU선택상태는 자연수(0)이고, 자연수이다.
+
+함수 HmjeGPU백엔드선택은
+    만약 HmjeGPU선택상태 == 2이면
+        HMJEGPU_BACKEND_VIRGL을 자연수로 반환한다.
+    만약 HmjeGPU선택상태 == 3이면
+        HMJEGPU_BACKEND_HOSTED를 자연수로 반환한다.
+    만약 HmjeGPU선택상태 == 1이면
+        HMJEGPU_BACKEND_NONE를 자연수로 반환한다.
+
+    만약 HmjeGPUVirGL장치탐지()이면
+        HmjeGPU선택상태는 2이다.
+        HMJEGPU_BACKEND_VIRGL을 자연수로 반환한다.
+
+    변수 요청은 [0, 0, 0, 0]이고, 자연수 4개의 고정배열이다.
+    상수 결과는 GPU시스템호출명령(GPU_COMMAND_QUERY, 요청의 주소, 자연수(32))이고, 정수이다.
+    만약 결과 > 0이면
+        HmjeGPU선택상태는 3이다.
+        HMJEGPU_BACKEND_HOSTED를 자연수로 반환한다.
+
+    HmjeGPU선택상태는 1이다.
+    HMJEGPU_BACKEND_NONE를 자연수로 반환한다.
+
+함수 HmjeGPU고정요청은 (종류: 자연수, 요청주소: 주소, 길이: 자연수)를 받아
+    상수 백엔드는 HmjeGPU백엔드선택()이고, 자연수이다.
+    만약 백엔드 == HMJEGPU_BACKEND_VIRGL이면
+        HmjeGPUVirGL고정요청(종류, 요청주소, 길이)를 정수로 반환한다.
+    만약 백엔드 == HMJEGPU_BACKEND_HOSTED이면
+        GPU시스템호출명령(종류, 요청주소, 길이)를 정수로 반환한다.
+    정수(0 - 38)을 정수로 반환한다.
+
+# 저수준 진단 앱의 이전 이름 호환. production HmjeGraphics는 위 HmjeGPU
+# 이름만 사용하며 플랫폼 선택은 이 파일 밖으로 새지 않는다.
+함수 GPU고정요청은 (종류: 자연수, 요청주소: 주소, 길이: 자연수)를 받아
+    HmjeGPU고정요청(종류, 요청주소, 길이)를 정수로 반환한다.

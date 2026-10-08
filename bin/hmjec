@@ -1,0 +1,304 @@
+#!/bin/sh
+
+# Owned scratch survives only when explicitly requested for debugging.
+hmje_temp_remove() {
+    if [ "${HMJE_KEEP_TEMP:-0}" = 1 ]; then
+        for hmje_temp_path do
+            [ "$hmje_temp_path" = -- ] || [ -z "$hmje_temp_path" ] || printf 'HMJE_KEEP_TEMP=1: %s\n' "$hmje_temp_path" >&2
+        done
+    else
+        rm -rf "$@"
+    fi
+}
+set -eu
+
+HMJE_DRIVER=$0
+while [ -L "$HMJE_DRIVER" ]; do
+    HMJE_LINK=$(readlink "$HMJE_DRIVER")
+    case "$HMJE_LINK" in
+        /*) HMJE_DRIVER=$HMJE_LINK ;;
+        *) HMJE_DRIVER=$(dirname -- "$HMJE_DRIVER")/$HMJE_LINK ;;
+    esac
+done
+ROOT=$(CDPATH= cd -- "$(dirname -- "$HMJE_DRIVER")/.." && pwd)
+. "$ROOT/bin/hmje-environment.sh"
+if [ "${1:-}" = --macos-signing ]; then
+    shift
+    exec "$ROOT/bin/hmje-macos-signing" "$@"
+fi
+if [ "${1:-}" = cache ]; then
+    shift
+    [ "${1:-}" = prune ] || { echo 'usage: hmjec cache prune [--max-gib N] [--min-age-hours N|--min-age-minutes N] [--dry-run]' >&2; exit 2; }
+    shift
+    CACHE_TOOL=$(hmje_cache_tool "${HMJE_TOOL_BIN:-${HMJE_BOOTSTRAP_BIN:-}}") || CACHE_TOOL=
+    [ -n "$CACHE_TOOL" ] && [ -x "$CACHE_TOOL" ] || { echo 'error: native cache tool is not installed' >&2; exit 2; }
+    exec "$CACHE_TOOL" prune "$HMJE_CACHE_HOME/v1" "$@"
+fi
+hmje_project_coordinator() {
+    case "$(uname -s)/$(uname -m)" in
+        Darwin/arm64|Darwin/aarch64) BOOTSTRAP_SLOT=darwin-aarch64 ;;
+        Darwin/x86_64|Darwin/amd64) BOOTSTRAP_SLOT=darwin-x86_64 ;;
+        Linux/arm64|Linux/aarch64) BOOTSTRAP_SLOT=linux-aarch64 ;;
+        Linux/x86_64|Linux/amd64) BOOTSTRAP_SLOT=linux-x86_64 ;;
+        *) echo 'error: unsupported native compiler host' >&2; exit 2 ;;
+    esac
+    PROJECT_COORDINATOR=${HMJE_PROJECT_COORDINATOR:-${HMJE_TOOL_BIN:-${HMJE_BOOTSTRAP_BIN:-$ROOT/bootstrap/$BOOTSTRAP_SLOT/bin}}/프로젝트조정기}
+    [ -x "$PROJECT_COORDINATOR" ] || { echo "error: missing native project coordinator: $PROJECT_COORDINATOR" >&2; exit 2; }
+}
+
+# --target-arch universal2 (macOS): build the arm64 and x86_64 products with
+# this same command, then merge each Mach-O with lipo. Thin slices keep their
+# own signatures; an app bundle is re-signed because its executable changed.
+HMJE_UNIVERSAL=0
+HMJE_UNIVERSAL_PREV=
+for ARG in "$@"; do
+    if [ "$HMJE_UNIVERSAL_PREV" = --target-arch ]; then
+        case "$ARG" in universal2|universal) HMJE_UNIVERSAL=1 ;; *) HMJE_UNIVERSAL=0 ;; esac
+    fi
+    HMJE_UNIVERSAL_PREV=$ARG
+done
+if [ "$HMJE_UNIVERSAL" -eq 1 ]; then
+    [ "$(uname -s)" = Darwin ] || { echo 'error: --target-arch universal2 needs a Darwin host' >&2; exit 2; }
+    U_TARGET= U_OUTPUT= U_PREV=
+    for ARG in "$@"; do
+        case "$U_PREV" in --target) U_TARGET=$ARG ;; -o|--output) U_OUTPUT=$ARG ;; esac
+        U_PREV=$ARG
+    done
+    case "$U_TARGET" in
+        posix-host-exe|macos-app) ;;
+        *) echo "error: --target-arch universal2 supports posix-host-exe and macos-app: ${U_TARGET:-none}" >&2; exit 2 ;;
+    esac
+    [ -n "$U_OUTPUT" ] || { echo 'error: -o output is required' >&2; exit 2; }
+    U_OUTPUT_DIR=$(CDPATH= cd -- "$(dirname -- "$U_OUTPUT")" && pwd)
+    U_NAME=$(basename -- "$U_OUTPUT")
+    U_WORK=$(mktemp -d "$U_OUTPUT_DIR/.hmje-universal.XXXXXXXX")
+    trap 'HMJE_EXIT_STATUS=$?; hmje_failed_output_remove "$HMJE_EXIT_STATUS" "$U_OUTPUT"; hmje_temp_remove "$U_WORK"' EXIT
+    trap 'exit 129' HUP
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+    for U_ARCH in aarch64 x86_64; do
+        mkdir -p "$U_WORK/$U_ARCH"
+        U_PREV=
+        U_FIRST=1
+        for ARG in "$@"; do
+            [ "$U_FIRST" -eq 0 ] || { set --; U_FIRST=0; }
+            case "$U_PREV" in
+                --target-arch) ARG=$U_ARCH ;;
+                -o|--output) ARG=$U_WORK/$U_ARCH/$U_NAME ;;
+            esac
+            set -- "$@" "$ARG"
+            U_PREV=$ARG
+        done
+        "$ROOT/bin/hmjec" "$@" || exit $?
+        # Restore the universal spelling for the next architecture's pass.
+        U_PREV=
+        U_FIRST=1
+        for ARG in "$@"; do
+            [ "$U_FIRST" -eq 0 ] || { set --; U_FIRST=0; }
+            case "$U_PREV" in
+                --target-arch) ARG=universal2 ;;
+                -o|--output) ARG=$U_OUTPUT ;;
+            esac
+            set -- "$@" "$ARG"
+            U_PREV=$ARG
+        done
+    done
+    U_ARM=$U_WORK/aarch64/$U_NAME U_X86=$U_WORK/x86_64/$U_NAME U_OUT=$U_WORK/universal/$U_NAME
+    mkdir -p "$U_WORK/universal"
+    hmje_universal_merge() {
+        # $1 arm64 tree, $2 x86_64 tree, $3 output tree (all the same shape).
+        for U_SIDE in 1 2; do
+            if [ "$U_SIDE" -eq 1 ]; then U_THIS=$1; U_OTHER=$2; else U_THIS=$2; U_OTHER=$1; fi
+            (cd "$U_THIS" && find . ! -path '*/_CodeSignature' ! -path '*/_CodeSignature/*') | while IFS= read -r U_FILE; do
+                if [ -L "$U_THIS/$U_FILE" ]; then
+                    [ -L "$U_OTHER/$U_FILE" ] && [ "$(readlink "$U_THIS/$U_FILE")" = "$(readlink "$U_OTHER/$U_FILE")" ] || {
+                        echo "error: universal2 symlinks differ in $U_FILE" >&2; exit 1;
+                    }
+                elif [ -d "$U_THIS/$U_FILE" ]; then
+                    [ ! -L "$U_OTHER/$U_FILE" ] && [ -d "$U_OTHER/$U_FILE" ] || {
+                        echo "error: universal2 directory missing in $U_FILE" >&2; exit 1;
+                    }
+                else
+                    [ ! -L "$U_OTHER/$U_FILE" ] && [ -f "$U_OTHER/$U_FILE" ] || {
+                        echo "error: universal2 file missing in $U_FILE" >&2; exit 1;
+                    }
+                fi
+            done || return $?
+        done
+        cp -R "$1" "$3"
+        (cd "$1" && find . -type f ! -path '*/_CodeSignature/*') | while IFS= read -r U_FILE; do
+            if /usr/bin/lipo -archs "$1/$U_FILE" >/dev/null 2>&1; then
+                [ -f "$2/$U_FILE" ] || { echo "error: x86_64 product lacks $U_FILE" >&2; exit 1; }
+                /usr/bin/lipo -create "$1/$U_FILE" "$2/$U_FILE" -output "$3/$U_FILE"
+            elif ! cmp -s "$1/$U_FILE" "$2/$U_FILE"; then
+                echo "error: arm64 and x86_64 products differ in $U_FILE" >&2; exit 1
+            fi
+        done
+    }
+    if [ -d "$U_ARM" ]; then
+        hmje_universal_merge "$U_ARM" "$U_X86" "$U_OUT"
+        U_IDENTITY=${HMJE_MACOS_SIGNING_IDENTITY:--}
+        if [ "$U_IDENTITY" = - ]; then U_STAMP=--timestamp=none; else U_STAMP=--timestamp; fi
+        /usr/bin/codesign --force --sign "$U_IDENTITY" "$U_STAMP" \
+            --preserve-metadata=identifier,entitlements,requirements,flags,runtime "$U_OUT"
+        /usr/bin/codesign --verify --deep --strict "$U_OUT"
+    else
+        /usr/bin/lipo -create "$U_ARM" "$U_X86" -output "$U_OUT"
+        /usr/bin/codesign --verify --strict "$U_OUT"
+        if [ -d "$U_ARM.assets" ] || [ -d "$U_X86.assets" ]; then
+            hmje_universal_merge "$U_ARM.assets" "$U_X86.assets" "$U_OUT.assets"
+            rm -rf "$U_OUTPUT.assets"
+            mv "$U_OUT.assets" "$U_OUTPUT.assets"
+        fi
+    fi
+    if [ -d "$U_OUT" ]; then
+        hmje_project_coordinator
+        HMJE_BUNDLE_PUBLISHER=${HMJE_COORDINATOR:-${HMJE_TOOL_BIN:-${HMJE_BOOTSTRAP_BIN:-$ROOT/bootstrap/$BOOTSTRAP_SLOT/bin}}/제품조정기}
+        "$HMJE_BUNDLE_PUBLISHER" --publish-bundle "$U_OUT" "$U_OUTPUT"
+    else
+        mv -f "$U_OUT" "$U_OUTPUT"
+    fi
+    echo "wrote $U_OUTPUT (universal2: arm64 x86_64)"
+    exit 0
+fi
+# 설치본이 함께 싣는 플랫폼 라이브러리(docs/platform-libraries.md)와 고정 커밋.
+case "${1:-}" in
+    --platform-libraries|--플랫폼라이브러리)
+        [ "$#" -eq 1 ] || { echo "usage: hmjec $1" >&2; exit 2; }
+        hmje_project_coordinator
+        exec "$PROJECT_COORDINATOR" --platform-libraries "$ROOT/bin/hmjec-selfhost" ;;
+    # 설치 직후 한 번: 모든 플랫폼 라이브러리를 가져오는 예열 프로젝트를 빌드해 공유 캐시를 채운다.
+    --warm-platform-libraries|--플랫폼라이브러리예열)
+        [ "$#" -eq 1 ] || { echo "usage: hmjec $1" >&2; exit 2; }
+        hmje_project_coordinator
+        WARM_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/hmje-platform-warm.XXXXXXXX")
+        trap 'hmje_temp_remove "$WARM_ROOT"' EXIT
+        trap 'exit 129' HUP
+        trap 'exit 130' INT
+        trap 'exit 143' TERM
+        "$PROJECT_COORDINATOR" --platform-warm-project "$ROOT/bin/hmjec-selfhost" "$WARM_ROOT" > "$WARM_ROOT/projects"
+        WARM_STATUS=0
+        while IFS= read -r WARM_PROJECT; do
+            [ -n "$WARM_PROJECT" ] || continue
+            WARM_TARGET=$(cat "$WARM_PROJECT/warm-target")
+            "$ROOT/bin/hmjec" --project "$WARM_PROJECT" --artifact 예열 --target "posix-host-$WARM_TARGET" \
+                -o "$WARM_PROJECT/예열" >"$WARM_PROJECT.log" 2>&1 || {
+                tail -n 20 "$WARM_PROJECT.log" >&2
+                echo "warning: platform library warm-up failed for $(basename -- "$WARM_PROJECT")" >&2
+                WARM_STATUS=1
+            }
+        done < "$WARM_ROOT/projects"
+        [ "$WARM_STATUS" -eq 0 ] || { echo 'warning: first builds will fill the rest of the cache' >&2; exit 1; }
+        echo "플랫폼 라이브러리 캐시 예열 완료: $HMJE_CACHE_HOME/v1"
+        exit 0 ;;
+esac
+# The native toolchain is the only implementation behind this command. Reference
+# comparisons invoke hmjec-reference explicitly from its separate repository.
+PROJECT_MODE=0
+for ARG in "$@"; do
+    case "$ARG" in
+        --project) PROJECT_MODE=1 ;;
+        -h|--help|--version) exec "$ROOT/bin/hmjec-selfhost" "$ARG" ;;
+    esac
+done
+if [ "$PROJECT_MODE" -eq 0 ]; then
+    exec "$ROOT/bin/hmjec-selfhost" "$@"
+fi
+
+TARGET= PROJECT_ROOT= PROJECT_ARTIFACT= PROJECT_OUTPUT= PROJECT_CACHE=
+TARGET_ARCH= TARGET_OS= IOS_DEPLOYMENT= OS_ROOT= UI_ROOT= LLVM_IR=
+PROJECT_DEFINES= PROJECT_NO_CACHE=0 PROJECT_DUMP_DEPS=0 MEASURE=0 PROJECT_CACHE_EXPLICIT=0
+trap 'HMJE_EXIT_STATUS=$?; hmje_failed_output_remove "$HMJE_EXIT_STATUS" "$PROJECT_OUTPUT"; exit "$HMJE_EXIT_STATUS"' EXIT
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --jobs|-j)
+            [ "$#" -ge 2 ] || { echo 'error: --jobs requires a value' >&2; exit 2; }
+            HMJE_JOBS=$2; hmje_validate_jobs; export HMJE_JOBS; shift 2 ;;
+        --target|--project|--artifact|-o|--output|--cache-dir|--cache-root|--define|--target-arch|--platform|--ios-deployment-target|--os-root|--ui-root|--llvm-ir)
+            [ "$#" -ge 2 ] && [ -n "$2" ] || { echo "error: $1 requires a value" >&2; exit 2; }
+            case "$1" in
+                --target) TARGET=$2 ;; --project) PROJECT_ROOT=$2 ;;
+                --artifact) PROJECT_ARTIFACT=$2 ;; -o|--output) PROJECT_OUTPUT=$2 ;;
+                --cache-dir|--cache-root) PROJECT_CACHE=$2; PROJECT_CACHE_EXPLICIT=1 ;; --target-arch) TARGET_ARCH=$2 ;;
+                --platform) TARGET_OS=$2 ;; --ios-deployment-target) IOS_DEPLOYMENT=$2 ;;
+                --os-root) OS_ROOT=$2 ;; --ui-root) UI_ROOT=$2 ;; --llvm-ir) LLVM_IR=$2 ;;
+                --define) PROJECT_DEFINES="${PROJECT_DEFINES}${PROJECT_DEFINES:+
+}$2" ;;
+            esac
+            shift 2 ;;
+        --no-cache|--캐시끄기) PROJECT_NO_CACHE=1; shift ;;
+        --dump-deps) PROJECT_DUMP_DEPS=1; shift ;;
+        --계측) MEASURE=1; shift ;;
+        # 의존 라이브러리가 어디서 풀렸는지(플랫폼 라이브러리·로컬 의존 프로젝트) 알린다.
+        -v|--verbose|--자세히) HMJE_PROJECT_VERBOSE=1; export HMJE_PROJECT_VERBOSE; shift ;;
+        *) echo "error: unsupported project argument: $1" >&2; exit 2 ;;
+    esac
+done
+[ -z "${HMJE_JOBS+x}" ] || hmje_validate_jobs
+[ -n "$TARGET" ] || { echo 'error: --target is required; use --target posix-host-exe for a console program (hmjec --help lists targets)' >&2; exit 2; }
+[ -n "$PROJECT_ARTIFACT" ] || { echo 'error: --artifact is required' >&2; exit 2; }
+if [ "$PROJECT_DUMP_DEPS" -eq 1 ] && [ -z "$PROJECT_OUTPUT" ]; then PROJECT_OUTPUT=/dev/null; fi
+[ -n "$PROJECT_OUTPUT" ] || { echo 'error: -o output is required' >&2; exit 2; }
+case "$TARGET" in
+    ios-*) PROJECT_PLATFORM=iOS ;;
+    android-*) PROJECT_PLATFORM=Android ;;
+    windows-*) PROJECT_PLATFORM=Windows ;;
+    macos-*) PROJECT_PLATFORM=macOS ;;
+    posix-host-*)
+        case "${TARGET_OS:-$(uname -s)}" in
+            darwin|Darwin|macOS) PROJECT_PLATFORM=macOS ;;
+            linux|Linux) PROJECT_PLATFORM=Linux ;;
+            *) echo 'error: unsupported project platform' >&2; exit 2 ;;
+        esac ;;
+    llvm-ir|hmir|limine-*|app-*|aarch64-*) PROJECT_PLATFORM=semtleOS ;;
+    *) echo "error: unsupported native project target: $TARGET" >&2; exit 2 ;;
+esac
+hmje_project_coordinator
+case "$TARGET_OS" in macOS) TARGET_OS=darwin ;; Linux) TARGET_OS=linux ;; esac
+if [ -f "$PROJECT_ROOT" ]; then
+    [ "$(basename -- "$PROJECT_ROOT")" = Project.hmjep ] || { echo 'error: project manifest must be named Project.hmjep' >&2; exit 2; }
+    PROJECT_ROOT=$(dirname -- "$PROJECT_ROOT")
+fi
+PROJECT_ROOT=$(CDPATH= cd -- "$PROJECT_ROOT" && pwd)
+# Only the compiler project needs compiler host services. Ordinary projects use
+# the app runtime, even when they share the posix-host-exe product target.
+if [ "$PROJECT_ROOT" = "$ROOT/compiler" ] && [ -z "${HMJE_HOST_SUPPORT:-}" ]; then
+    if [ "$PROJECT_PLATFORM" = Windows ]; then
+        HMJE_HOST_SUPPORT=$ROOT/compiler/runtime/host_support_windows.c
+    else
+        HMJE_HOST_SUPPORT=$ROOT/compiler/runtime/host_support.c
+    fi
+    export HMJE_HOST_SUPPORT
+fi
+[ -n "$PROJECT_CACHE" ] || PROJECT_CACHE=${HMJE_BUILD_CACHE_DIR:-$HMJE_CACHE_HOME/v1}
+mkdir -p "$PROJECT_CACHE"
+PROJECT_CACHE=$(CDPATH= cd -- "$PROJECT_CACHE" && pwd)
+HMJE_CACHE_ROOT=$PROJECT_CACHE/products
+if [ "$PROJECT_CACHE_EXPLICIT" -eq 1 ]; then
+    HMJE_PARSE_CACHE=$PROJECT_CACHE/parse
+else
+    HMJE_PARSE_CACHE=${HMJE_PARSE_CACHE:-$PROJECT_CACHE/parse}
+fi
+export HMJE_CACHE_ROOT HMJE_PARSE_CACHE
+# Generated plans must never be overwritten by another target or invocation.
+HMJE_PROJECT_SCRATCH=$(mktemp -d "$PROJECT_CACHE/invocation.$$.XXXXXXXX")
+HMJE_PROJECT_SCRATCH=$(CDPATH= cd -- "$HMJE_PROJECT_SCRATCH" && pwd -P)
+HMJE_PROJECT_SOURCE_ID="$PROJECT_ROOT|$PROJECT_ARTIFACT|$TARGET|$TARGET_ARCH|$TARGET_OS|$IOS_DEPLOYMENT"
+HMJE_PROJECT_SOURCE_PATH=$HMJE_PROJECT_SCRATCH/entry.hmje
+export HMJE_PROJECT_SCRATCH HMJE_PROJECT_SOURCE_ID HMJE_PROJECT_SOURCE_PATH
+trap 'HMJE_EXIT_STATUS=$?; hmje_failed_output_remove "$HMJE_EXIT_STATUS" "$PROJECT_OUTPUT"; hmje_temp_remove "$HMJE_PROJECT_SCRATCH"; exit "$HMJE_EXIT_STATUS"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+set -- "$PROJECT_COORDINATOR" "$ROOT/bin/hmjec-selfhost" "$PROJECT_ROOT" "$PROJECT_ARTIFACT" "$TARGET" "$PROJECT_OUTPUT" "$PROJECT_CACHE" "$PROJECT_PLATFORM"
+[ "$PROJECT_NO_CACHE" -eq 0 ] || set -- "$@" --캐시끄기
+[ "$PROJECT_DUMP_DEPS" -eq 0 ] || set -- "$@" --dump-deps
+[ "$MEASURE" -eq 0 ] || set -- "$@" --계측
+[ -z "$PROJECT_DEFINES" ] || set -- "$@" --define "$PROJECT_DEFINES"
+[ -z "$TARGET_ARCH" ] || set -- "$@" --target-arch "$TARGET_ARCH"
+[ -z "$TARGET_OS" ] || set -- "$@" --platform "$TARGET_OS"
+[ -z "$IOS_DEPLOYMENT" ] || set -- "$@" --ios-deployment-target "$IOS_DEPLOYMENT"
+[ -z "$OS_ROOT" ] || set -- "$@" --os-root "$OS_ROOT"
+[ -z "$UI_ROOT" ] || set -- "$@" --ui-root "$UI_ROOT"
+[ -z "$LLVM_IR" ] || set -- "$@" --llvm-ir "$LLVM_IR"
+"$@"

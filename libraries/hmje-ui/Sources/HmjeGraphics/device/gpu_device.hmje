@@ -1,0 +1,132 @@
+운영체제를 가져온다.
+
+# HmjeGPU와 저수준 GPU device ABI 사이의 typed userspace 경계다.
+# hosted HMJE Graphics의 고수준 GPU_COMMAND_* bridge와 독립이며, 지원하지 않는
+# 플랫폼에서는 정보읽기의 결과가 음수(-ENOSYS)다.
+
+프로젝트 내부 구조체 GPU장치정보의
+    프로젝트 내부 변수 결과는 정수이고,
+    프로젝트 내부 상수 백엔드는 자연수이고,
+    프로젝트 내부 상수 기능들은 자연수이고,
+    프로젝트 내부 상수 최대명령바이트는 자연수이고,
+    프로젝트 내부 상수 최대제출리소스는 자연수이고,
+    프로젝트 내부 상수 최대문맥수는 자연수이고,
+    프로젝트 내부 변수 화면너비는 자연수이고,
+    프로젝트 내부 변수 화면높이는 자연수이고,
+    프로젝트 내부 상수 화면형식은 자연수이고,
+    프로젝트 내부 상수 capset수는 자연수이고,
+    프로젝트 내부 상수 최대리소스바이트는 자연수이다.
+
+프로젝트 내부 구조체 GPU장치capset정보의
+    프로젝트 내부 변수 결과는 정수이고,
+    프로젝트 내부 변수 ID는 자연수이고,
+    프로젝트 내부 상수 최대버전은 자연수이고,
+    프로젝트 내부 상수 최대바이트는 자연수이다.
+
+프로젝트 내부 구조체 GPU장치문맥의
+    프로젝트 내부 변수 결과는 정수이고,
+    프로젝트 내부 변수 핸들은 자연수이고,
+    프로젝트 내부 상수 화면핸들은 자연수이고,
+    프로젝트 내부 상수 화면wireID는 자연수이고,
+    프로젝트 내부 상수 완료값은 자연수이다.
+
+프로젝트 내부 구조체 GPU장치리소스의
+    프로젝트 내부 변수 결과는 정수이고,
+    프로젝트 내부 변수 핸들은 자연수이고,
+    프로젝트 내부 상수 wireID는 자연수이다.
+
+프로젝트 내부 구조체 GPU장치제출결과의
+    프로젝트 내부 변수 결과는 정수이고,
+    프로젝트 내부 상수 신호값은 자연수이다.
+
+프로젝트 내부 구조체 GPU장치대기결과의
+    프로젝트 내부 변수 결과는 정수이고,
+    프로젝트 내부 상수 완료값은 자연수이다.
+
+프로젝트 내부 함수 GPU장치정보읽기는
+    변수 요청은 [GPU_DEVICE_QUERY_SIZE, GPU_DEVICE_ABI_VERSION, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 13개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_QUERY, 요청의 주소, GPU_DEVICE_QUERY_SIZE)이고, 정수이다.
+    GPU장치정보(
+        결과: 결과값,
+        백엔드: 요청[GPU_DEVICE_QUERY_BACKEND_OFFSET / 8],
+        기능들: 요청[GPU_DEVICE_QUERY_FEATURES_OFFSET / 8],
+        최대명령바이트: 요청[GPU_DEVICE_QUERY_MAX_COMMAND_BYTES_OFFSET / 8],
+        최대제출리소스: 요청[GPU_DEVICE_QUERY_MAX_SUBMIT_RESOURCES_OFFSET / 8],
+        최대문맥수: 요청[GPU_DEVICE_QUERY_MAX_CONTEXTS_OFFSET / 8],
+        화면너비: 요청[GPU_DEVICE_QUERY_SCANOUT_WIDTH_OFFSET / 8],
+        화면높이: 요청[GPU_DEVICE_QUERY_SCANOUT_HEIGHT_OFFSET / 8],
+        화면형식: 요청[GPU_DEVICE_QUERY_SCANOUT_FORMAT_OFFSET / 8],
+        capset수: 요청[GPU_DEVICE_QUERY_CAPSET_COUNT_OFFSET / 8],
+        최대리소스바이트: 요청[GPU_DEVICE_QUERY_MAX_RESOURCE_BYTES_OFFSET / 8]
+    )를 GPU장치정보로 반환한다.
+
+프로젝트 내부 함수 GPU장치capset정보읽기는 (번호: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_CAPSET_INFO_SIZE, GPU_DEVICE_ABI_VERSION, 0, 번호, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_CAPSET_INFO, 요청의 주소, GPU_DEVICE_CAPSET_INFO_SIZE)이고, 정수이다.
+    GPU장치capset정보(
+        결과: 결과값,
+        ID: 요청[GPU_DEVICE_CAPSET_INFO_ID_OFFSET / 8],
+        최대버전: 요청[GPU_DEVICE_CAPSET_INFO_VERSION_OFFSET / 8],
+        최대바이트: 요청[GPU_DEVICE_CAPSET_INFO_MAX_SIZE_OFFSET / 8]
+    )를 GPU장치capset정보로 반환한다.
+
+프로젝트 내부 함수 GPU장치capset읽기는 (ID: 자연수, 버전: 자연수, 출력주소: 주소, 출력용량: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_CAPSET_READ_SIZE, GPU_DEVICE_ABI_VERSION, 0, ID, 버전, 자연수(출력주소), 출력용량, 0]이고, 자연수 8개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_CAPSET_READ, 요청의 주소, GPU_DEVICE_CAPSET_READ_SIZE)이고, 정수이다.
+    만약 결과값 != 0이면
+        결과값을 정수로 반환한다.
+    정수(요청[GPU_DEVICE_CAPSET_READ_OUT_SIZE_OFFSET / 8])를 정수로 반환한다.
+
+프로젝트 내부 함수 GPU장치문맥열기는 (표시권한: 참거짓)를 받아
+    변수 플래그는 자연수(0)이고, 자연수이다.
+    만약 표시권한이면
+        플래그는 GPU_DEVICE_CONTEXT_PRESENT이다.
+    변수 요청은 [GPU_DEVICE_CONTEXT_CREATE_SIZE, GPU_DEVICE_ABI_VERSION, 플래그, 0, 0, 0, 0]이고, 자연수 7개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_CONTEXT_CREATE, 요청의 주소, GPU_DEVICE_CONTEXT_CREATE_SIZE)이고, 정수이다.
+    GPU장치문맥(
+        결과: 결과값,
+        핸들: 요청[GPU_DEVICE_CONTEXT_CREATE_HANDLE_OFFSET / 8],
+        화면핸들: 요청[GPU_DEVICE_CONTEXT_CREATE_SCANOUT_HANDLE_OFFSET / 8],
+        화면wireID: 요청[GPU_DEVICE_CONTEXT_CREATE_SCANOUT_WIRE_ID_OFFSET / 8],
+        완료값: 요청[GPU_DEVICE_CONTEXT_CREATE_COMPLETED_OFFSET / 8]
+    )를 GPU장치문맥으로 반환한다.
+
+프로젝트 내부 함수 GPU장치문맥닫기는 (문맥핸들: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_CONTEXT_DESTROY_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들]이고, 자연수 4개의 고정배열이다.
+    GPU장치시스템호출(GPU_DEVICE_CONTEXT_DESTROY, 요청의 주소, GPU_DEVICE_CONTEXT_DESTROY_SIZE)를 정수로 반환한다.
+
+프로젝트 내부 함수 GPU장치버퍼만들기는 (문맥핸들: 자연수, 바이트수: 자연수, 사용법: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_RESOURCE_CREATE_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, GPU_DEVICE_RESOURCE_BUFFER, GPU_DEVICE_FORMAT_NONE, 0, 0, 바이트수, 사용법, 0, 0]이고, 자연수 12개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_RESOURCE_CREATE, 요청의 주소, GPU_DEVICE_RESOURCE_CREATE_SIZE)이고, 정수이다.
+    GPU장치리소스(결과: 결과값, 핸들: 요청[GPU_DEVICE_RESOURCE_CREATE_HANDLE_OFFSET / 8], wireID: 요청[GPU_DEVICE_RESOURCE_CREATE_WIRE_ID_OFFSET / 8])를 GPU장치리소스로 반환한다.
+
+프로젝트 내부 함수 GPU장치이미지만들기는 (문맥핸들: 자연수, 너비: 자연수, 높이: 자연수, 형식: 자연수, 사용법: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_RESOURCE_CREATE_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, GPU_DEVICE_RESOURCE_IMAGE_2D, 형식, 너비, 높이, 0, 사용법, 0, 0]이고, 자연수 12개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_RESOURCE_CREATE, 요청의 주소, GPU_DEVICE_RESOURCE_CREATE_SIZE)이고, 정수이다.
+    GPU장치리소스(결과: 결과값, 핸들: 요청[GPU_DEVICE_RESOURCE_CREATE_HANDLE_OFFSET / 8], wireID: 요청[GPU_DEVICE_RESOURCE_CREATE_WIRE_ID_OFFSET / 8])를 GPU장치리소스로 반환한다.
+
+프로젝트 내부 함수 GPU장치리소스닫기는 (문맥핸들: 자연수, 리소스핸들: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_RESOURCE_DESTROY_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, 리소스핸들]이고, 자연수 5개의 고정배열이다.
+    GPU장치시스템호출(GPU_DEVICE_RESOURCE_DESTROY, 요청의 주소, GPU_DEVICE_RESOURCE_DESTROY_SIZE)를 정수로 반환한다.
+
+프로젝트 내부 함수 GPU장치버퍼쓰기는 (문맥핸들: 자연수, 리소스핸들: 자연수, 원본주소: 주소, 원본길이: 자연수, 대상오프셋: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_RESOURCE_WRITE_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, 리소스핸들, 자연수(원본주소), 원본길이, 0, 0, 0, 0, 0, 대상오프셋]이고, 자연수 13개의 고정배열이다.
+    GPU장치시스템호출(GPU_DEVICE_RESOURCE_WRITE, 요청의 주소, GPU_DEVICE_RESOURCE_WRITE_SIZE)를 정수로 반환한다.
+
+프로젝트 내부 함수 GPU장치이미지쓰기는 (문맥핸들: 자연수, 리소스핸들: 자연수, 원본주소: 주소, 원본길이: 자연수, 원본피치: 자연수, x: 자연수, y: 자연수, 너비: 자연수, 높이: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_RESOURCE_WRITE_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, 리소스핸들, 자연수(원본주소), 원본길이, 원본피치, x, y, 너비, 높이, 0]이고, 자연수 13개의 고정배열이다.
+    GPU장치시스템호출(GPU_DEVICE_RESOURCE_WRITE, 요청의 주소, GPU_DEVICE_RESOURCE_WRITE_SIZE)를 정수로 반환한다.
+
+프로젝트 내부 함수 GPU장치명령제출은 (문맥핸들: 자연수, 명령주소: 주소, 명령길이: 자연수, 핸들목록주소: 주소, 핸들개수: 자연수, 기다림값: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_SUBMIT_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, 자연수(명령주소), 명령길이, 자연수(핸들목록주소), 핸들개수, 기다림값, 0]이고, 자연수 10개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_SUBMIT, 요청의 주소, GPU_DEVICE_SUBMIT_SIZE)이고, 정수이다.
+    GPU장치제출결과(결과: 결과값, 신호값: 요청[GPU_DEVICE_SUBMIT_SIGNAL_OFFSET / 8])를 GPU장치제출결과로 반환한다.
+
+프로젝트 내부 함수 GPU장치timeline기다리기는 (문맥핸들: 자연수, 값: 자연수, 절대마감밀리초: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_WAIT_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, 값, 절대마감밀리초, 0]이고, 자연수 7개의 고정배열이다.
+    상수 결과값은 GPU장치시스템호출(GPU_DEVICE_WAIT, 요청의 주소, GPU_DEVICE_WAIT_SIZE)이고, 정수이다.
+    GPU장치대기결과(결과: 결과값, 완료값: 요청[GPU_DEVICE_WAIT_COMPLETED_OFFSET / 8])를 GPU장치대기결과로 반환한다.
+
+프로젝트 내부 함수 GPU장치화면표시는 (문맥핸들: 자연수, 화면핸들: 자연수, 기다림값: 자연수, x: 자연수, y: 자연수, 너비: 자연수, 높이: 자연수)를 받아
+    변수 요청은 [GPU_DEVICE_PRESENT_SIZE, GPU_DEVICE_ABI_VERSION, 0, 문맥핸들, 화면핸들, 기다림값, x, y, 너비, 높이]이고, 자연수 10개의 고정배열이다.
+    GPU장치시스템호출(GPU_DEVICE_PRESENT, 요청의 주소, GPU_DEVICE_PRESENT_SIZE)를 정수로 반환한다.

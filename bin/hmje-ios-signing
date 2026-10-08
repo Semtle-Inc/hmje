@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Owned scratch survives only when explicitly requested for debugging.
+hmje_temp_remove() {
+    if [ "${HMJE_KEEP_TEMP:-0}" = 1 ]; then
+        for hmje_temp_path do
+            [ "$hmje_temp_path" = -- ] || [ -z "$hmje_temp_path" ] || printf 'HMJE_KEEP_TEMP=1: %s\n' "$hmje_temp_path" >&2
+        done
+    else
+        rm -rf "$@"
+    fi
+}
+# Prepare explicitly selected device credentials. Never search the user's keychain
+# or choose a profile/certificate implicitly.
+set -eu
+[ "$#" -eq 4 ] || { echo 'usage: hmje-ios-signing bundle-id profile-output entitlements-output requested-entitlements' >&2; exit 2; }
+BUNDLE_ID=$1 PROFILE_OUTPUT=$2 ENTITLEMENTS_OUTPUT=$3 REQUESTED_ENTITLEMENTS=$4
+: "${HMJE_IOS_SIGNING_IDENTITY:?ios-app requires HMJE_IOS_SIGNING_IDENTITY}"
+: "${HMJE_IOS_PROVISIONING_PROFILE:?ios-app requires HMJE_IOS_PROVISIONING_PROFILE}"
+[ "$HMJE_IOS_SIGNING_IDENTITY" != - ] || { echo 'error: a device application needs a signing certificate, not ad-hoc signing' >&2; exit 2; }
+[ -f "$HMJE_IOS_PROVISIONING_PROFILE" ] || { echo 'error: provisioning profile does not exist' >&2; exit 2; }
+SIGNING_WORK=$(mktemp -d "${TMPDIR:-/tmp}/hmje-ios-signing.XXXXXXXX")
+trap 'hmje_temp_remove "$SIGNING_WORK"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+/usr/bin/security cms -D -i "$HMJE_IOS_PROVISIONING_PROFILE" > "$SIGNING_WORK/profile.plist"
+PROFILE_APPLICATION=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$SIGNING_WORK/profile.plist")
+TEAM_PREFIX=${PROFILE_APPLICATION%%.*}
+case "$TEAM_PREFIX.$BUNDLE_ID" in
+    "$PROFILE_APPLICATION") ;;
+    *)
+        case "$PROFILE_APPLICATION" in
+            *'.*')
+                PROFILE_PREFIX=${PROFILE_APPLICATION%\*}
+                case "$TEAM_PREFIX.$BUNDLE_ID" in
+                    "$PROFILE_PREFIX"*) ;;
+                    *) echo 'error: provisioning profile wildcard does not match bundle identifier' >&2; exit 2 ;;
+                esac ;;
+            *) echo 'error: provisioning profile application identifier does not match the project bundle identifier' >&2; exit 2 ;;
+        esac ;;
+esac
+PROFILE_EXPIRATION=$(/usr/bin/plutil -extract ExpirationDate xml1 -o - "$SIGNING_WORK/profile.plist" | sed -n 's/.*<date>\(.*\)<\/date>.*/\1/p')
+PROFILE_EXPIRATION_SECONDS=$(/bin/date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$PROFILE_EXPIRATION" +%s)
+[ "$PROFILE_EXPIRATION_SECONDS" -gt "$(/bin/date +%s)" ] || { echo 'error: provisioning profile has expired' >&2; exit 2; }
+if [ -n "$REQUESTED_ENTITLEMENTS" ]; then
+    /bin/cp "$REQUESTED_ENTITLEMENTS" "$ENTITLEMENTS_OUTPUT"
+else
+    /usr/libexec/PlistBuddy -x -c 'Print :Entitlements' "$SIGNING_WORK/profile.plist" > "$ENTITLEMENTS_OUTPUT"
+    /usr/bin/plutil -replace application-identifier -string "$TEAM_PREFIX.$BUNDLE_ID" "$ENTITLEMENTS_OUTPUT"
+    # Xcode specializes a wildcard keychain group to the chosen application.
+    /usr/bin/plutil -replace keychain-access-groups -json "[\"$TEAM_PREFIX.$BUNDLE_ID\"]" "$ENTITLEMENTS_OUTPUT"
+fi
+ENTITLEMENT_APPLICATION=$(/usr/libexec/PlistBuddy -c 'Print :application-identifier' "$ENTITLEMENTS_OUTPUT")
+[ "$ENTITLEMENT_APPLICATION" = "$TEAM_PREFIX.$BUNDLE_ID" ] || { echo 'error: signing entitlements application identifier does not match the bundle/profile' >&2; exit 2; }
+/bin/cp "$HMJE_IOS_PROVISIONING_PROFILE" "$PROFILE_OUTPUT"

@@ -1,0 +1,18 @@
+HmjeNetwork를 가져온다.
+
+비동기인 함수 앱시작은
+    상수 URL은 "https://www.amazon.com/robots.txt"이고, 문자열이다.
+    상수 설정은 네트워크HTTP기본설정(URL)이고, 네트워크HTTP설정이다.
+    상수 응답은 네트워크HTTP요청(설정)을 기다린 결과이고, 네트워크HTTP응답이다.
+    상수 POST기본은 네트워크HTTP기본설정("https://postman-echo.com/post")이고, 네트워크HTTP설정이다.
+    상수 POST설정은 네트워크HTTP본문설정(POST기본, "POST", "hmje-http2-post")이고, 네트워크HTTP설정이다.
+    상수 POST응답은 네트워크HTTP요청(POST설정)을 기다린 결과이고, 네트워크HTTP응답이다.
+    만약 응답.성공 그리고 응답.상태 == 200 그리고 응답.본문.길이 != 0 그리고 POST응답.성공 그리고 POST응답.상태 == 200 그리고 문자열포함하는가(POST응답.본문, "hmje-http2-post")이면
+        "hmje-network-https-integration-ok"를 출력한다.
+    아니면
+        "hmje-network-https-integration-failed"를 출력한다.
+        응답.상태를 출력한다.
+        응답.오류를 출력한다.
+        POST응답.상태를 출력한다.
+        POST응답.오류를 출력한다.
+    반환한다.

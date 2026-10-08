@@ -1,0 +1,99 @@
+HMJE 도구 소스 공개 라이선스 — Beta 1
+라이선스 버전 1.0 · 2026-10-09
+Copyright (c) 2026 오현우. All rights reserved.
+
+한국어 (주 문서)
+
+1. 정의
+- "도구": 이 저장소와 Releases에서 제공하는 HMJE 컴파일러, 프런트엔드, 타입 검사기, HMIR·LLVM 생성기, 빌드·설치 도구, Swift 씨앗과 재현 검증 코드, 그리고 이들의 문서와 예제를 말합니다. 훈민정음 IDE 바이너리도 도구에 포함합니다. IDE 본체 소스는 공개하지 않으며 이 라이선스의 대상이 아닙니다.
+- "파생 도구": 도구를 수정하거나 도구의 코드를 포함하여 만든 저작물을 말합니다. 도구로 만든 앱은 파생 도구가 아닙니다.
+- "앱": 라이선스를 받은 자가 도구를 사용하여 만든 프로그램과 그 결과물을 말합니다.
+- "경쟁 제공": 주된 목적이 HMJE 코드의 컴파일, 편집, 실행 또는 언어 도구 기능을 제3자에게 제공하는 것인 제품이나 서비스를 말합니다.
+- "조직 내부": 라이선스를 받은 개인이나 법인의 임직원과 계약자가 그 개인이나 법인을 위해 수행하는 업무를 말합니다.
+- "저작권자": 도구의 저작권을 보유하고 이 라이선스를 허락하는 오현우를 말합니다.
+- "배포자": 저작권자를 대신하여 도구를 공개 배포하는 Semtle Inc.를 말합니다. 배포자는 저작권자의 허락 범위 안에서 배포하며, 이 라이선스의 허가 주체는 저작권자입니다.
+
+2. 적용 범위
+이 라이선스는 도구에 적용됩니다. 도구의 개별 파일이나 구성요소에 다른 라이선스가 명시되어 있으면 그 구성요소에는 명시된 라이선스가 우선합니다. 앱에 포함되는 런타임·표준·플랫폼 라이브러리에는 LICENSE-RUNTIME이 적용되며, 두 문서가 충돌하면 그 코드에 대해서는 LICENSE-RUNTIME이 우선합니다. 제삼자 자료는 THIRD_PARTY_NOTICES.md와 각 원래 라이선스를 따릅니다. 별도 저장소에서 다른 라이선스를 명시한 예제(예: 개발자 세션 예제)는 그 저장소의 라이선스를 따릅니다.
+
+3. 허용되는 사용
+가. 개인과 법인은 도구를 무료로 내려받고, 검토하고, 복제하고, 수정하고, 빌드하여 사용할 수 있습니다. 상업적 목적과 조직 내부 빌드 시스템에서의 사용을 포함합니다.
+나. 도구로 만든 앱은 누구에게나 판매, 배포하거나 서비스로 제공할 수 있습니다. 앱에 포함된 HMJE 런타임·라이브러리는 LICENSE-RUNTIME을 따릅니다.
+다. 라이선스를 받은 자는 조직 내부의 임직원과 계약자에게 도구를 제공하여, 그들이 그 자를 위해 도구를 사용하게 할 수 있습니다. 이때 그 임직원과 계약자는 도구를 자신을 위해 사용하거나 제3자에게 제공할 수 없습니다.
+라. 개발 용역 업체가 고객의 앱을 도구로 개발하여 고객에게 인도하는 것은 허용됩니다. 이때 고객에게 인도되는 것은 앱과 LICENSE-RUNTIME에 따른 런타임뿐이며, 도구 자체는 인도할 수 없습니다.
+
+4. 금지되는 행위
+가. 도구 또는 파생 도구를 무료 또는 유료로 제3자에게 판매, 재라이선스, 배포하는 행위. 제3조 나목의 앱 배포와 제3조 다목의 조직 내부 제공은 제외합니다.
+나. 도구 또는 파생 도구를 경쟁 제공의 형태로 제3자에게 제공하는 행위. 호스팅된 컴파일러나 IDE, 제3자가 사용하는 온라인 빌드 서비스가 예입니다.
+다. 도구의 상표를 사용하여 공식 배포판인 것처럼 표시하는 행위.
+다음 행위는 가목과 나목의 제한에 해당하지 않습니다. 자신의 앱을 만들기 위해 도구를 자신의 빌드 시스템이나 CI에서 실행하는 것, 그리고 제3조 라목에 따라 고객의 앱을 개발하는 것.
+
+5. 권리의 유지와 종료
+이 라이선스가 명시적으로 허용하지 않은 권리는 부여되지 않습니다. 허용된 복제본에는 저작권 표시와 이 라이선스를 함께 포함해야 합니다. 저작권자가 위반 사실을 서면으로 통지하고 30일 안에 시정되지 않으면 이 라이선스는 종료됩니다. 제4조 나목이나 다목의 위반처럼 시정할 수 없는 위반은 즉시 종료될 수 있습니다. 종료된 후에는 도구와 파생 도구의 사용과 배포를 중단해야 합니다. 다만 종료 전에 적법하게 배포된 앱과, 그 앱에 포함된 런타임의 사용 권리는 LICENSE-RUNTIME에 따라 유지됩니다.
+
+6. 기여
+저작권자는 별도 서면 합의가 없는 한 외부 코드 기여를 받지 않습니다. 버그 보고와 제안은 저장소의 Issues로 받습니다. 합의 없이 제출된 코드는 제출자가 저작권자와 배포자가 이 라이선스 조건에 따라 그 코드를 사용, 수정, 배포할 수 있음에 동의한 것으로 봅니다.
+
+7. 상표
+"HMJE"와 "훈민정음 IDE"는 저작권자 오현우의 이름이자 상표입니다. 이 라이선스는 상표 사용 권리나 공식 배포판으로 표시할 권리를 부여하지 않습니다. 정확한 출처 표시와 LICENSE-RUNTIME이 요구하는 기여 표시는 할 수 있습니다.
+
+8. 수출
+도구를 수출, 재수출, 이전할 때에는 대한민국과 미국을 포함한 적용 가능한 수출 통제 법령을 따라야 합니다.
+
+9. 보증과 책임
+법률이 허용하는 범위에서 도구는 어떠한 명시적·묵시적 보증도 없이 현 상태 그대로(AS IS) 제공됩니다. 저작권자, 배포자 Semtle Inc., 기여자는 도구의 사용으로 생긴 간접 손해, 특별 손해, 결과적 손해에 책임을 지지 않습니다. 다만 고의 또는 중대한 과실로 인한 책임, 생명이나 신체의 침해, 그 밖에 법률상 배제하거나 제한할 수 없는 책임은 제외합니다.
+
+10. 준거법과 관할
+이 라이선스는 대한민국 법률에 따라 해석하고 적용합니다. 이 라이선스와 관련된 분쟁의 제1심 관할 법원은 서울중앙지방법원으로 합니다.
+
+11. 언어와 일부 무효
+한국어 문서와 영어 참고 번역의 해석이 다르면 한국어 문서가 우선합니다. 이 라이선스의 일부가 무효이거나 집행할 수 없더라도 나머지 조항은 효력을 유지합니다.
+
+English (reference translation)
+
+1. Definitions
+- "Tools": the HMJE compiler, frontend, type checker, HMIR and LLVM code generator, build and installation tools, the Swift seed and reproduction verification code, and their documentation and examples, as provided in this repository and in Releases. The Hunminjeongeum IDE binaries are also Tools. IDE application source is not published and is not covered by this license.
+- "Derivative Tools": works that modify the Tools or incorporate Tools code. Applications built with the Tools are not Derivative Tools.
+- "Applications": programs and their outputs created by a licensee using the Tools.
+- "Competing Offering": a product or service whose principal purpose is to provide HMJE code compilation, editing, execution, or language tooling to third parties.
+- "Internal Organization": a licensee's employees and contractors, acting for that licensee.
+- "Licensor": 오현우, the copyright holder of the Tools, who grants this license.
+- "Distributor": Semtle Inc., which publicly distributes the Tools on the Licensor's behalf and within the scope the Licensor permits.
+
+2. Scope
+This license applies to the Tools. Where an individual file or component states a different license, that statement governs that component. The runtime, standard, and platform libraries embedded in Applications are governed by LICENSE-RUNTIME, which prevails for that code if the two conflict. Third-party materials remain under THIRD_PARTY_NOTICES.md and their original licenses. Examples in a separate repository that state a different license (for example, the developer session examples) follow that repository's license.
+
+3. Permitted Use
+a. Individuals and organizations may download, review, copy, modify, build, and use the Tools free of charge, including for commercial purposes and within internal build systems.
+b. Applications built with the Tools may be sold, distributed, or offered as a service to anyone. HMJE runtime and library code embedded in Applications is governed by LICENSE-RUNTIME.
+c. A licensee may make the Tools available to its Internal Organization so that they can use the Tools on the licensee's behalf. Those individuals may not use the Tools for their own purposes or provide them to third parties.
+d. A development services provider may build a client's Application with the Tools and deliver the Application to the client. Only the Application and the runtime governed by LICENSE-RUNTIME may be delivered to the client; the Tools themselves may not.
+
+4. Prohibited Conduct
+a. Selling, sublicensing, or distributing the Tools or Derivative Tools to third parties, whether free or paid. This does not restrict distribution of Applications under 3(b) or provision within the Internal Organization under 3(c).
+b. Providing the Tools or Derivative Tools to third parties as a Competing Offering, such as a hosted compiler or IDE, or an online build service used by third parties.
+c. Using the name or marks of the Tools to present a copy as an official distribution.
+The following do not fall under 4(a) or 4(b): running the Tools in your own build system or CI to build your own Applications, and developing a client's Application under 3(d).
+
+5. Retention of Rights and Termination
+No rights are granted except those expressly stated. Permitted copies must include the copyright notice and this license. If the Licensor notifies a licensee in writing of a breach and the breach is not cured within 30 days, this license terminates. A breach that cannot be cured, such as a Competing Offering under 4(b) or a breach of 4(c), may terminate this license immediately. After termination, the licensee must stop using and distributing the Tools and Derivative Tools. Applications lawfully distributed before termination, and the right to use the runtime they contain, remain governed by LICENSE-RUNTIME.
+
+6. Contributions
+Unless agreed in writing, the Licensor does not accept external code contributions. Bug reports and suggestions are accepted through the repository's Issues. Code submitted outside such an agreement is deemed to be submitted on the basis that the Licensor and the Distributor may use, modify, and distribute it under the terms of this license.
+
+7. Trademarks
+"HMJE" and "Hunminjeongeum IDE" are names and trademarks of the Licensor (오현우). This license grants no right to use these marks or to represent a copy as an official distribution. Accurate attribution and the attribution required by LICENSE-RUNTIME are permitted.
+
+8. Export
+Export, re-export, or transfer of the Tools must comply with applicable export control laws, including those of the Republic of Korea and the United States.
+
+9. Warranty and Liability
+To the extent permitted by law, the Tools are provided AS IS, without any express or implied warranty. The Licensor, the Distributor (Semtle Inc.), and contributors are not liable for indirect, special, or consequential damages arising from use of the Tools. This does not exclude liability for intentional or gross negligence, personal injury or death, or liability that cannot be excluded or limited under applicable law.
+
+10. Governing Law and Venue
+This license is governed by and construed in accordance with the laws of the Republic of Korea. The Seoul Central District Court is the court of first instance for any dispute arising from this license.
+
+11. Language and Severability
+If the Korean text and this English reference translation differ in meaning, the Korean text controls. If any provision is invalid or unenforceable, the remaining provisions remain in effect.
+
+This is a source-available license. It is not an OSI-approved open-source license. It is a separate HMJE license and is not adopted from PolyForm or any other license.

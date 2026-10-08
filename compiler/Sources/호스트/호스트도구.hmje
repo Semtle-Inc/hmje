@@ -1,0 +1,32 @@
+# 컴파일러 도구 전용 호스트 서비스. 캐시·작업 디렉터리·원자 복사·도구 지문은
+# 언어 표준 API가 아니라 컴파일러 호스트 지원(compiler/runtime/host_support*.c와
+# platforms/tools/targets/posix_host_shim.c)이 구현하는 도구 계약이다.
+
+외부 함수 hmje_posix_directory_create_all은 (경로주소: 자연수, 경로길이: 자연수)를 받아 정수로 반환하며 외부에서 "hmje_host_directory_create_all"이라는 이름으로 구현된다.
+외부 함수 hmje_host_directory_remove_tree은 (경로주소: 자연수, 경로길이: 자연수)를 받아 정수로 반환하며 외부에서 "hmje_host_directory_remove_tree"이라는 이름으로 구현된다.
+외부 함수 hmje_posix_path_slot_hash는 (경로주소: 자연수, 경로길이: 자연수)를 받아 자연수로 반환하며 외부에서 "hmje_host_path_slot_hash"이라는 이름으로 구현된다.
+외부 함수 hmje_posix_file_copy_atomic은 (원본주소: 자연수, 원본길이: 자연수, 대상주소: 자연수, 대상길이: 자연수, 실행권한: 자연수)를 받아 정수로 반환하며 외부에서 "hmje_host_file_copy_atomic"이라는 이름으로 구현된다.
+# 읽기 실패는 0, 성공은 파일 내용의 지문이다. 큰 도구 파일도 고정 버퍼로 읽는다.
+외부 함수 hmje_posix_file_content_hash는 (경로주소: 자연수, 경로길이: 자연수)를 받아 자연수로 반환하며 외부에서 "hmje_host_file_content_hash"이라는 이름으로 구현된다.
+외부 함수 hmje_posix_tool_query_hash는 (경로주소: 자연수, 경로길이: 자연수, 옵션주소: 자연수, 옵션길이: 자연수)를 받아 자연수로 반환하며 외부에서 "hmje_host_tool_query_hash"이라는 이름으로 구현된다.
+
+프로젝트 내부 함수 포직스디렉터리모두만들기는 (경로: 문자열)를 받아
+    hmje_posix_directory_create_all(자연수(경로.주소), 경로.길이)를 정수로 반환한다.
+
+프로젝트 내부 함수 호스트작업디렉터리지우기는 (경로: 문자열)를 받아
+    hmje_host_directory_remove_tree(자연수(경로.주소), 경로.길이)를 정수로 반환한다.
+
+프로젝트 내부 함수 포직스경로슬롯해시는 (경로: 문자열)를 받아
+    hmje_posix_path_slot_hash(자연수(경로.주소), 경로.길이)를 자연수로 반환한다.
+
+프로젝트 내부 함수 포직스파일원자복사는 (원본: 문자열, 대상: 문자열, 실행본인가: 참거짓)를 받아
+    변수 실행권한은 0이고, 자연수이다.
+    만약 실행본인가이면
+        실행권한은 1이다.
+    hmje_posix_file_copy_atomic(자연수(원본.주소), 원본.길이, 자연수(대상.주소), 대상.길이, 실행권한)를 정수로 반환한다.
+
+프로젝트 내부 함수 포직스파일내용해시는 (경로: 문자열)를 받아
+    hmje_posix_file_content_hash(자연수(경로.주소), 경로.길이)를 자연수로 반환한다.
+
+프로젝트 내부 함수 포직스도구질의지문은 (경로: 문자열, 옵션: 문자열)를 받아
+    hmje_posix_tool_query_hash(자연수(경로.주소), 경로.길이, 자연수(옵션.주소), 옵션.길이)를 자연수로 반환한다.

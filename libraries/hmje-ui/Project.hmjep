@@ -1,0 +1,135 @@
+프로젝트 hmje-ui의
+    버전은 "0.1.0"이다.
+
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+
+의존 프로젝트 hmje-network의
+    로컬 경로는 "../hmje-network"이다.
+
+# 그래픽 공통 추상화. 그리기 명령·표면·GPU 장치 계약(Sources/HmjeGraphics/device)도
+# 이 모듈이 소유한다. 창·입력·프레임버퍼·GPU 명령은 운영체제 모듈, 폰트·이모지
+# 폰트 자원(`assets`)은 표준의 자원 API(`자원열기`)로 읽는다.
+모듈 HmjeGraphics의
+    원본 경로는 "Sources/HmjeGraphics"이고,
+    자원 경로는 "assets"이고,
+    의존 라이브러리는
+        기반과,
+        운영체제이다.
+
+# 데스크톱 창 API(Sources/HmjeUIDesktop — 창 열기·닫기·정책·창실행)는 창이 있는
+# 데스크톱 대상에만 싣는다. iOS·Android·semtleOS에서 그 이름을 쓰면 컴파일러가 대상을
+# 밝힌 미지원 오류를 낸다. 창 문맥·창 사건 처리(ui_window*.hmje)는 모든 대상에 있다.
+모듈 HmjeUI의
+    원본 경로는 "Sources/HmjeUI"이고,
+    외부 구현은
+        HmjeExternalURL과,
+        HmjeDesktopFiles와,
+        HmjeDesktopWatch와,
+        HmjeDesktopNotifications이고,
+    의존 모듈은 HmjeGraphics이고,
+    의존 라이브러리는
+        기반과,
+        운영체제와,
+        HmjeNetwork이다.
+    macOS 설정의
+        원본 경로는 "Sources/HmjeUIDesktop"이다.
+    Windows 설정의
+        원본 경로는 "Sources/HmjeUIDesktop"이다.
+    Linux 설정의
+        원본 경로는 "Sources/HmjeUIDesktop"이다.
+
+라이브러리 HmjeGraphics의
+    내보내는 모듈은 HmjeGraphics이다.
+
+라이브러리 HmjeUI의
+    내보내는 모듈은
+        HmjeGraphics와,
+        HmjeUI이다.
+
+# 시스템 브라우저로 http(s) 주소 열기(ui_external_url.hmje).
+외부 구현 HmjeExternalURL의
+    원본 경로는 "Native/ExternalURL"이다.
+    iOS 설정의
+        원본 파일은 "external_url_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            UIKit이다.
+    macOS 설정의
+        원본 파일은 "external_url_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            AppKit이다.
+    Android 설정의
+        원본 파일은 "external_url_android.c"이다.
+    Linux 설정의
+        원본 파일은 "external_url_stub.c"이다.
+    Windows 설정의
+        원본 파일은 "external_url_windows.c"이고,
+        시스템 라이브러리는
+            shell32와,
+            winhttp이다.
+    semtleOS 설정의
+        원본 파일은 "external_url_stub.c"이다.
+
+# 모달 파일 열기/저장 선택 창(ui_file_dialog.hmje).
+외부 구현 HmjeDesktopFiles의
+    원본 경로는 "Native/DesktopFiles"이다.
+    macOS 설정의
+        원본 파일은 "file_dialog_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            AppKit이다.
+    Windows 설정의
+        원본 파일은 "file_dialog_windows.c"이고,
+        시스템 라이브러리는
+            ole32과,
+            shell32과,
+            uuid이다.
+    iOS 설정의
+        원본 파일은 "file_dialog_stub.c"이다.
+    Android 설정의
+        원본 파일은 "file_dialog_stub.c"이다.
+    Linux 설정의
+        원본 파일은 "file_dialog_linux.c"이다.
+    semtleOS 설정의
+        원본 파일은 "file_dialog_stub.c"이다.
+
+외부 구현 HmjeDesktopWatch의
+    원본 경로는 "Native/Watch"이다.
+    macOS 설정의
+        원본 파일은 "watch_apple.m"이고,
+        시스템 프레임워크는 CoreServices이다.
+    Linux 설정의
+        원본 파일은 "watch_linux.c"이다.
+    Windows 설정의
+        원본 파일은 "watch_windows.c"이다.
+    iOS 설정의
+        원본 파일은 "watch_stub.c"이다.
+    Android 설정의
+        원본 파일은 "watch_stub.c"이다.
+    semtleOS 설정의
+        원본 파일은 "watch_stub.c"이다.
+
+외부 구현 HmjeDesktopNotifications의
+    원본 경로는 "Native/Notifications"이다.
+    macOS 설정의
+        원본 파일은 "notifications_apple.m"이고,
+        시스템 프레임워크는
+            AppKit과,
+            UserNotifications이다.
+    Windows 설정의
+        원본 파일은 "notifications_windows.cpp"이고,
+        시스템 라이브러리는
+            runtimeobject과,
+            shell32과,
+            windowsapp과,
+            msvcprt이다.
+    Linux 설정의
+        원본 파일은 "notifications_stub.c"이다.
+    iOS 설정의
+        원본 파일은 "notifications_stub.c"이다.
+    Android 설정의
+        원본 파일은 "notifications_stub.c"이다.
+    semtleOS 설정의
+        원본 파일은 "notifications_stub.c"이다.

@@ -1,0 +1,1466 @@
+컴파일러호스트를 가져온다.
+
+# Android(Bionic, arm64-v8a) 제품 타깃. 세 산출물이 있고 앞의 둘은 같은 hosted 방출을 공유한다.
+#   android-llvm-ir : aarch64-linux-android<minSdk> 트리플의 LLVM IR(제품조정기의
+#                     "llvm" 경로를 그대로 탄다 — 트리플만 다르다).
+#   android-exe     : 플레인 실행 파일(진짜 main()). adb push로 실행한다. android_shim.c + async_host_runtime.c 링크.
+#   android-apk     : main()을 hmje_app_main으로 리네임해 libhmjeapp.so에 넣고
+#                     android_jni.c(JNI + ANativeWindow)가 진입점을 제공, APK 패키징.
+
+# NDK/SDK 도구 해석은 드라이버(bin/hmje-android-tools)가 하고 여기서는 환경변수로
+# 받는다 — ELF 타깃이 ld.lld 경로를 드라이버에서 받는 것과 같은 경계다.
+# macOS·iOS·Windows 파일은 전혀 관여하지 않는다.
+
+
+
+함수 안드로이드오류는 (내용: 문자열, 코드: 자연수)를 받아
+    내용을 오류로 출력한다.
+    종료를 (코드: 코드)로 실행한다.
+
+함수 안드로이드환경값은 (이름: 문자열)를 받아
+    상수 값은 환경변수(이름)이고, 문자열?이다.
+    만약 값이 없으면
+        ""를 문자열로 반환한다.
+    값!을 문자열로 반환한다.
+
+# 드라이버가 반드시 채워야 하는 도구 경로. 비어 있으면 드라이버 경계가 깨진 것이다.
+함수 안드로이드도구경로는 (이름: 문자열)를 받아
+    변수 값은 안드로이드환경값(이름)이고, 문자열이다.
+    만약 값 == "" 그리고 안드로이드윈도우호스트인가()이면
+        값은 안드로이드윈도우도구(이름)이다.
+    만약 문자열바이트길이(값) == 0이면
+        안드로이드오류를 (내용: 문자열붙인값("Android 도구 경로가 없습니다: ", 이름), 코드: 1)로 실행한다.
+    값을 문자열로 반환한다.
+
+함수 안드로이드최소SDK는
+    상수 값은 안드로이드환경값("HMJE_ANDROID_MIN_SDK")이고, 문자열이다.
+    만약 문자열바이트길이(값) == 0이면
+        "33"을 문자열로 반환한다.
+    값을 문자열로 반환한다.
+
+함수 안드로이드실행은 (인자들: 문자열의 배열, 단계: 문자열)를 받아
+    변수 명령은 인자들이고, 문자열의 배열이다.
+    만약 인자들[0] == "java" 또는 인자들[0] == "javac" 또는 인자들[0] == "jar" 또는 인자들[0] == "keytool"이면
+        명령[0]은 안드로이드JDK도구(인자들[0])이다.
+    만약 안드로이드윈도우호스트인가() 그리고 인자들[0] == 안드로이드도구경로("HMJE_ANDROID_CLANG")이면
+        명령은 [인자들[0], "--target=aarch64-linux-android" + 안드로이드최소SDK()]이다.
+        변수 번은 1이고, 자연수이다.
+        번 < 인자들.길이일 동안
+            명령에 인자들[번]을 추가한다.
+            번은 번 + 1이다.
+    상수 정규도구는 iOS문자열대체(인자들[0], "\\", "/")이고, 문자열이다.
+    # SDK 배치 래퍼 대신 배포된 JAR를 직접 실행해 cmd의 인자 재해석을 피한다.
+    만약 안드로이드윈도우호스트인가() 그리고 (문자열끝나는가(정규도구, "/d8.bat") 또는 문자열끝나는가(정규도구, "/apksigner.bat"))이면
+        상수 도구뿌리는 문자열부분(정규도구, 0, 정규도구.길이 - 안드로이드파일이름(정규도구).길이)이고, 문자열이다.
+        만약 문자열끝나는가(정규도구, "/d8.bat")이면
+            명령은 [안드로이드JDK도구("java"), "-cp", 도구뿌리 + "lib/d8.jar", "com.android.tools.r8.D8"]이다.
+        아니면
+            명령은 [안드로이드JDK도구("java"), "-jar", 도구뿌리 + "lib/apksigner.jar"]이다.
+        변수 번은 1이고, 자연수이다.
+        번 < 인자들.길이일 동안
+            명령에 인자들[번]을 추가한다.
+            번은 번 + 1이다.
+    상수 결과는 조정기내부실행(명령)이고, 정수이다.
+    만약 결과 != 0이면
+        만약 조정기내부기록 != ""이면
+            조정기내부기록을 오류로 출력한다.
+        안드로이드오류를 (내용: "Android \(단계)에 실패했습니다 (종료 코드 \(결과))", 코드: 1)로 실행한다.
+
+함수 안드로이드파일읽기는 (경로: 문자열)를 받아
+    상수 핸들은 파일열기(경로, 파일모드_읽기)이고, 정수이다.
+    만약 핸들 <= 0이면
+        ""를 문자열로 반환한다.
+    변수 정보는 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+    만약 파일정보(핸들, 정보의 주소) != 0이면
+        상수 실패닫기는 파일닫기(핸들)이고, 정수이다.
+        ""를 문자열로 반환한다.
+    상수 길이는 정보[0]이고, 자연수이다.
+    상수 버퍼는 메모리할당(길이)이고, 주소이다.
+    만약 길이 > 0 그리고 버퍼 == 주소(0)이면
+        상수 할당실패닫기는 파일닫기(핸들)이고, 정수이다.
+        ""를 문자열로 반환한다.
+    변수 읽기결과는 0이고, 정수이다.
+    만약 길이 > 0이면
+        읽기결과는 파일읽기(핸들, 0, 버퍼, 길이)이다.
+    상수 닫은수는 파일닫기(핸들)이고, 정수이다.
+    만약 읽기결과 != 정수(길이) 또는 닫은수 != 0이면
+        만약 버퍼 != 주소(0)이면
+            메모리해제를 (대상주소: 버퍼)로 실행한다.
+        ""를 문자열로 반환한다.
+    상수 결과는 바이트영역문자열(버퍼, 길이)이고, 문자열이다.
+    만약 버퍼 != 주소(0)이면
+        메모리해제를 (대상주소: 버퍼)로 실행한다.
+    결과를 문자열로 반환한다.
+
+함수 안드로이드필수파일읽기는 (경로: 문자열)를 받아
+    상수 내용은 안드로이드파일읽기(경로)이고, 문자열이다.
+    만약 내용.길이 == 0이면
+        안드로이드오류를 (내용: "필수 Android 파일을 읽을 수 없거나 비어 있습니다: \(경로)", 코드: 1)로 실행한다.
+    내용을 문자열로 반환한다.
+
+함수 안드로이드파일쓰기는 (경로: 문자열, 내용: 문자열)를 받아
+    상수 핸들은 파일열기(경로, 파일모드_쓰기 | 파일모드_생성 | 파일모드_절단)이고, 정수이다.
+    만약 핸들 <= 0이면
+        거짓을 참거짓으로 반환한다.
+    상수 쓴수는 파일쓰기(핸들, 0, 내용.주소, 내용.길이)이고, 정수이다.
+    상수 닫은수는 파일닫기(핸들)이고, 정수이다.
+    만약 쓴수 != 정수(내용.길이) 또는 닫은수 != 0이면
+        거짓을 참거짓으로 반환한다.
+    참을 참거짓으로 반환한다.
+
+함수 안드로이드파일있나는 (경로: 문자열)를 받아
+    상수 핸들은 파일열기(경로, 파일모드_읽기)이고, 정수이다.
+    만약 핸들 <= 0이면
+        거짓을 참거짓으로 반환한다.
+    상수 닫은수는 파일닫기(핸들)이고, 정수이다.
+    참을 참거짓으로 반환한다.
+
+함수 안드로이드파일이름은 (경로: 문자열)를 받아
+    변수 시작은 0이고, 자연수이다.
+    변수 번호는 0이고, 자연수이다.
+    번호 < 문자열바이트길이(경로)일 동안
+        만약 자연수(문자열바이트(경로, 번호)) == 47이면
+            시작은 번호 + 1이다.
+        번호는 번호 + 1이다.
+    문자열부분(경로, 시작, 문자열바이트길이(경로) - 시작)를 문자열로 반환한다.
+
+# ---- 앱 아이콘 폴더 ----
+# `아이콘 자원`이 폴더면 res 겹침으로 본다(훈민정음 IDE 아이콘 편집기가 만드는 꼴, docs/project.md 3.8):
+#   mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/hmje_app_icon.png   레거시(API 26 미만) — 하나 이상
+#   drawable-nodpi/hmje_app_icon_foreground.png                  적응형 전경(108dp, 안전 영역 66dp)
+#   drawable-nodpi/hmje_app_icon_background.png                  적응형 배경(없으면 기본 그라데이션)
+#   drawable-nodpi/hmje_app_icon_monochrome.png                  테마 아이콘(API 33 이상 platform jar일 때만)
+# 전경이 있으면 mipmap-anydpi-v26/hmje_app_icon.xml(adaptive-icon)을 여기서 쓴다. 정해진 이름만 옮기므로
+# 폴더의 다른 파일은 APK에 들어가지 않는다.
+전역 상수 안드로이드아이콘밀도들은 ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"]이고, 문자열 5개의 고정배열이다.
+
+함수 안드로이드아이콘폴더인가는 (경로: 문자열)를 받아
+    변수 번호는 0이고, 자연수이다.
+    번호 < 5일 동안
+        만약 안드로이드파일있나(문자열붙인값(경로, 문자열붙인값("/mipmap-", 문자열붙인값(안드로이드아이콘밀도들[번호], "/hmje_app_icon.png"))))이면
+            참을 참거짓으로 반환한다.
+        번호는 번호 + 1이다.
+    안드로이드파일있나(문자열붙인값(경로, "/drawable-nodpi/hmje_app_icon_foreground.png"))를 참거짓으로 반환한다.
+
+# platform jar 경로의 `android-NN`에서 API 수준(모르면 0)
+함수 안드로이드플랫폼API는 (플랫폼jar: 문자열)를 받아
+    상수 자리는 문자열찾기(플랫폼jar, "android-")이고, 자연수?이다.
+    만약 자리가 없으면
+        0을 자연수로 반환한다.
+    변수 번호는 자리! + 8이고, 자연수이다.
+    변수 값은 0이고, 자연수이다.
+    번호 < 문자열바이트길이(플랫폼jar)일 동안
+        상수 바이트는 자연수(문자열바이트(플랫폼jar, 번호))이고, 자연수이다.
+        만약 바이트 < 48 또는 바이트 > 57이면
+            반복을 종료한다.
+        값은 값 * 10 + (바이트 - 48)이다.
+        번호는 번호 + 1이다.
+    값을 자연수로 반환한다.
+
+함수 안드로이드아이콘파일복사는 (원본: 문자열, 대상폴더: 문자열, 이름: 문자열)를 받아
+    만약 포직스디렉터리모두만들기(대상폴더) != 0이면
+        안드로이드오류를 (내용: 문자열붙인값("res 디렉터리 생성 실패: ", 대상폴더), 코드: 1)로 실행한다.
+    만약 포직스파일원자복사(원본, 문자열붙인값(대상폴더, 문자열붙인값("/", 이름)), 거짓) != 0이면
+        안드로이드오류를 (내용: 문자열붙인값("Android 앱 아이콘 복사 실패: ", 원본), 코드: 1)로 실행한다.
+
+함수 안드로이드아이콘폴더복사는 (폴더: 문자열, res폴더: 문자열, 플랫폼jar: 문자열)를 받아
+    변수 레거시수는 0이고, 자연수이다.
+    변수 번호는 0이고, 자연수이다.
+    번호 < 5일 동안
+        상수 밀도폴더는 문자열붙인값("/mipmap-", 안드로이드아이콘밀도들[번호])이고, 문자열이다.
+        상수 원본은 문자열붙인값(폴더, 문자열붙인값(밀도폴더, "/hmje_app_icon.png"))이고, 문자열이다.
+        만약 안드로이드파일있나(원본)이면
+            안드로이드아이콘파일복사를 (원본: 원본, 대상폴더: 문자열붙인값(res폴더, 밀도폴더), 이름: "hmje_app_icon.png")로 실행한다.
+            레거시수는 레거시수 + 1이다.
+        번호는 번호 + 1이다.
+    만약 레거시수 == 0이면
+        안드로이드오류를 (내용: 문자열붙인값("Android 아이콘 폴더에 mipmap-*/hmje_app_icon.png가 없습니다: ", 폴더), 코드: 1)로 실행한다.
+    상수 전경은 문자열붙인값(폴더, "/drawable-nodpi/hmje_app_icon_foreground.png")이고, 문자열이다.
+    만약 안드로이드파일있나(전경) == 거짓이면
+        반환한다.
+    상수 drawable폴더는 문자열붙인값(res폴더, "/drawable-nodpi")이고, 문자열이다.
+    안드로이드아이콘파일복사를 (원본: 전경, 대상폴더: drawable폴더, 이름: "hmje_app_icon_foreground.png")로 실행한다.
+    상수 배경은 문자열붙인값(폴더, "/drawable-nodpi/hmje_app_icon_background.png")이고, 문자열이다.
+    만약 안드로이드파일있나(배경)이면
+        안드로이드아이콘파일복사를 (원본: 배경, 대상폴더: drawable폴더, 이름: "hmje_app_icon_background.png")로 실행한다.
+    아니면
+        상수 drawableXML폴더는 문자열붙인값(res폴더, "/drawable")이고, 문자열이다.
+        만약 포직스디렉터리모두만들기(drawableXML폴더) != 0이면
+            안드로이드오류를 (내용: "res/drawable 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        상수 기본배경은 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<shape xmlns:android=\"http://schemas.android.com/apk/res/android\" android:shape=\"rectangle\">\n    <gradient android:angle=\"270\" android:startColor=\"#1A8CFF\" android:endColor=\"#005EE0\" />\n</shape>\n"이고, 문자열이다.
+        만약 안드로이드파일쓰기(문자열붙인값(drawableXML폴더, "/hmje_app_icon_background.xml"), 기본배경) == 거짓이면
+            안드로이드오류를 (내용: "Android adaptive icon 배경을 쓰지 못했습니다", 코드: 1)로 실행한다.
+    변수 단색줄은 ""이고, 문자열이다.
+    상수 단색은 문자열붙인값(폴더, "/drawable-nodpi/hmje_app_icon_monochrome.png")이고, 문자열이다.
+    # <monochrome>은 API 33 platform jar의 속성이다. 낮은 jar로 링크하면 aapt2가 거절하므로 뺀다.
+    만약 안드로이드파일있나(단색) 그리고 안드로이드플랫폼API(플랫폼jar) >= 33이면
+        안드로이드아이콘파일복사를 (원본: 단색, 대상폴더: drawable폴더, 이름: "hmje_app_icon_monochrome.png")로 실행한다.
+        단색줄은 "    <monochrome android:drawable=\"@drawable/hmje_app_icon_monochrome\" />\n"이다.
+    상수 adaptive폴더는 문자열붙인값(res폴더, "/mipmap-anydpi-v26")이고, 문자열이다.
+    만약 포직스디렉터리모두만들기(adaptive폴더) != 0이면
+        안드로이드오류를 (내용: "res/mipmap-anydpi-v26 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    상수 적응형은 문자열붙인값("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\">\n    <background android:drawable=\"@drawable/hmje_app_icon_background\" />\n    <foreground android:drawable=\"@drawable/hmje_app_icon_foreground\" />\n", 문자열붙인값(단색줄, "</adaptive-icon>\n"))이고, 문자열이다.
+    만약 안드로이드파일쓰기(문자열붙인값(adaptive폴더, "/hmje_app_icon.xml"), 적응형) == 거짓이면
+        안드로이드오류를 (내용: "Android adaptive icon 정의를 쓰지 못했습니다", 코드: 1)로 실행한다.
+
+함수 안드로이드작업폴더만들기는 (경로: 문자열)를 받아
+    만약 호스트작업디렉터리지우기(경로) != 0이면
+        안드로이드오류를 (내용: "Android 작업 디렉터리 정리 실패", 코드: 1)로 실행한다.
+    만약 포직스디렉터리모두만들기(경로) != 0이면
+        안드로이드오류를 (내용: "Android 작업 디렉터리 생성 실패", 코드: 1)로 실행한다.
+
+# ---- 1) 공통: 대상 C 원본 경로 ----
+
+함수 안드로이드대상폴더는 (툴체인루트: 문자열)를 받아
+    문자열붙인값(툴체인루트, "/platforms/tools/targets")를 문자열로 반환한다.
+
+함수 안드로이드원본확인은 (경로: 문자열, 설명: 문자열)를 받아
+    만약 안드로이드파일있나(경로) == 거짓이면
+        안드로이드오류를 (내용: 문자열붙인값(설명, 경로), 코드: 1)로 실행한다.
+
+# ---- 2) android-exe ----
+# main은 hmje가 낸 그대로 둔다(.so가 아니라
+# 독립 실행 파일이라 심볼 충돌 상대가 없다). 오브젝트 파일 이름은
+# <출력이름>.ll/.o/-shim.o/-async-runtime.o를 쓴다 — LLVM이 .ll 파일의 basename을
+# 오브젝트에 적어 넣기 때문에 이름은 오브젝트 파일 내용에 영향을 준다.
+# Project native code, linker flags and assets share the iOS plan's neutral TSV
+# schema. Apple-only entries are rejected before invoking the Android toolchain.
+함수 안드로이드자바원본인가는 (원본: 문자열)를 받아
+    (문자열끝나는가(원본, ".java") 또는 문자열끝나는가(원본, ".android.lock.json"))를 참거짓으로 반환한다.
+
+함수 안드로이드자바있는가는 (계획: iOS번들계획)를 받아
+    변수 번은 0이고, 자연수이다.
+    번 < 계획.원본들.길이일 동안
+        만약 안드로이드자바원본인가(계획.원본들[번])이면
+            참을 참거짓으로 반환한다.
+        번은 번 + 1이다.
+    거짓을 참거짓으로 반환한다.
+
+함수 안드로이드외부링크인자들은 (clang: 문자열, 계획: iOS번들계획, 작업폴더: 문자열, 대상폴더: 문자열, 자바허용: 참거짓)를 받아
+    만약 계획.메탈원본들.길이 > 0 또는 계획.프레임워크들.길이 > 0이면
+        안드로이드오류를 (내용: "Android 외부 구현은 Apple 프레임워크 또는 Metal을 지원하지 않습니다", 코드: 2)로 실행한다.
+    변수 결과는 []이고, 문자열의 배열이다.
+    변수 번은 0이고, 자연수이다.
+    변수 CPP있나는 거짓이고, 참거짓이다.
+    번 < 계획.원본들.길이일 동안
+        상수 원본은 계획.원본들[번]이고, 문자열이다.
+        만약 안드로이드자바원본인가(원본)이면
+            만약 자바허용 == 거짓이면
+                안드로이드오류를 (내용: "Java와 AAR/JAR 잠금 파일은 android-apk에서만 사용할 수 있습니다", 코드: 2)로 실행한다.
+        아니면
+            만약 문자열끝나는가(원본, ".cpp") 또는 문자열끝나는가(원본, ".cc") 또는 문자열끝나는가(원본, ".cxx")이면
+                CPP있나는 참이다.
+            그렇지 않고 문자열끝나는가(원본, ".c") == 거짓이면
+                안드로이드오류를 (내용: 문자열붙인값("Android 외부 구현 원본 확장자를 지원하지 않습니다: ", 원본), 코드: 2)로 실행한다.
+            상수 오브젝트는 문자열붙인값(문자열붙인값(작업폴더, "/native-"), 문자열붙인값(문자열로만들기(번), ".o"))이고, 문자열이다.
+            변수 인자들은 [clang, "-O2", "-fPIC", "-I", 대상폴더]이고, 문자열의 배열이다.
+            변수 설정번은 0이고, 자연수이다.
+            설정번 < 계획.헤더들.길이일 동안
+                인자들에 "-I"를 추가한다.
+                인자들에 계획.헤더들[설정번]을 추가한다.
+                설정번은 설정번 + 1이다.
+            설정번은 0이다.
+            설정번 < 계획.정의들.길이일 동안
+                인자들에 문자열붙인값("-D", 계획.정의들[설정번])를 추가한다.
+                설정번은 설정번 + 1이다.
+            인자들에 "-c"를 추가한다.
+            인자들에 원본을 추가한다.
+            인자들에 "-o"를 추가한다.
+            인자들에 오브젝트를 추가한다.
+            안드로이드실행을 (인자들: 인자들, 단계: "프로젝트 외부 구현 컴파일")로 실행한다.
+            결과에 오브젝트를 추가한다.
+        번은 번 + 1이다.
+    번은 0이다.
+    번 < 계획.라이브러리들.길이일 동안
+        결과에 문자열붙인값("-l", 계획.라이브러리들[번])를 추가한다.
+        번은 번 + 1이다.
+    만약 CPP있나이면
+        결과에 "-lc++_static"을 추가한다.
+        결과에 "-lc++abi"를 추가한다.
+    결과를 문자열의 배열로 반환한다.
+
+함수 안드로이드프로젝트자원복사는 (계획: iOS번들계획, 자원뿌리: 문자열)를 받아
+    변수 결과는 []이고, 문자열의 배열이다.
+    변수 번은 0이고, 자연수이다.
+    번 < 계획.자원물리들.길이일 동안
+        상수 이름은 계획.자원논리들[번]이고, 문자열이다.
+        만약 문자열바이트길이(이름) == 0 또는 문자열시작하는가(이름, "/") 또는 문자열찾기(이름, "\\")가 있으면
+            안드로이드오류를 (내용: "Android 자원 경로는 안전한 상대 경로여야 합니다", 코드: 2)로 실행한다.
+        상수 조각들은 문자열나누기(이름, "/")이고, 문자열의 배열이다.
+        변수 조각번은 0이고, 자연수이다.
+        조각번 < 조각들.길이일 동안
+            만약 조각들[조각번] == ".." 또는 조각들[조각번] == "."이면
+                안드로이드오류를 (내용: "Android 자원 경로에 상위 경로를 사용할 수 없습니다", 코드: 2)로 실행한다.
+            조각번은 조각번 + 1이다.
+        만약 조정기문자열있는가(결과, 이름)이면
+            안드로이드오류를 (내용: 문자열붙인값("Android 자원 이름이 중복됩니다: ", 이름), 코드: 2)로 실행한다.
+        상수 대상은 문자열붙인값(문자열붙인값(자원뿌리, "/"), 이름)이고, 문자열이다.
+        만약 포직스디렉터리모두만들기(조정기부모경로(대상)) != 0 또는 포직스파일원자복사(계획.자원물리들[번], 대상, 거짓) != 0이면
+            안드로이드오류를 (내용: 문자열붙인값("Android 자원 복사 실패: ", 이름), 코드: 1)로 실행한다.
+        결과에 이름을 추가한다.
+        번은 번 + 1이다.
+    결과를 문자열의 배열로 반환한다.
+
+함수 안드로이드EXE만들기는 (llvm경로: 문자열, 출력: 문자열, 툴체인루트: 문자열, 작업폴더: 문자열, 네이티브계획경로: 문자열)를 받아
+    상수 계획은 iOS계획읽기(네이티브계획경로)이고, iOS번들계획이다.
+    상수 대상폴더는 안드로이드대상폴더(툴체인루트)이고, 문자열이다.
+    상수 shim원본은 문자열붙인값(대상폴더, "/android_shim.c")이고, 문자열이다.
+    상수 async원본은 문자열붙인값(대상폴더, "/async_host_runtime.c")이고, 문자열이다.
+    안드로이드원본확인을 (경로: shim원본, 설명: "Android 시스템콜 shim이 없습니다: ")로 실행한다.
+    안드로이드원본확인을 (경로: async원본, 설명: "Android 비동기 runtime이 없습니다: ")로 실행한다.
+    상수 clang은 안드로이드도구경로("HMJE_ANDROID_CLANG")이고, 문자열이다.
+    안드로이드작업폴더만들기를 (경로: 작업폴더)로 실행한다.
+    상수 이름은 안드로이드파일이름(출력)이고, 문자열이다.
+    상수 IR경로는 문자열붙인값(문자열붙인값(작업폴더, "/"), 문자열붙인값(이름, ".ll"))이고, 문자열이다.
+    상수 앱오브젝트는 문자열붙인값(문자열붙인값(작업폴더, "/"), 문자열붙인값(이름, ".o"))이고, 문자열이다.
+    상수 shim오브젝트는 문자열붙인값(문자열붙인값(작업폴더, "/"), 문자열붙인값(이름, "-shim.o"))이고, 문자열이다.
+    상수 async오브젝트는 문자열붙인값(문자열붙인값(작업폴더, "/"), 문자열붙인값(이름, "-async-runtime.o"))이고, 문자열이다.
+    만약 포직스파일원자복사(llvm경로, IR경로, 거짓) != 0이면
+        안드로이드오류를 (내용: "Android LLVM IR 사본을 만들지 못했습니다", 코드: 1)로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIE", "-c", IR경로, "-o", 앱오브젝트], 단계: "android-exe 앱 오브젝트 컴파일")로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIE", "-c", shim원본, "-o", shim오브젝트], 단계: "android-exe shim 컴파일")로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIE", "-c", async원본, "-o", async오브젝트], 단계: "android-exe async runtime 컴파일")로 실행한다.
+    변수 링크인자들은 [clang, "-O2", "-fPIE", "-pie", 앱오브젝트, shim오브젝트, async오브젝트]이고, 문자열의 배열이다.
+    상수 외부인자들은 안드로이드외부링크인자들(clang, 계획, 작업폴더, 대상폴더, 거짓)이고, 문자열의 배열이다.
+    변수 외부번은 0이고, 자연수이다.
+    외부번 < 외부인자들.길이일 동안
+        링크인자들에 외부인자들[외부번]을 추가한다.
+        외부번은 외부번 + 1이다.
+    링크인자들에 "-o"를 추가한다.
+    링크인자들에 출력을 추가한다.
+    안드로이드실행을 (인자들: 링크인자들, 단계: "android-exe 최종 링크")로 실행한다.
+    상수 복사된자원들은 안드로이드프로젝트자원복사(계획, 문자열붙인값(출력, ".assets"))이고, 문자열의 배열이다.
+
+# ---- 3) android-apk ----
+# LLVM IR에서 줄 첫머리의 `define i32 @main()`
+# 하나를 @hmje_app_main으로 바꾼다. android_jni.c가 진짜 main/JNI 진입을 제공한다.
+함수 안드로이드진입리네임은 (내용: 문자열)를 받아
+    상수 표식은 "define i32 @main()"이고, 문자열이다.
+    만약 문자열시작하는가(내용, 표식)이면
+        문자열붙인값("define i32 @hmje_app_main()", 문자열부분(내용, 18, 문자열바이트길이(내용) - 18))를 문자열로 반환한다.
+    상수 자리는 문자열찾기(내용, "\ndefine i32 @main()")이고, 자연수?이다.
+    만약 자리가 없으면
+        안드로이드오류를 (내용: "android-apk 타깃: LLVM IR에서 hmje 진입점(@main)을 정확히 하나 찾지 못했습니다", 코드: 1)로 실행한다.
+        ""를 문자열로 반환한다.
+    상수 줄앞자리는 자리!이고, 자연수이다.
+    상수 앞끝은 줄앞자리 + 1이고, 자연수이다.
+    상수 뒤시작은 앞끝 + 18이고, 자연수이다.
+    변수 결과는 문자열부분(내용, 0, 앞끝)이고, 문자열이다.
+    결과는 문자열붙이기(결과, "define i32 @hmje_app_main()")이다.
+    결과는 문자열붙이기(결과, 문자열부분(내용, 뒤시작, 문자열바이트길이(내용) - 뒤시작))이다.
+    결과를 문자열로 반환한다.
+
+함수 안드로이드XML속성은 (값: 문자열)를 받아
+    변수 결과는 iOSXML이스케이프(값)이고, 문자열이다.
+    결과는 iOS문자열대체(결과, "\"", "&quot;")이다.
+    결과는 iOS문자열대체(결과, "'", "&apos;")이다.
+    결과를 문자열로 반환한다.
+
+함수 안드로이드매니페스트는 (최소SDK: 문자열)를 받아
+    변수 결과는 ""이고, 문자열이다.
+    결과는 문자열붙이기(결과, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")이다.
+    결과는 문자열붙이기(결과, "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n")이다.
+    결과는 문자열붙이기(결과, "    package=\"net.semtle.semtleuidemo\">\n")이다.
+    결과는 문자열붙이기(결과, "    <uses-sdk android:minSdkVersion=\"")이다.
+    결과는 문자열붙이기(결과, 최소SDK)이다.
+    결과는 문자열붙이기(결과, "\" android:targetSdkVersion=\"")이다.
+    결과는 문자열붙이기(결과, 최소SDK)이다.
+    결과는 문자열붙이기(결과, "\" />\n")이다.
+    결과는 문자열붙이기(결과, "    <application android:label=\"HmjeUIDemo\" android:hardwareAccelerated=\"false\"\n")이다.
+    결과는 문자열붙이기(결과, "        android:theme=\"@android:style/Theme.Material.Light.NoActionBar\">\n")이다.
+    결과는 문자열붙이기(결과, "        <activity android:name=\"net.semtle.semtleuidemo.MainActivity\" android:exported=\"true\"\n")이다.
+    결과는 문자열붙이기(결과, "            android:hardwareAccelerated=\"false\" android:windowSoftInputMode=\"adjustResize\">\n")이다.
+    결과는 문자열붙이기(결과, "            <intent-filter>\n")이다.
+    결과는 문자열붙이기(결과, "                <action android:name=\"android.intent.action.MAIN\" />\n")이다.
+    결과는 문자열붙이기(결과, "                <category android:name=\"android.intent.category.LAUNCHER\" />\n")이다.
+    결과는 문자열붙이기(결과, "            </intent-filter>\n")이다.
+    결과는 문자열붙이기(결과, "        </activity>\n")이다.
+    결과는 문자열붙이기(결과, "    </application>\n")이다.
+    결과는 문자열붙이기(결과, "</manifest>\n")이다.
+    결과를 문자열로 반환한다.
+
+# MainActivity.java 원본. APK 생성 단계에서 프로젝트의 묶음 식별자로
+# package 선언을 바꿔 쓴다.
+함수 안드로이드자바원본은 (카메라쓰나: 참거짓)를 받아
+    변수 결과는 ""이고, 문자열이다.
+    결과는 문자열붙이기(결과, "package net.semtle.semtleuidemo;\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "import android.app.Activity;\n")이다.
+    결과는 문자열붙이기(결과, "import android.Manifest;\n")이다.
+    결과는 문자열붙이기(결과, "import android.content.Context;\n")이다.
+    결과는 문자열붙이기(결과, "import android.content.pm.PackageManager;\n")이다.
+    결과는 문자열붙이기(결과, "import android.content.res.AssetManager;\n")이다.
+    결과는 문자열붙이기(결과, "import android.graphics.PixelFormat;\n")이다.
+    결과는 문자열붙이기(결과, "import android.location.Location;\n")이다.
+    결과는 문자열붙이기(결과, "import android.location.LocationListener;\n")이다.
+    결과는 문자열붙이기(결과, "import android.location.LocationManager;\n")이다.
+    결과는 문자열붙이기(결과, "import android.os.Bundle;\n")이다.
+    결과는 문자열붙이기(결과, "import android.os.Build;\n")이다.
+    결과는 문자열붙이기(결과, "import android.text.Editable;\n")이다.
+    결과는 문자열붙이기(결과, "import android.text.InputType;\n")이다.
+    결과는 문자열붙이기(결과, "import android.text.SpannableStringBuilder;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.KeyEvent;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.MotionEvent;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.Surface;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.SurfaceHolder;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.SurfaceView;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.View;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.ViewConfiguration;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.WindowManager;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.inputmethod.BaseInputConnection;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.inputmethod.EditorInfo;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.inputmethod.InputConnection;\n")이다.
+    결과는 문자열붙이기(결과, "import android.view.inputmethod.InputMethodManager;\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "public class MainActivity extends Activity implements SurfaceHolder.Callback {\n")이다.
+    결과는 문자열붙이기(결과, "    static {\n")이다.
+    결과는 문자열붙이기(결과, "        System.loadLibrary(\"hmjeapp\");\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeInit(AssetManager assetManager, int scale);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeSurfaceCreated(Surface surface);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeSurfaceChanged(int width, int height);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeSurfaceDestroyed();\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeLifecycle(int state);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeTextCodepoint(int codepoint);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeTextKey(int scanCode, boolean pressed);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeAudioPermissionResult(int status);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeLocationPermissionResult(int status);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativeLocationSample(double latitude, double longitude,\n")이다.
+    결과는 문자열붙이기(결과, "        double accuracy, double speed, long timeMs, boolean mock);\n")이다.
+    결과는 문자열붙이기(결과, "    private native void nativePointerSample(long timeUs, long pointerId, long x, long y,\n")이다.
+    결과는 문자열붙이기(결과, "        int pressure, int altitude, int azimuth, int tool, int phase, int buttons,\n")이다.
+    결과는 문자열붙이기(결과, "        int changedButton, long scrollX, long scrollY, long flags);\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private HmjeSurfaceView surfaceView;\n")이다.
+    결과는 문자열붙이기(결과, "    private HmjeAccessibilityProvider accessibilityProvider;\n")이다.
+    결과는 문자열붙이기(결과, "    private native boolean nativeAccessibilityAction(long identifier, int action);\n")이다.
+    결과는 문자열붙이기(결과, "    public void publishAccessibilitySnapshot(final long[] nodes, final String[] labels,\n")이다.
+    결과는 문자열붙이기(결과, "            final String[] values, final int scale) {\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() { @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "            if (accessibilityProvider != null) accessibilityProvider.publish(nodes, labels, values, scale);\n")이다.
+    결과는 문자열붙이기(결과, "        }});\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "    private long textInputClient;\n")이다.
+    결과는 문자열붙이기(결과, "    private long textInputFlags;\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    public int microphonePermissionStatus() {\n")이다.
+    결과는 문자열붙이기(결과, "        if (Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.RECORD_AUDIO)\n")이다.
+    결과는 문자열붙이기(결과, "                == PackageManager.PERMISSION_GRANTED) return 2;\n")이다.
+    결과는 문자열붙이기(결과, "        boolean requested = getPreferences(Context.MODE_PRIVATE)\n")이다.
+    결과는 문자열붙이기(결과, "            .getBoolean(\"hmje.microphone.permission.requested\", false);\n")이다.
+    결과는 문자열붙이기(결과, "        return requested ? 1 : 0;\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    public void requestMicrophonePermission() {\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                if (microphonePermissionStatus() == 2) {\n")이다.
+    결과는 문자열붙이기(결과, "                    nativeAudioPermissionResult(2);\n")이다.
+    결과는 문자열붙이기(결과, "                    return;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "                getPreferences(Context.MODE_PRIVATE).edit()\n")이다.
+    결과는 문자열붙이기(결과, "                    .putBoolean(\"hmje.microphone.permission.requested\", true).apply();\n")이다.
+    결과는 문자열붙이기(결과, "                requestPermissions(new String[] { Manifest.permission.RECORD_AUDIO }, 42424);\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    # hmje-location: 위치 권한 상태·요청 다리. 상태 값은 hmje-location의 위치권한 상수와
+    # 같다(0 미결정, 1 거부, 2 사용 중, 3 항상). 매니페스트에 권한이 없으면 항상 1이다.
+    결과는 문자열붙이기(결과, "    public int locationPermissionStatus() {\n")이다.
+    결과는 문자열붙이기(결과, "        if (Build.VERSION.SDK_INT < 23) return 2;\n")이다.
+    결과는 문자열붙이기(결과, "        boolean fine = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)\n")이다.
+    결과는 문자열붙이기(결과, "                == PackageManager.PERMISSION_GRANTED;\n")이다.
+    결과는 문자열붙이기(결과, "        boolean coarse = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)\n")이다.
+    결과는 문자열붙이기(결과, "                == PackageManager.PERMISSION_GRANTED;\n")이다.
+    결과는 문자열붙이기(결과, "        if (fine || coarse) {\n")이다.
+    결과는 문자열붙이기(결과, "            if (Build.VERSION.SDK_INT >= 29 && checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)\n")이다.
+    결과는 문자열붙이기(결과, "                    == PackageManager.PERMISSION_GRANTED) return 3;\n")이다.
+    결과는 문자열붙이기(결과, "            return 2;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        boolean requested = getPreferences(Context.MODE_PRIVATE)\n")이다.
+    결과는 문자열붙이기(결과, "            .getBoolean(\"hmje.location.permission.requested\", false);\n")이다.
+    결과는 문자열붙이기(결과, "        return requested ? 1 : 0;\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    public void requestLocationPermission() {\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                int current = locationPermissionStatus();\n")이다.
+    결과는 문자열붙이기(결과, "                if (current >= 2) {\n")이다.
+    결과는 문자열붙이기(결과, "                    nativeLocationPermissionResult(current);\n")이다.
+    결과는 문자열붙이기(결과, "                    return;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "                getPreferences(Context.MODE_PRIVATE).edit()\n")이다.
+    결과는 문자열붙이기(결과, "                    .putBoolean(\"hmje.location.permission.requested\", true).apply();\n")이다.
+    결과는 문자열붙이기(결과, "                requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION,\n")이다.
+    결과는 문자열붙이기(결과, "                    Manifest.permission.ACCESS_COARSE_LOCATION }, 42425);\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private LocationListener locationListener;\n")이다.
+    결과는 문자열붙이기(결과, "    private LocationListener locationListenerOf() {\n")이다.
+    결과는 문자열붙이기(결과, "        if (locationListener == null) {\n")이다.
+    결과는 문자열붙이기(결과, "            locationListener = new LocationListener() {\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public void onLocationChanged(Location location) { publishLocation(location); }\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public void onProviderDisabled(String provider) {}\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public void onProviderEnabled(String provider) {}\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public void onStatusChanged(String provider, int status, Bundle extras) {}\n")이다.
+    결과는 문자열붙이기(결과, "            };\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        return locationListener;\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "    private void publishLocation(Location location) {\n")이다.
+    결과는 문자열붙이기(결과, "        if (location == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "        boolean mock = Build.VERSION.SDK_INT >= 31 ? location.isMock() : location.isFromMockProvider();\n")이다.
+    결과는 문자열붙이기(결과, "        nativeLocationSample(location.getLatitude(), location.getLongitude(),\n")이다.
+    결과는 문자열붙이기(결과, "            location.hasAccuracy() ? location.getAccuracy() : -1.0,\n")이다.
+    결과는 문자열붙이기(결과, "            location.hasSpeed() ? location.getSpeed() : -1.0, location.getTime(), mock);\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "    public void startLocationUpdates(final long minIntervalMs) {\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);\n")이다.
+    결과는 문자열붙이기(결과, "                if (manager == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "                try {\n")이다.
+    결과는 문자열붙이기(결과, "                    String[] providers = { LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER };\n")이다.
+    결과는 문자열붙이기(결과, "                    for (String provider : providers) {\n")이다.
+    결과는 문자열붙이기(결과, "                        if (!manager.isProviderEnabled(provider)) continue;\n")이다.
+    결과는 문자열붙이기(결과, "                        manager.requestLocationUpdates(provider, minIntervalMs, 0f, locationListenerOf(), getMainLooper());\n")이다.
+    결과는 문자열붙이기(결과, "                    }\n")이다.
+    결과는 문자열붙이기(결과, "                } catch (SecurityException | IllegalArgumentException error) {\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "    public void stopLocationUpdates() {\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);\n")이다.
+    결과는 문자열붙이기(결과, "                if (manager == null || locationListener == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "                try { manager.removeUpdates(locationListener); } catch (SecurityException error) {}\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "    public void requestSingleLocation() {\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);\n")이다.
+    결과는 문자열붙이기(결과, "                if (manager == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "                try {\n")이다.
+    결과는 문자열붙이기(결과, "                    String provider = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)\n")이다.
+    결과는 문자열붙이기(결과, "                        ? LocationManager.GPS_PROVIDER : LocationManager.NETWORK_PROVIDER;\n")이다.
+    결과는 문자열붙이기(결과, "                    Location last = manager.getLastKnownLocation(provider);\n")이다.
+    결과는 문자열붙이기(결과, "                    if (last != null && System.currentTimeMillis() - last.getTime() < 30000L) {\n")이다.
+    결과는 문자열붙이기(결과, "                        publishLocation(last);\n")이다.
+    결과는 문자열붙이기(결과, "                        return;\n")이다.
+    결과는 문자열붙이기(결과, "                    }\n")이다.
+    결과는 문자열붙이기(결과, "                    if (Build.VERSION.SDK_INT >= 30) {\n")이다.
+    결과는 문자열붙이기(결과, "                        manager.getCurrentLocation(provider, null, getMainExecutor(),\n")이다.
+    결과는 문자열붙이기(결과, "                            new java.util.function.Consumer<Location>() {\n")이다.
+    결과는 문자열붙이기(결과, "                                @Override public void accept(Location location) { publishLocation(location); }\n")이다.
+    결과는 문자열붙이기(결과, "                            });\n")이다.
+    결과는 문자열붙이기(결과, "                    } else {\n")이다.
+    결과는 문자열붙이기(결과, "                        manager.requestSingleUpdate(provider, locationListenerOf(), getMainLooper());\n")이다.
+    결과는 문자열붙이기(결과, "                    }\n")이다.
+    결과는 문자열붙이기(결과, "                } catch (SecurityException | IllegalArgumentException error) {\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    # hmje-camera: `필요 기능은 카메라`일 때만 권한 다리·onActivityResult 전달·제공자를 싣는다.
+    만약 카메라쓰나이면
+        결과는 문자열붙이기(결과, "    // hmje-camera: 카메라 권한 다리. 상태 값은 hmje-camera의 카메라권한 상수와 같다\n")이다.
+        결과는 문자열붙이기(결과, "    // (0 미결정, 1 거부, 2 허용). 촬영 흐름은 라이브러리 Java(HmjeCameraBridge)가\n")이다.
+        결과는 문자열붙이기(결과, "    // 맡고, 결과는 hmjeAddActivityResultHandler로 등록한 처리기에 전달한다.\n")이다.
+        결과는 문자열붙이기(결과, "    private native void nativeCameraPermissionResult(int status);\n")이다.
+        결과는 문자열붙이기(결과, "    public int cameraPermissionStatus() {\n")이다.
+        결과는 문자열붙이기(결과, "        if (Build.VERSION.SDK_INT < 23) return 2;\n")이다.
+        결과는 문자열붙이기(결과, "        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) return 2;\n")이다.
+        결과는 문자열붙이기(결과, "        boolean requested = getPreferences(Context.MODE_PRIVATE)\n")이다.
+        결과는 문자열붙이기(결과, "            .getBoolean(\"hmje.camera.permission.requested\", false);\n")이다.
+        결과는 문자열붙이기(결과, "        return requested ? 1 : 0;\n")이다.
+        결과는 문자열붙이기(결과, "    }\n")이다.
+        결과는 문자열붙이기(결과, "\n")이다.
+        결과는 문자열붙이기(결과, "    public void requestCameraPermission() {\n")이다.
+        결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+        결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+        결과는 문자열붙이기(결과, "                if (cameraPermissionStatus() == 2) {\n")이다.
+        결과는 문자열붙이기(결과, "                    nativeCameraPermissionResult(2);\n")이다.
+        결과는 문자열붙이기(결과, "                    return;\n")이다.
+        결과는 문자열붙이기(결과, "                }\n")이다.
+        결과는 문자열붙이기(결과, "                getPreferences(Context.MODE_PRIVATE).edit()\n")이다.
+        결과는 문자열붙이기(결과, "                    .putBoolean(\"hmje.camera.permission.requested\", true).apply();\n")이다.
+        결과는 문자열붙이기(결과, "                requestPermissions(new String[] { Manifest.permission.CAMERA }, 42426);\n")이다.
+        결과는 문자열붙이기(결과, "            }\n")이다.
+        결과는 문자열붙이기(결과, "        });\n")이다.
+        결과는 문자열붙이기(결과, "    }\n")이다.
+        결과는 문자열붙이기(결과, "\n")이다.
+        결과는 문자열붙이기(결과, "    // static: 카메라 앱이 가로로 돌면 MainActivity가 재생성되므로 처리기 목록은 인스턴스를 넘어 유지한다.\n")이다.
+        결과는 문자열붙이기(결과, "    private static final java.util.ArrayList<Object> activityResultHandlers = new java.util.ArrayList<Object>();\n")이다.
+        결과는 문자열붙이기(결과, "    public void hmjeAddActivityResultHandler(Object handler) {\n")이다.
+        결과는 문자열붙이기(결과, "        if (handler == null) return;\n")이다.
+        결과는 문자열붙이기(결과, "        synchronized (activityResultHandlers) {\n")이다.
+        결과는 문자열붙이기(결과, "            if (!activityResultHandlers.contains(handler)) activityResultHandlers.add(handler);\n")이다.
+        결과는 문자열붙이기(결과, "        }\n")이다.
+        결과는 문자열붙이기(결과, "    }\n")이다.
+        결과는 문자열붙이기(결과, "\n")이다.
+        결과는 문자열붙이기(결과, "    @Override protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {\n")이다.
+        결과는 문자열붙이기(결과, "        super.onActivityResult(requestCode, resultCode, data);\n")이다.
+        결과는 문자열붙이기(결과, "        Object[] handlers;\n")이다.
+        결과는 문자열붙이기(결과, "        synchronized (activityResultHandlers) { handlers = activityResultHandlers.toArray(); }\n")이다.
+        결과는 문자열붙이기(결과, "        for (Object handler : handlers) {\n")이다.
+        결과는 문자열붙이기(결과, "            try {\n")이다.
+        결과는 문자열붙이기(결과, "                java.lang.reflect.Method method = handler.getClass().getMethod(\"onHmjeActivityResult\",\n")이다.
+        결과는 문자열붙이기(결과, "                    Activity.class, int.class, int.class, android.content.Intent.class);\n")이다.
+        결과는 문자열붙이기(결과, "                Object handled = method.invoke(handler, this, requestCode, resultCode, data);\n")이다.
+        결과는 문자열붙이기(결과, "                if (Boolean.TRUE.equals(handled)) return;\n")이다.
+        결과는 문자열붙이기(결과, "            } catch (Exception error) {\n")이다.
+        결과는 문자열붙이기(결과, "            }\n")이다.
+        결과는 문자열붙이기(결과, "        }\n")이다.
+        결과는 문자열붙이기(결과, "    }\n")이다.
+        결과는 문자열붙이기(결과, "\n")이다.
+        결과는 문자열붙이기(결과, "    // 카메라 앱이 촬영 결과를 쓰는 content:// URI 제공자. androidx FileProvider와 같은\n")이다.
+        결과는 문자열붙이기(결과, "    // 역할을 의존성 없이 한다: cache/hmje-camera/<이름> 한 단계만 열고, 내보내지 않으며\n")이다.
+        결과는 문자열붙이기(결과, "    // (exported=false) 인텐트의 URI 권한 부여로만 접근된다.\n")이다.
+        결과는 문자열붙이기(결과, "    public static final class HmjeCameraFileProvider extends android.content.ContentProvider {\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public boolean onCreate() { return true; }\n")이다.
+        결과는 문자열붙이기(결과, "        private java.io.File fileOf(android.net.Uri uri) throws java.io.FileNotFoundException {\n")이다.
+        결과는 문자열붙이기(결과, "            java.util.List<String> segments = uri.getPathSegments();\n")이다.
+        결과는 문자열붙이기(결과, "            android.content.Context context = getContext();\n")이다.
+        결과는 문자열붙이기(결과, "            if (context == null || segments.size() != 2 || !\"capture\".equals(segments.get(0)))\n")이다.
+        결과는 문자열붙이기(결과, "                throw new java.io.FileNotFoundException(\"hmje-camera: unknown uri\");\n")이다.
+        결과는 문자열붙이기(결과, "            String name = segments.get(1);\n")이다.
+        결과는 문자열붙이기(결과, "            if (name.startsWith(\".\") || !name.matches(\"[A-Za-z0-9_.-]+\"))\n")이다.
+        결과는 문자열붙이기(결과, "                throw new java.io.FileNotFoundException(\"hmje-camera: bad name\");\n")이다.
+        결과는 문자열붙이기(결과, "            return new java.io.File(new java.io.File(context.getCacheDir(), \"hmje-camera\"), name);\n")이다.
+        결과는 문자열붙이기(결과, "        }\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public android.os.ParcelFileDescriptor openFile(android.net.Uri uri, String mode)\n")이다.
+        결과는 문자열붙이기(결과, "                throws java.io.FileNotFoundException {\n")이다.
+        결과는 문자열붙이기(결과, "            return android.os.ParcelFileDescriptor.open(fileOf(uri), android.os.ParcelFileDescriptor.parseMode(mode));\n")이다.
+        결과는 문자열붙이기(결과, "        }\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public String getType(android.net.Uri uri) { return \"image/jpeg\"; }\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public android.database.Cursor query(android.net.Uri uri, String[] projection, String selection,\n")이다.
+        결과는 문자열붙이기(결과, "                String[] selectionArgs, String sortOrder) {\n")이다.
+        결과는 문자열붙이기(결과, "            java.io.File file;\n")이다.
+        결과는 문자열붙이기(결과, "            try { file = fileOf(uri); } catch (java.io.FileNotFoundException error) { return null; }\n")이다.
+        결과는 문자열붙이기(결과, "            String[] columns = projection != null ? projection\n")이다.
+        결과는 문자열붙이기(결과, "                : new String[] { android.provider.OpenableColumns.DISPLAY_NAME, android.provider.OpenableColumns.SIZE };\n")이다.
+        결과는 문자열붙이기(결과, "            Object[] row = new Object[columns.length];\n")이다.
+        결과는 문자열붙이기(결과, "            for (int index = 0; index < columns.length; index++) {\n")이다.
+        결과는 문자열붙이기(결과, "                if (android.provider.OpenableColumns.DISPLAY_NAME.equals(columns[index])) row[index] = file.getName();\n")이다.
+        결과는 문자열붙이기(결과, "                else if (android.provider.OpenableColumns.SIZE.equals(columns[index])) row[index] = file.length();\n")이다.
+        결과는 문자열붙이기(결과, "            }\n")이다.
+        결과는 문자열붙이기(결과, "            android.database.MatrixCursor cursor = new android.database.MatrixCursor(columns, 1);\n")이다.
+        결과는 문자열붙이기(결과, "            cursor.addRow(row);\n")이다.
+        결과는 문자열붙이기(결과, "            return cursor;\n")이다.
+        결과는 문자열붙이기(결과, "        }\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public android.net.Uri insert(android.net.Uri uri, android.content.ContentValues values) { return null; }\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public int delete(android.net.Uri uri, String selection, String[] selectionArgs) { return 0; }\n")이다.
+        결과는 문자열붙이기(결과, "        @Override public int update(android.net.Uri uri, android.content.ContentValues values, String selection,\n")이다.
+        결과는 문자열붙이기(결과, "                String[] selectionArgs) { return 0; }\n")이다.
+        결과는 문자열붙이기(결과, "    }\n")이다.
+        결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions,\n")이다.
+    결과는 문자열붙이기(결과, "            int[] grantResults) {\n")이다.
+    결과는 문자열붙이기(결과, "        super.onRequestPermissionsResult(requestCode, permissions, grantResults);\n")이다.
+    결과는 문자열붙이기(결과, "        if (requestCode == 42424) {\n")이다.
+    결과는 문자열붙이기(결과, "            boolean granted = grantResults.length > 0\n")이다.
+    결과는 문자열붙이기(결과, "                && grantResults[0] == PackageManager.PERMISSION_GRANTED;\n")이다.
+    결과는 문자열붙이기(결과, "            nativeAudioPermissionResult(granted ? 2 : 1);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (requestCode == 42425) {\n")이다.
+    결과는 문자열붙이기(결과, "            nativeLocationPermissionResult(locationPermissionStatus() >= 2 ? locationPermissionStatus() : 1);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    만약 카메라쓰나이면
+        결과는 문자열붙이기(결과, "        if (requestCode == 42426) {\n")이다.
+        결과는 문자열붙이기(결과, "            nativeCameraPermissionResult(cameraPermissionStatus() == 2 ? 2 : 1);\n")이다.
+        결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private void emitText(CharSequence text) {\n")이다.
+    결과는 문자열붙이기(결과, "        if (text == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "        String value = text.toString();\n")이다.
+    결과는 문자열붙이기(결과, "        for (int offset = 0; offset < value.length();) {\n")이다.
+    결과는 문자열붙이기(결과, "            int codepoint = value.codePointAt(offset);\n")이다.
+    결과는 문자열붙이기(결과, "            nativeTextCodepoint(codepoint);\n")이다.
+    결과는 문자열붙이기(결과, "            offset += Character.charCount(codepoint);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private void emitKey(int scanCode) {\n")이다.
+    결과는 문자열붙이기(결과, "        nativeTextKey(scanCode, true);\n")이다.
+    결과는 문자열붙이기(결과, "        nativeTextKey(scanCode, false);\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private int pendingHardwareAccent;\n")이다.
+    결과는 문자열붙이기(결과, "    private boolean forwardHardwareKey(KeyEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "        final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;\n")이다.
+    결과는 문자열붙이기(결과, "        final boolean up = event.getAction() == KeyEvent.ACTION_UP;\n")이다.
+    결과는 문자열붙이기(결과, "        if (!down && !up) return false;\n")이다.
+    결과는 문자열붙이기(결과, "        int scan = -1;\n")이다.
+    결과는 문자열붙이기(결과, "        switch (event.getKeyCode()) {\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_DEL: scan = 51; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_FORWARD_DEL: scan = 117; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_ENTER: case KeyEvent.KEYCODE_NUMPAD_ENTER: scan = 251; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_TAB: scan = 250; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_ESCAPE: scan = 53; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_DPAD_LEFT: scan = 123; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_DPAD_RIGHT: scan = 124; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_DPAD_UP: scan = 126; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_DPAD_DOWN: scan = 125; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_MOVE_HOME: scan = 115; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_MOVE_END: scan = 119; break;\n")이다.
+    결과는 문자열붙이기(결과, "            case KeyEvent.KEYCODE_A:\n")이다.
+    결과는 문자열붙이기(결과, "                if (event.isCtrlPressed() || event.isMetaPressed()) scan = 0;\n")이다.
+    결과는 문자열붙이기(결과, "                break;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (scan >= 0) {\n")이다.
+    결과는 문자열붙이기(결과, "            if (event.isShiftPressed()) scan |= 65536;\n")이다.
+    결과는 문자열붙이기(결과, "            if (event.isCtrlPressed()) scan |= 131072;\n")이다.
+    결과는 문자열붙이기(결과, "            if (event.isAltPressed()) scan |= 262144;\n")이다.
+    결과는 문자열붙이기(결과, "            if (event.isMetaPressed()) scan |= 524288;\n")이다.
+    결과는 문자열붙이기(결과, "            nativeTextKey(scan, down);\n")이다.
+    결과는 문자열붙이기(결과, "            return true;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (event.isCtrlPressed() || event.isMetaPressed()) return false;\n")이다.
+    결과는 문자열붙이기(결과, "        int codepoint = event.getUnicodeChar();\n")이다.
+    결과는 문자열붙이기(결과, "        if (codepoint == 0) return false;\n")이다.
+    결과는 문자열붙이기(결과, "        if (!down) return true;\n")이다.
+    결과는 문자열붙이기(결과, "        if ((codepoint & android.view.KeyCharacterMap.COMBINING_ACCENT) != 0) {\n")이다.
+    결과는 문자열붙이기(결과, "            pendingHardwareAccent = codepoint & android.view.KeyCharacterMap.COMBINING_ACCENT_MASK;\n")이다.
+    결과는 문자열붙이기(결과, "            return true;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (pendingHardwareAccent != 0) {\n")이다.
+    결과는 문자열붙이기(결과, "            int combined = android.view.KeyCharacterMap.getDeadChar(pendingHardwareAccent, codepoint);\n")이다.
+    결과는 문자열붙이기(결과, "            if (combined == 0) emitText(new String(Character.toChars(pendingHardwareAccent)));\n")이다.
+    결과는 문자열붙이기(결과, "            else codepoint = combined;\n")이다.
+    결과는 문자열붙이기(결과, "            pendingHardwareAccent = 0;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (Character.isValidCodePoint(codepoint)) emitText(new String(Character.toChars(codepoint)));\n")이다.
+    결과는 문자열붙이기(결과, "        return true;\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private final class HmjeSurfaceView extends SurfaceView {\n")이다.
+    결과는 문자열붙이기(결과, "        @Override public android.view.accessibility.AccessibilityNodeProvider getAccessibilityNodeProvider() {\n")이다.
+    결과는 문자열붙이기(결과, "            return accessibilityProvider;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        @Override public boolean dispatchHoverEvent(MotionEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "            return (accessibilityProvider != null && accessibilityProvider.hover(event)) || super.dispatchHoverEvent(event);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        HmjeSurfaceView(Context context) {\n")이다.
+    결과는 문자열붙이기(결과, "            super(context);\n")이다.
+    결과는 문자열붙이기(결과, "            setFocusable(true);\n")이다.
+    결과는 문자열붙이기(결과, "            setFocusableInTouchMode(true);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "        @Override public boolean onKeyDown(int keyCode, KeyEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "            return forwardHardwareKey(event) || super.onKeyDown(keyCode, event);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        @Override public boolean onKeyUp(int keyCode, KeyEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "            return forwardHardwareKey(event) || super.onKeyUp(keyCode, event);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        @Override public boolean onCheckIsTextEditor() {\n")이다.
+    결과는 문자열붙이기(결과, "            return true;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "        @Override public InputConnection onCreateInputConnection(EditorInfo info) {\n")이다.
+    결과는 문자열붙이기(결과, "            final boolean secure = (textInputFlags & 4L) != 0L;\n")이다.
+    결과는 문자열붙이기(결과, "            info.inputType = secure\n")이다.
+    결과는 문자열붙이기(결과, "                ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS\n")이다.
+    결과는 문자열붙이기(결과, "                : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES\n")이다.
+    결과는 문자열붙이기(결과, "                    | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;\n")이다.
+    결과는 문자열붙이기(결과, "            if (secure && (textInputFlags & 8L) != 0L) info.inputType |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;\n")이다.
+    결과는 문자열붙이기(결과, "            info.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI\n")이다.
+    결과는 문자열붙이기(결과, "                | (secure ? EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING : 0)\n")이다.
+    결과는 문자열붙이기(결과, "                | (secure && (textInputFlags & 8L) == 0L ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_NONE);\n")이다.
+    결과는 문자열붙이기(결과, "            return new BaseInputConnection(this, true) {\n")이다.
+    결과는 문자열붙이기(결과, "                private final SpannableStringBuilder document = new SpannableStringBuilder();\n")이다.
+    결과는 문자열붙이기(결과, "                private String lastCommitted = \"\";\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public Editable getEditable() {\n")이다.
+    결과는 문자열붙이기(결과, "                    return document;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean performContextMenuAction(int id) {\n")이다.
+    결과는 문자열붙이기(결과, "                    if (secure && (id == android.R.id.copy || id == android.R.id.cut\n")이다.
+    결과는 문자열붙이기(결과, "                            || id == android.R.id.shareText)) return false;\n")이다.
+    결과는 문자열붙이기(결과, "                    return super.performContextMenuAction(id);\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                private int safeCommonPrefix(String before, String after) {\n")이다.
+    결과는 문자열붙이기(결과, "                    int limit = Math.min(before.length(), after.length());\n")이다.
+    결과는 문자열붙이기(결과, "                    int prefix = 0;\n")이다.
+    결과는 문자열붙이기(결과, "                    while (prefix < limit && before.charAt(prefix) == after.charAt(prefix)) prefix++;\n")이다.
+    결과는 문자열붙이기(결과, "                    if (prefix > 0 && prefix < before.length()\n")이다.
+    결과는 문자열붙이기(결과, "                            && Character.isLowSurrogate(before.charAt(prefix))) prefix--;\n")이다.
+    결과는 문자열붙이기(결과, "                    if (prefix > 0 && prefix < after.length()\n")이다.
+    결과는 문자열붙이기(결과, "                            && Character.isLowSurrogate(after.charAt(prefix))) prefix--;\n")이다.
+    결과는 문자열붙이기(결과, "                    return prefix;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                private void forwardCommittedDocument() {\n")이다.
+    결과는 문자열붙이기(결과, "                    String after = document.toString();\n")이다.
+    결과는 문자열붙이기(결과, "                    if (after.equals(lastCommitted)) return;\n")이다.
+    결과는 문자열붙이기(결과, "                    int prefix = safeCommonPrefix(lastCommitted, after);\n")이다.
+    결과는 문자열붙이기(결과, "                    String removed = lastCommitted.substring(prefix);\n")이다.
+    결과는 문자열붙이기(결과, "                    int removedCount = removed.codePointCount(0, removed.length());\n")이다.
+    결과는 문자열붙이기(결과, "                    for (int index = 0; index < removedCount; index++) emitKey(51);\n")이다.
+    결과는 문자열붙이기(결과, "                    emitText(after.substring(prefix));\n")이다.
+    결과는 문자열붙이기(결과, "                    lastCommitted = after;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean setComposingText(CharSequence text, int cursor) {\n")이다.
+    결과는 문자열붙이기(결과, "                    /* Keep pre-edit inside Android.  HMJE receives the stable\n")이다.
+    결과는 문자열붙이기(결과, "                     * document only when the IME commits/finishes composition,\n")이다.
+    결과는 문자열붙이기(결과, "                     * which lets Gboard/Samsung Keyboard retain prediction and\n")이다.
+    결과는 문자열붙이기(결과, "                     * autocorrection context instead of being reset per jamo. */\n")이다.
+    결과는 문자열붙이기(결과, "                    return super.setComposingText(text, cursor);\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean commitText(CharSequence text, int cursor) {\n")이다.
+    결과는 문자열붙이기(결과, "                    boolean handled = super.commitText(text, cursor);\n")이다.
+    결과는 문자열붙이기(결과, "                    forwardCommittedDocument();\n")이다.
+    결과는 문자열붙이기(결과, "                    return handled;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean finishComposingText() {\n")이다.
+    결과는 문자열붙이기(결과, "                    boolean handled = super.finishComposingText();\n")이다.
+    결과는 문자열붙이기(결과, "                    forwardCommittedDocument();\n")이다.
+    결과는 문자열붙이기(결과, "                    return handled;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean deleteSurroundingText(int before, int after) {\n")이다.
+    결과는 문자열붙이기(결과, "                    if (document.length() == 0 && before > 0) {\n")이다.
+    결과는 문자열붙이기(결과, "                        for (int index = 0; index < before; index++) emitKey(51);\n")이다.
+    결과는 문자열붙이기(결과, "                        return true;\n")이다.
+    결과는 문자열붙이기(결과, "                    }\n")이다.
+    결과는 문자열붙이기(결과, "                    boolean handled = super.deleteSurroundingText(before, after);\n")이다.
+    결과는 문자열붙이기(결과, "                    forwardCommittedDocument();\n")이다.
+    결과는 문자열붙이기(결과, "                    return handled;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean sendKeyEvent(KeyEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "                    if (event.getAction() != KeyEvent.ACTION_DOWN) return true;\n")이다.
+    결과는 문자열붙이기(결과, "                    if (event.getKeyCode() == KeyEvent.KEYCODE_DEL) {\n")이다.
+    결과는 문자열붙이기(결과, "                        if (document.length() == 0) emitKey(51);\n")이다.
+    결과는 문자열붙이기(결과, "                        else {\n")이다.
+    결과는 문자열붙이기(결과, "                            super.sendKeyEvent(event);\n")이다.
+    결과는 문자열붙이기(결과, "                            forwardCommittedDocument();\n")이다.
+    결과는 문자열붙이기(결과, "                        }\n")이다.
+    결과는 문자열붙이기(결과, "                    } else if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) emitKey(251);\n")이다.
+    결과는 문자열붙이기(결과, "                    else return forwardHardwareKey(event);\n")이다.
+    결과는 문자열붙이기(결과, "                    return true;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "                @Override public boolean performEditorAction(int actionCode) {\n")이다.
+    결과는 문자열붙이기(결과, "                    emitKey(251);\n")이다.
+    결과는 문자열붙이기(결과, "                    return true;\n")이다.
+    결과는 문자열붙이기(결과, "                }\n")이다.
+    결과는 문자열붙이기(결과, "            };\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    public void setTextInputRequest(final long request) {\n")이다.
+    결과는 문자열붙이기(결과, "        setTextInputConfig(request >>> 2, request & 3L);\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    public boolean setTextInputConfig(final long client, final long flags) {\n")이다.
+    결과는 문자열붙이기(결과, "        final java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);\n")이다.
+    결과는 문자열붙이기(결과, "        final boolean[] applied = new boolean[1];\n")이다.
+    결과는 문자열붙이기(결과, "        runOnUiThread(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                try {\n")이다.
+    결과는 문자열붙이기(결과, "                    if (surfaceView == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "                    final InputMethodManager manager =\n")이다.
+    결과는 문자열붙이기(결과, "                        (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);\n")이다.
+    결과는 문자열붙이기(결과, "                    if (manager == null) return;\n")이다.
+    결과는 문자열붙이기(결과, "                    final boolean active = (flags & 1L) != 0L;\n")이다.
+    결과는 문자열붙이기(결과, "                    final boolean clientChanged = client != textInputClient || ((flags ^ textInputFlags) & ~2L) != 0L;\n")이다.
+    결과는 문자열붙이기(결과, "                    textInputClient = client;\n")이다.
+    결과는 문자열붙이기(결과, "                    textInputFlags = flags;\n")이다.
+    결과는 문자열붙이기(결과, "                    getWindow().setSoftInputMode((flags & 2L) != 0L\n")이다.
+    결과는 문자열붙이기(결과, "                        ? WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING\n")이다.
+    결과는 문자열붙이기(결과, "                        : WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);\n")이다.
+    결과는 문자열붙이기(결과, "                    if (active) {\n")이다.
+    결과는 문자열붙이기(결과, "                        surfaceView.requestFocus();\n")이다.
+    결과는 문자열붙이기(결과, "                        if (clientChanged) manager.restartInput(surfaceView);\n")이다.
+    결과는 문자열붙이기(결과, "                        surfaceView.post(new Runnable() {\n")이다.
+    결과는 문자열붙이기(결과, "                            @Override public void run() {\n")이다.
+    결과는 문자열붙이기(결과, "                                if (textInputClient == client && textInputFlags == flags)\n")이다.
+    결과는 문자열붙이기(결과, "                                    manager.showSoftInput(surfaceView, InputMethodManager.SHOW_IMPLICIT);\n")이다.
+    결과는 문자열붙이기(결과, "                            }\n")이다.
+    결과는 문자열붙이기(결과, "                        });\n")이다.
+    결과는 문자열붙이기(결과, "                    } else {\n")이다.
+    결과는 문자열붙이기(결과, "                        manager.hideSoftInputFromWindow(surfaceView.getWindowToken(), 0);\n")이다.
+    결과는 문자열붙이기(결과, "                        surfaceView.clearFocus();\n")이다.
+    결과는 문자열붙이기(결과, "                        manager.restartInput(surfaceView);\n")이다.
+    결과는 문자열붙이기(결과, "                    }\n")이다.
+    결과는 문자열붙이기(결과, "                    applied[0] = true;\n")이다.
+    결과는 문자열붙이기(결과, "                } finally { done.countDown(); }\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "        try {\n")이다.
+    결과는 문자열붙이기(결과, "            return done.await(2, java.util.concurrent.TimeUnit.SECONDS) && applied[0];\n")이다.
+    결과는 문자열붙이기(결과, "        } catch (InterruptedException interrupted) {\n")이다.
+    결과는 문자열붙이기(결과, "            Thread.currentThread().interrupt();\n")이다.
+    결과는 문자열붙이기(결과, "            return false;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private static int clampUnit(float value) {\n")이다.
+    결과는 문자열붙이기(결과, "        return Math.max(0, Math.min(65535, Math.round(value * 65535.0f)));\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private static int toolOf(MotionEvent event, int index) {\n")이다.
+    결과는 문자열붙이기(결과, "        switch (event.getToolType(index)) {\n")이다.
+    결과는 문자열붙이기(결과, "            case MotionEvent.TOOL_TYPE_STYLUS: return 1;\n")이다.
+    결과는 문자열붙이기(결과, "            case MotionEvent.TOOL_TYPE_FINGER: return 2;\n")이다.
+    결과는 문자열붙이기(결과, "            case MotionEvent.TOOL_TYPE_MOUSE: return 3;\n")이다.
+    결과는 문자열붙이기(결과, "            case MotionEvent.TOOL_TYPE_ERASER: return 4;\n")이다.
+    결과는 문자열붙이기(결과, "            default: return 5;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private void emitPointer(MotionEvent event, int index, int history, int phase, long sampleFlags) {\n")이다.
+    결과는 문자열붙이기(결과, "        boolean historical = history >= 0;\n")이다.
+    결과는 문자열붙이기(결과, "        float x = historical ? event.getHistoricalX(index, history) : event.getX(index);\n")이다.
+    결과는 문자열붙이기(결과, "        float y = historical ? event.getHistoricalY(index, history) : event.getY(index);\n")이다.
+    결과는 문자열붙이기(결과, "        float pressure = historical ? event.getHistoricalPressure(index, history) : event.getPressure(index);\n")이다.
+    결과는 문자열붙이기(결과, "        float tilt = historical\n")이다.
+    결과는 문자열붙이기(결과, "            ? event.getHistoricalAxisValue(MotionEvent.AXIS_TILT, index, history)\n")이다.
+    결과는 문자열붙이기(결과, "            : event.getAxisValue(MotionEvent.AXIS_TILT, index);\n")이다.
+    결과는 문자열붙이기(결과, "        float orientation = historical\n")이다.
+    결과는 문자열붙이기(결과, "            ? event.getHistoricalOrientation(index, history)\n")이다.
+    결과는 문자열붙이기(결과, "            : event.getOrientation(index);\n")이다.
+    결과는 문자열붙이기(결과, "        long timeUs = (historical ? event.getHistoricalEventTime(history) : event.getEventTime()) * 1000L;\n")이다.
+    결과는 문자열붙이기(결과, "        int altitude = clampUnit(1.0f - Math.min(1.0f, Math.abs(tilt) / ((float)Math.PI / 2.0f)));\n")이다.
+    결과는 문자열붙이기(결과, "        float azimuthUnit = (orientation + (float)Math.PI) / (2.0f * (float)Math.PI);\n")이다.
+    결과는 문자열붙이기(결과, "        long capabilities = (1L << 8) | (1L << 11);\n")이다.
+    결과는 문자열붙이기(결과, "        int tool = toolOf(event, index);\n")이다.
+    결과는 문자열붙이기(결과, "        if (tool == 1 || tool == 4) capabilities |= (1L << 9) | (1L << 10);\n")이다.
+    결과는 문자열붙이기(결과, "        nativePointerSample(timeUs, event.getPointerId(index), Math.round(x), Math.round(y),\n")이다.
+    결과는 문자열붙이기(결과, "            clampUnit(pressure), altitude, clampUnit(azimuthUnit), tool, phase,\n")이다.
+    결과는 문자열붙이기(결과, "            event.getButtonState(), 0, 0L, 0L, sampleFlags | capabilities);\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    private boolean forwardPointerEvent(MotionEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "        int action = event.getActionMasked();\n")이다.
+    결과는 문자열붙이기(결과, "        if (action == MotionEvent.ACTION_MOVE) {\n")이다.
+    결과는 문자열붙이기(결과, "            for (int history = 0; history < event.getHistorySize(); history++) {\n")이다.
+    결과는 문자열붙이기(결과, "                for (int index = 0; index < event.getPointerCount(); index++)\n")이다.
+    결과는 문자열붙이기(결과, "                    emitPointer(event, index, history, 2, 1L << 1);\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "            for (int index = 0; index < event.getPointerCount(); index++)\n")이다.
+    결과는 문자열붙이기(결과, "                emitPointer(event, index, -1, 2, 0L);\n")이다.
+    결과는 문자열붙이기(결과, "            return true;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (action == MotionEvent.ACTION_HOVER_MOVE) {\n")이다.
+    결과는 문자열붙이기(결과, "            emitPointer(event, event.getActionIndex(), -1, 5, 0L);\n")이다.
+    결과는 문자열붙이기(결과, "            return true;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        if (action == MotionEvent.ACTION_SCROLL) {\n")이다.
+    결과는 문자열붙이기(결과, "            int index = Math.max(0, event.getActionIndex());\n")이다.
+    결과는 문자열붙이기(결과, "            ViewConfiguration configuration = ViewConfiguration.get(this);\n")이다.
+    결과는 문자열붙이기(결과, "            float horizontalFactor = Build.VERSION.SDK_INT >= 26\n")이다.
+    결과는 문자열붙이기(결과, "                ? configuration.getScaledHorizontalScrollFactor() : 48.0f;\n")이다.
+    결과는 문자열붙이기(결과, "            float verticalFactor = Build.VERSION.SDK_INT >= 26\n")이다.
+    결과는 문자열붙이기(결과, "                ? configuration.getScaledVerticalScrollFactor() : 48.0f;\n")이다.
+    결과는 문자열붙이기(결과, "            nativePointerSample(event.getEventTime() * 1000L, event.getPointerId(index),\n")이다.
+    결과는 문자열붙이기(결과, "                Math.round(event.getX(index)), Math.round(event.getY(index)),\n")이다.
+    결과는 문자열붙이기(결과, "                0, 0, 0, toolOf(event, index), 6, event.getButtonState(), 0,\n")이다.
+    결과는 문자열붙이기(결과, "                Math.round(event.getAxisValue(MotionEvent.AXIS_HSCROLL) * horizontalFactor),\n")이다.
+    결과는 문자열붙이기(결과, "                Math.round(event.getAxisValue(MotionEvent.AXIS_VSCROLL) * verticalFactor),\n")이다.
+    결과는 문자열붙이기(결과, "                (1L << 11) | (1L << 12));\n")이다.
+    결과는 문자열붙이기(결과, "            return true;\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        int phase;\n")이다.
+    결과는 문자열붙이기(결과, "        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) phase = 1;\n")이다.
+    결과는 문자열붙이기(결과, "        else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) phase = 3;\n")이다.
+    결과는 문자열붙이기(결과, "        else if (action == MotionEvent.ACTION_CANCEL) phase = 4;\n")이다.
+    결과는 문자열붙이기(결과, "        else return false;\n")이다.
+    결과는 문자열붙이기(결과, "        if (action == MotionEvent.ACTION_CANCEL) {\n")이다.
+    결과는 문자열붙이기(결과, "            for (int index = 0; index < event.getPointerCount(); index++)\n")이다.
+    결과는 문자열붙이기(결과, "                emitPointer(event, index, -1, phase, 0L);\n")이다.
+    결과는 문자열붙이기(결과, "        } else {\n")이다.
+    결과는 문자열붙이기(결과, "            emitPointer(event, event.getActionIndex(), -1, phase, 0L);\n")이다.
+    결과는 문자열붙이기(결과, "        }\n")이다.
+    결과는 문자열붙이기(결과, "        return true;\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    @Override protected void onResume() { super.onResume(); nativeLifecycle(1); }\n")이다.
+    결과는 문자열붙이기(결과, "    @Override protected void onPause() { nativeLifecycle(2); super.onPause(); }\n")이다.
+    결과는 문자열붙이기(결과, "    @Override protected void onDestroy() { nativeLifecycle(3); super.onDestroy(); }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    @Override\n")이다.
+    결과는 문자열붙이기(결과, "    protected void onCreate(Bundle savedInstanceState) {\n")이다.
+    결과는 문자열붙이기(결과, "        super.onCreate(savedInstanceState);\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView = new HmjeSurfaceView(this);\n")이다.
+    결과는 문자열붙이기(결과, "        accessibilityProvider = new HmjeAccessibilityProvider(surfaceView, new HmjeAccessibilityProvider.Action() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public boolean perform(long identifier, int action) { return nativeAccessibilityAction(identifier, action); }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView.setOnTouchListener(new View.OnTouchListener() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public boolean onTouch(View view, MotionEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "                return forwardPointerEvent(event);\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView.setOnHoverListener(new View.OnHoverListener() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public boolean onHover(View view, MotionEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "                return forwardPointerEvent(event);\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView.setOnGenericMotionListener(new View.OnGenericMotionListener() {\n")이다.
+    결과는 문자열붙이기(결과, "            @Override public boolean onGenericMotion(View view, MotionEvent event) {\n")이다.
+    결과는 문자열붙이기(결과, "                return forwardPointerEvent(event);\n")이다.
+    결과는 문자열붙이기(결과, "            }\n")이다.
+    결과는 문자열붙이기(결과, "        });\n")이다.
+    결과는 문자열붙이기(결과, "        setContentView(surfaceView);\n")이다.
+    결과는 문자열붙이기(결과, "        // 포맷은 여기(Java, addCallback 전)에서 요청한다 — 네이티브에서\n")이다.
+    결과는 문자열붙이기(결과, "        // ANativeWindow_setBuffersGeometry로 강제하면 실기/에뮬레이터 검증 중\n")이다.
+    결과는 문자열붙이기(결과, "        // SurfaceFlinger의 초기 버퍼 협상(binder IPC)과 경합해 무작위 시스템 스레드가\n")이다.
+    결과는 문자열붙이기(결과, "        // 죽는 크래시가 재현됐다(tools/targets/android_jni.c 주석 참고).\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView.getHolder().setFormat(PixelFormat.RGBX_8888);\n")이다.
+    결과는 문자열붙이기(결과, "        surfaceView.getHolder().addCallback(this);\n")이다.
+    결과는 문자열붙이기(결과, "        // HMJE 표면 계약은 정수 물리px/논리좌표 배율을 쓴다. Android\n")이다.
+    결과는 문자열붙이기(결과, "        // density(AVD 2.625 등)는 가장 가까운 정수로 반올림해 iOS 2x/3x와\n")이다.
+    결과는 문자열붙이기(결과, "        // 같은 공통 명령 재생·폰트 재베이크 경로를 타게 한다.\n")이다.
+    결과는 문자열붙이기(결과, "        int scale = Math.max(1, Math.round(getResources().getDisplayMetrics().density));\n")이다.
+    결과는 문자열붙이기(결과, "        nativeInit(getAssets(), scale);\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    @Override\n")이다.
+    결과는 문자열붙이기(결과, "    public void surfaceCreated(SurfaceHolder holder) {\n")이다.
+    결과는 문자열붙이기(결과, "        nativeSurfaceCreated(holder.getSurface());\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    @Override\n")이다.
+    결과는 문자열붙이기(결과, "    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {\n")이다.
+    결과는 문자열붙이기(결과, "        // hmje 렌더 스레드는 여기서(surfaceCreated가 아니라) 깨운다 — 지오메트리가 이\n")이다.
+    결과는 문자열붙이기(결과, "        // 시점에 확정된다(tools/targets/android_jni.c 주석 참고, 실기/에뮬레이터에서\n")이다.
+    결과는 문자열붙이기(결과, "        // 검증한 순서).\n")이다.
+    결과는 문자열붙이기(결과, "        nativeSurfaceChanged(width, height);\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "\n")이다.
+    결과는 문자열붙이기(결과, "    @Override\n")이다.
+    결과는 문자열붙이기(결과, "    public void surfaceDestroyed(SurfaceHolder holder) {\n")이다.
+    결과는 문자열붙이기(결과, "        nativeSurfaceDestroyed();\n")이다.
+    결과는 문자열붙이기(결과, "    }\n")이다.
+    결과는 문자열붙이기(결과, "}\n")이다.
+    결과를 문자열로 반환한다.
+
+# APK assets/에 번들할 폰트. 목록 순서가 APK zip 항목 순서가 된다.
+
+함수 안드로이드번들폰트들은
+    ["SUITE-SemiBold.otf", "Pretendard-Regular.otf", "Pretendard-Medium.otf", "Pretendard-SemiBold.otf"]를 문자열의 배열로 반환한다.
+
+함수 안드로이드폰트뿌리는
+    상수 UI뿌리는 안드로이드환경값("HMJE_UI_ROOT")이고, 문자열이다.
+    만약 문자열바이트길이(UI뿌리) == 0이면
+        안드로이드오류를 (내용: "assets/fonts를 찾지 못했습니다. UI 자산 소유 저장소를 HMJE_UI_ROOT로 설정하세요.", 코드: 1)로 실행한다.
+    문자열붙인값(UI뿌리, "/assets/fonts")를 문자열로 반환한다.
+
+# `define` 줄이 정의하는 함수 이름(`@main`, `@hmje_fn_…`). 없으면 "".
+함수 안드로이드IR정의이름은 (줄: 문자열)를 받아
+    상수 기호자리는 문자열찾기(줄, "@")이고, 자연수?이다.
+    만약 기호자리가 없으면
+        ""를 문자열로 반환한다.
+    상수 길이는 문자열바이트길이(줄)이고, 자연수이다.
+    변수 끝은 기호자리! + 1이고, 자연수이다.
+    변수 계속은 참이고, 참거짓이다.
+    끝 < 길이 그리고 계속일 동안
+        상수 바이트는 자연수(문자열바이트(줄, 끝))이고, 자연수이다.
+        만약 (바이트 >= 48 그리고 바이트 <= 57) 또는 (바이트 >= 65 그리고 바이트 <= 90) 또는 (바이트 >= 97 그리고 바이트 <= 122) 또는 바이트 == 95 또는 바이트 == 46 또는 바이트 == 36이면
+            끝은 끝 + 1이다.
+        아니면
+            계속은 거짓이다.
+    문자열부분(줄, 기호자리! + 1, 끝 - 기호자리! - 1)을 문자열로 반환한다.
+
+# LLVM IR 줄에서 `@hmje_…` 심볼 이름들을 뽑는다.
+함수 안드로이드IR심볼들은 (줄: 문자열)를 받아
+    변수 결과는 []이고, 문자열의 배열이다.
+    상수 길이는 문자열바이트길이(줄)이고, 자연수이다.
+    변수 번은 0이고, 자연수이다.
+    번 + 6 < 길이일 동안
+        만약 자연수(문자열바이트(줄, 번)) == 64 그리고 문자열시작하는가(문자열부분(줄, 번 + 1, 5), "hmje_")이면
+            변수 끝은 번 + 1이고, 자연수이다.
+            변수 계속은 참이고, 참거짓이다.
+            끝 < 길이 그리고 계속일 동안
+                상수 바이트는 자연수(문자열바이트(줄, 끝))이고, 자연수이다.
+                만약 (바이트 >= 48 그리고 바이트 <= 57) 또는 (바이트 >= 65 그리고 바이트 <= 90) 또는 (바이트 >= 97 그리고 바이트 <= 122) 또는 바이트 == 95 또는 바이트 == 46 또는 바이트 == 36이면
+                    끝은 끝 + 1이다.
+                아니면
+                    계속은 거짓이다.
+            결과에 문자열부분(줄, 번 + 1, 끝 - 번 - 1)을 추가한다.
+            번은 끝이다.
+        아니면
+            번은 번 + 1이다.
+    결과를 문자열의 배열로 반환한다.
+
+# 표준 소켓 연결의 단일 진입(표준/시스템/시스템호출.hmje의 `소켓시스템호출연결`)이
+# 앱에서 도달하는가. HMJE 함수(`hmje_fn_…`)와 클로저 어댑터가 아닌 정의(런타임
+# 진입·main·JNI)와 전역 초기값이 뿌리다. 소켓 이름의 LLVM 심볼 접두는 컴파일러의
+# 이름 맹글링(LLVM/이름맹글링.hmje: 한글 음절마다 u<16진>, `_`로 잇기)을 따른다.
+프로젝트 내부 함수 안드로이드소켓연결도달하는가는 (IR: 문자열)를 받아
+    상수 대상접두는 "hmje_fn_uc18c_ucf13_uc2dc_uc2a4_ud15c_ud638_ucd9c_uc5f0_uacb0__"이고, 문자열이다.
+    만약 문자열찾기(IR, 대상접두)가 없으면
+        거짓을 참거짓으로 반환한다.
+    상수 줄들은 문자열나누기(IR, "\n")이고, 문자열의 배열이다.
+    변수 간선들은 문자열로 문자열을 찾는 사전이다.
+    변수 뿌리들은 []이고, 문자열의 배열이다.
+    변수 현재함수는 ""이고, 문자열이다.
+    변수 현재간선은 ""이고, 문자열이다.
+    줄들에서 각 줄마다
+        만약 문자열시작하는가(줄, "define ")이면
+            상수 정의이름은 안드로이드IR정의이름(줄)이고, 문자열이다.
+            만약 문자열바이트길이(정의이름) > 0이면
+                현재함수는 정의이름이다.
+                현재간선은 ""이다.
+                만약 문자열시작하는가(현재함수, "hmje_fn_") == 거짓 그리고 문자열시작하는가(현재함수, "hmje_closure_adapter_") == 거짓이면
+                    뿌리들에 현재함수를 추가한다.
+        그렇지 않고 줄 == "}"이면
+            만약 현재함수 != ""이면
+                간선들에서 현재함수의 값은 현재간선이다.
+            현재함수는 ""이다.
+        그렇지 않고 현재함수 != ""이면
+            상수 참조들은 안드로이드IR심볼들(줄)이고, 문자열의 배열이다.
+            참조들에서 각 참조마다
+                현재간선은 문자열붙인값(현재간선, 문자열붙인값(참조, "\n"))이다.
+        그렇지 않고 문자열시작하는가(줄, "@")이면
+            상수 전역참조들은 안드로이드IR심볼들(줄)이고, 문자열의 배열이다.
+            변수 전역번은 1이고, 자연수이다.
+            전역번 < 전역참조들.길이일 동안
+                뿌리들에 전역참조들[전역번]을 추가한다.
+                전역번은 전역번 + 1이다.
+    변수 본것은 문자열로 참거짓을 찾는 사전이다.
+    변수 대기는 뿌리들이고, 문자열의 배열이다.
+    변수 대기번은 0이고, 자연수이다.
+    대기번 < 대기.길이일 동안
+        상수 이름은 대기[대기번]이고, 문자열이다.
+        대기번은 대기번 + 1이다.
+        만약 사전에서찾기(본것, 이름, 거짓) == 거짓이면
+            본것에서 이름의 값은 참이다.
+            만약 문자열시작하는가(이름, 대상접두)이면
+                참을 참거짓으로 반환한다.
+            상수 다음들은 문자열나누기(사전에서찾기(간선들, 이름, ""), "\n")이고, 문자열의 배열이다.
+            다음들에서 각 다음마다
+                만약 문자열바이트길이(다음) > 0 그리고 사전에서찾기(본것, 다음, 거짓) == 거짓이면
+                    대기에 다음을 추가한다.
+    거짓을 참거짓으로 반환한다.
+
+함수 안드로이드APK만들기는 (llvm경로: 문자열, 출력: 문자열, 툴체인루트: 문자열, 작업폴더: 문자열, 네이티브계획경로: 문자열)를 받아
+    상수 계획은 iOS계획읽기(네이티브계획경로)이고, iOS번들계획이다.
+    변수 앱패키지는 iOS설정값(계획, "묶음 식별자")이고, 문자열이다.
+    만약 문자열바이트길이(앱패키지) == 0이면
+        앱패키지는 "net.semtle.semtleuidemo"이다.
+    상수 대상폴더는 안드로이드대상폴더(툴체인루트)이고, 문자열이다.
+    상수 shim원본은 문자열붙인값(대상폴더, "/android_shim.c")이고, 문자열이다.
+    상수 jni원본은 문자열붙인값(대상폴더, "/android_jni.c")이고, 문자열이다.
+    상수 async원본은 문자열붙인값(대상폴더, "/async_host_runtime.c")이고, 문자열이다.
+    안드로이드원본확인을 (경로: shim원본, 설명: "Android 시스템콜 shim이 없습니다: ")로 실행한다.
+    안드로이드원본확인을 (경로: jni원본, 설명: "Android JNI/Surface 구현이 없습니다: ")로 실행한다.
+    안드로이드원본확인을 (경로: async원본, 설명: "Android 비동기 runtime이 없습니다: ")로 실행한다.
+    상수 clang은 안드로이드도구경로("HMJE_ANDROID_CLANG")이고, 문자열이다.
+    상수 sysroot포함은 안드로이드도구경로("HMJE_ANDROID_SYSROOT_INCLUDE")이고, 문자열이다.
+    상수 aapt2는 안드로이드도구경로("HMJE_ANDROID_AAPT2")이고, 문자열이다.
+    상수 d8은 안드로이드도구경로("HMJE_ANDROID_D8")이고, 문자열이다.
+    상수 zipalign은 안드로이드도구경로("HMJE_ANDROID_ZIPALIGN")이고, 문자열이다.
+    상수 apksigner는 안드로이드도구경로("HMJE_ANDROID_APKSIGNER")이고, 문자열이다.
+    상수 플랫폼jar는 안드로이드도구경로("HMJE_ANDROID_PLATFORM_JAR")이고, 문자열이다.
+    상수 최소SDK는 안드로이드최소SDK()이고, 문자열이다.
+    안드로이드작업폴더만들기를 (경로: 작업폴더)로 실행한다.
+
+    # ---- 3-1) 네이티브 라이브러리(libhmjeapp.so) ----
+    상수 IR경로는 문자열붙인값(작업폴더, "/app.ll")이고, 문자열이다.
+    상수 앱오브젝트는 문자열붙인값(작업폴더, "/app.o")이고, 문자열이다.
+    상수 shim오브젝트는 문자열붙인값(작업폴더, "/shim.o")이고, 문자열이다.
+    상수 async오브젝트는 문자열붙인값(작업폴더, "/async-runtime.o")이고, 문자열이다.
+    상수 jni오브젝트는 문자열붙인값(작업폴더, "/jni.o")이고, 문자열이다.
+    상수 jni빌드원본은 문자열붙인값(작업폴더, "/android_jni.c")이고, 문자열이다.
+    상수 so경로는 문자열붙인값(작업폴더, "/libhmjeapp.so")이고, 문자열이다.
+    상수 원IR은 안드로이드필수파일읽기(llvm경로)이고, 문자열이다.
+    # 표준은 소켓을 늘 싣지만 INTERNET 권한은 소켓 연결이 실제로 도달할 때만 준다.
+    상수 소켓도달은 안드로이드소켓연결도달하는가(원IR)이고, 참거짓이다.
+    만약 안드로이드파일쓰기(IR경로, 안드로이드진입리네임(원IR)) == 거짓이면
+        안드로이드오류를 (내용: "android-apk LLVM IR을 쓰지 못했습니다", 코드: 1)로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIC", "-c", IR경로, "-o", 앱오브젝트], 단계: "네이티브 obj 컴파일(app)")로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIC", "-c", shim원본, "-o", shim오브젝트], 단계: "네이티브 obj 컴파일(shim)")로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIC", "-c", async원본, "-o", async오브젝트], 단계: "네이티브 obj 컴파일(async)")로 실행한다.
+    # JNI 장명은 Java package를 포함한다. 밑줄을 JNI 규칙의 _1로 먼저 이스케이프한 뒤
+    # 점을 밑줄로 바꾸어, Java 원본·매니페스트·네이티브 심볼이 같은 패키지를 가리키게 한다.
+    변수 jni패키지는 iOS문자열대체(앱패키지, "_", "_1")이고, 문자열이다.
+    jni패키지는 iOS문자열대체(jni패키지, ".", "_")이다.
+    변수 jni내용은 안드로이드필수파일읽기(jni원본)이고, 문자열이다.
+    jni내용은 iOS문자열대체(jni내용, "Java_net_semtle_semtleuidemo_MainActivity_", 문자열붙인값("Java_", 문자열붙인값(jni패키지, "_MainActivity_")))이다.
+    만약 안드로이드파일쓰기(jni빌드원본, jni내용) == 거짓이면
+        안드로이드오류를 (내용: "패키지별 Android JNI 원본을 쓰지 못했습니다", 코드: 1)로 실행한다.
+    안드로이드실행을 (인자들: [clang, "-O2", "-fPIC", "-I", sysroot포함, "-I", 대상폴더, "-c", jni빌드원본, "-o", jni오브젝트], 단계: "네이티브 obj 컴파일(jni)")로 실행한다.
+    변수 so인자들은 [clang, "-O2", "-shared", "-fPIC", "-Wl,-soname,libhmjeapp.so", "-Wl,--no-undefined", "-Wl,--wrap=open", "-Wl,--wrap=openat", 앱오브젝트, shim오브젝트, async오브젝트, jni오브젝트]이고, 문자열의 배열이다.
+    상수 외부인자들은 안드로이드외부링크인자들(clang, 계획, 작업폴더, 대상폴더, 참)이고, 문자열의 배열이다.
+    변수 외부번은 0이고, 자연수이다.
+    외부번 < 외부인자들.길이일 동안
+        so인자들에 외부인자들[외부번]을 추가한다.
+        외부번은 외부번 + 1이다.
+    상수 시스템인자들은 ["-landroid", "-lEGL", "-lGLESv3", "-llog", "-lm", "-o", so경로]이고, 문자열의 배열이다.
+    외부번은 0이다.
+    외부번 < 시스템인자들.길이일 동안
+        so인자들에 시스템인자들[외부번]을 추가한다.
+        외부번은 외부번 + 1이다.
+    안드로이드실행을 (인자들: so인자들, 단계: "네이티브 .so 링크")로 실행한다.
+
+    # ---- 3-2) Java 원본 → dex ----
+    상수 자바패키지경로는 iOS문자열대체(앱패키지, ".", "/")이고, 문자열이다.
+    상수 자바폴더는 문자열붙인값(작업폴더, 문자열붙인값("/java/", 자바패키지경로))이고, 문자열이다.
+    만약 포직스디렉터리모두만들기(자바폴더) != 0이면
+        안드로이드오류를 (내용: "Java 원본 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    상수 자바경로는 문자열붙인값(자바폴더, "/MainActivity.java")이고, 문자열이다.
+    변수 자바내용은 안드로이드자바원본(iOS설정값(계획, "카메라") == "1")이고, 문자열이다.
+    자바내용은 iOS문자열대체(자바내용, "package net.semtle.semtleuidemo;", 문자열붙인값("package ", 문자열붙인값(앱패키지, ";")))이다.
+    만약 안드로이드파일쓰기(자바경로, 자바내용) == 거짓이면
+        안드로이드오류를 (내용: "MainActivity.java를 쓰지 못했습니다", 코드: 1)로 실행한다.
+    상수 접근성자바경로는 문자열붙인값(자바폴더, "/HmjeAccessibilityProvider.java")이고, 문자열이다.
+    변수 접근성자바내용은 안드로이드필수파일읽기(문자열붙인값(대상폴더, "/HmjeAccessibilityProvider.java"))이고, 문자열이다.
+    접근성자바내용은 iOS문자열대체(접근성자바내용, "package net.semtle.semtleuidemo;", 문자열붙인값("package ", 문자열붙인값(앱패키지, ";")))이다.
+    만약 안드로이드파일쓰기(접근성자바경로, 접근성자바내용) == 거짓이면
+        안드로이드오류를 (내용: "Android 접근성 Java 원본 쓰기 실패", 코드: 1)로 실행한다.
+    상수 클래스폴더는 문자열붙인값(작업폴더, "/classes")이고, 문자열이다.
+    만약 포직스디렉터리모두만들기(클래스폴더) != 0이면
+        안드로이드오류를 (내용: "클래스 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    # JDK 25의 javac는 --release/최신 -source,-target과 -bootclasspath 조합을
+    # 거부한다. android.jar가 오래된 bytecode major version을 기대하고 D8이 어차피
+    # 재작성하므로 -source/-target 8 + -bootclasspath 조합을 쓴다.
+    만약 안드로이드자바있는가(계획) == 거짓이면
+        안드로이드실행을 (인자들: ["javac", "-source", "8", "-target", "8", "-bootclasspath", 플랫폼jar, "-classpath", 플랫폼jar, "-d", 클래스폴더, 자바경로, 접근성자바경로], 단계: "javac")로 실행한다.
+    상수 dex폴더는 문자열붙인값(작업폴더, "/dex")이고, 문자열이다.
+    만약 포직스디렉터리모두만들기(dex폴더) != 0이면
+        안드로이드오류를 (내용: "dex 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    # JDK jar로 재귀 클래스 입력을 묶어 셸·find·xargs 없이 D8에 전달한다.
+    만약 안드로이드자바있는가(계획) == 거짓이면
+        상수 클래스jar는 문자열붙인값(작업폴더, "/classes.jar")이고, 문자열이다.
+        안드로이드실행을 (인자들: ["jar", "cfM", 클래스jar, "-C", 클래스폴더, "."], 단계: "클래스 JAR 생성")로 실행한다.
+        안드로이드실행을 (인자들: [d8, "--output", dex폴더, "--min-api", 최소SDK, 클래스jar], 단계: "d8")로 실행한다.
+
+    # ---- 3-3) 리소스/매니페스트 → 베이스 APK(aapt2) ----
+    상수 매니페스트경로는 문자열붙인값(작업폴더, "/AndroidManifest.xml")이고, 문자열이다.
+    변수 매니페스트내용은 안드로이드매니페스트(최소SDK)이고, 문자열이다.
+    상수 묶음식별자는 iOS설정값(계획, "묶음 식별자")이고, 문자열이다.
+    상수 표시이름은 iOS설정값(계획, "표시 이름")이고, 문자열이다.
+    상수 아이콘자원은 iOS설정값(계획, "아이콘 자원")이고, 문자열이다.
+    만약 문자열바이트길이(묶음식별자) > 0이면
+        매니페스트내용은 iOS문자열대체(매니페스트내용, "package=\"net.semtle.semtleuidemo\"", 문자열붙인값("package=\"", 문자열붙인값(안드로이드XML속성(묶음식별자), "\"")))이다.
+    매니페스트내용은 iOS문자열대체(매니페스트내용, "net.semtle.semtleuidemo.MainActivity", 문자열붙인값(앱패키지, ".MainActivity"))이다.
+    만약 문자열바이트길이(표시이름) > 0이면
+        매니페스트내용은 iOS문자열대체(매니페스트내용, "android:label=\"HmjeUIDemo\"", 문자열붙인값("android:label=\"", 문자열붙인값(안드로이드XML속성(표시이름), "\"")))이다.
+    만약 문자열바이트길이(아이콘자원) > 0이면
+        # 런처 아이콘은 drawable이 아니라 mipmap으로 선언한다. API 26 이상에서는
+        # 같은 이름의 v26 adaptive-icon XML을 선택해 제조사 런처가 레거시 아이콘에
+        # 흰색 판을 덧대지 않게 하고, 이전 버전은 원본 PNG를 그대로 쓴다.
+        매니페스트내용은 iOS문자열대체(매니페스트내용, "<application ", "<application android:icon=\"@mipmap/hmje_app_icon\" android:roundIcon=\"@mipmap/hmje_app_icon\" ")이다.
+    변수 버전이름은 iOS설정값(계획, "프로젝트 버전")이고, 문자열이다.
+    만약 문자열바이트길이(버전이름) == 0이면
+        버전이름은 "1.0"이다.
+    상수 버전코드는 안드로이드도구경로("HMJE_ANDROID_VERSION_CODE")이고, 문자열이다.
+    상수 목표SDK는 안드로이드도구경로("HMJE_ANDROID_TARGET_SDK")이고, 문자열이다.
+    매니페스트내용은 iOS문자열대체(매니페스트내용, "<manifest ", 문자열붙인값("<manifest android:versionCode=\"", 문자열붙인값(버전코드, 문자열붙인값("\" android:versionName=\"", 문자열붙인값(안드로이드XML속성(버전이름), "\" ")))))이다.
+    매니페스트내용은 iOS문자열대체(매니페스트내용, 문자열붙인값("android:targetSdkVersion=\"", 문자열붙인값(최소SDK, "\"")), 문자열붙인값("android:targetSdkVersion=\"", 문자열붙인값(목표SDK, "\"")))이다.
+    변수 권한내용은 ""이고, 문자열이다.
+    만약 iOS설정값(계획, "오디오 입력") == "1"이면
+        권한내용은 문자열붙인값(권한내용, "    <uses-permission android:name=\"android.permission.RECORD_AUDIO\" />\n")이다.
+    # 네트워크 권한: 모듈·외부 구현이 `필요 기능은 네트워크`를 선언했거나(예: HmjeNetwork)
+    # 표준 소켓 연결(소켓연결·TLS13첫비행 등)이 앱 진입에서 도달한다.
+    만약 iOS설정값(계획, "네트워크") == "1" 또는 소켓도달이면
+        권한내용은 문자열붙인값(권한내용, "    <uses-permission android:name=\"android.permission.INTERNET\" />\n")이다.
+    만약 iOS설정값(계획, "위치") == "1"이면
+        권한내용은 문자열붙인값(권한내용, "    <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />\n")이다.
+        권한내용은 문자열붙인값(권한내용, "    <uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />\n")이다.
+    # `필요 기능은 카메라`: 카메라 권한, 카메라 없는 기기도 설치되도록 required=false,
+    # 패키지 가시성(API 30+)에서 촬영 앱을 찾도록 IMAGE_CAPTURE queries.
+    상수 카메라켬은 iOS설정값(계획, "카메라") == "1"이고, 참거짓이다.
+    만약 카메라켬이면
+        권한내용은 문자열붙인값(권한내용, "    <uses-permission android:name=\"android.permission.CAMERA\" />\n")이다.
+        권한내용은 문자열붙인값(권한내용, "    <uses-feature android:name=\"android.hardware.camera\" android:required=\"false\" />\n")이다.
+        권한내용은 문자열붙인값(권한내용, "    <queries>\n        <intent>\n            <action android:name=\"android.media.action.IMAGE_CAPTURE\" />\n        </intent>\n    </queries>\n")이다.
+    매니페스트내용은 iOS문자열대체(매니페스트내용, "    <application ", 문자열붙인값(권한내용, "    <application "))이다.
+    # `파일 공유는 "1"이다`: 앱이 임시 파일을 content:// URI로 다른 앱과 공유하도록
+    # androidx FileProvider를 선언한다. 권한 이름은 <묶음 식별자>.hmje.files, 경로
+    # 목록은 res/xml/hmje_file_paths.xml이며 공유용 캐시 하위 경로를 지정한다.
+    # FileProvider 클래스는 앱의 JVM 잠금 그래프(androidx.core)가 제공해야 한다.
+    상수 파일공유켬은 iOS설정값(계획, "파일 공유") == "1"이고, 참거짓이다.
+    만약 파일공유켬이면
+        변수 공유권한은 "net.semtle.semtleuidemo"이고, 문자열이다.
+        만약 문자열바이트길이(묶음식별자) > 0이면
+            공유권한은 묶음식별자이다.
+        변수 제공자는 ""이고, 문자열이다.
+        제공자는 문자열붙이기(제공자, "        <provider android:name=\"androidx.core.content.FileProvider\"\n")이다.
+        제공자는 문자열붙이기(제공자, 문자열붙인값("            android:authorities=\"", 문자열붙인값(안드로이드XML속성(공유권한), ".hmje.files\"\n")))이다.
+        제공자는 문자열붙이기(제공자, "            android:exported=\"false\" android:grantUriPermissions=\"true\">\n")이다.
+        제공자는 문자열붙이기(제공자, "            <meta-data android:name=\"android.support.FILE_PROVIDER_PATHS\" android:resource=\"@xml/hmje_file_paths\" />\n")이다.
+        제공자는 문자열붙이기(제공자, "        </provider>\n")이다.
+        매니페스트내용은 iOS문자열대체(매니페스트내용, "    </application>\n", 문자열붙인값(제공자, "    </application>\n"))이다.
+    # 카메라 촬영 결과를 받는 content:// 제공자(MainActivity$HmjeCameraFileProvider).
+    # 권한 이름은 <묶음 식별자>.hmjecamera(= ${applicationId}.hmjecamera).
+    만약 카메라켬이면
+        변수 카메라권한이름은 "net.semtle.semtleuidemo"이고, 문자열이다.
+        만약 문자열바이트길이(묶음식별자) > 0이면
+            카메라권한이름은 묶음식별자이다.
+        변수 카메라제공자는 ""이고, 문자열이다.
+        카메라제공자는 문자열붙이기(카메라제공자, 문자열붙인값("        <provider android:name=\"", 문자열붙인값(앱패키지, ".MainActivity$HmjeCameraFileProvider\"\n")))이다.
+        카메라제공자는 문자열붙이기(카메라제공자, 문자열붙인값("            android:authorities=\"", 문자열붙인값(안드로이드XML속성(카메라권한이름), ".hmjecamera\"\n")))이다.
+        카메라제공자는 문자열붙이기(카메라제공자, "            android:exported=\"false\" android:grantUriPermissions=\"true\" />\n")이다.
+        매니페스트내용은 iOS문자열대체(매니페스트내용, "    </application>\n", 문자열붙인값(카메라제공자, "    </application>\n"))이다.
+    만약 안드로이드파일쓰기(매니페스트경로, 매니페스트내용) == 거짓이면
+        안드로이드오류를 (내용: "AndroidManifest.xml을 쓰지 못했습니다", 코드: 1)로 실행한다.
+    상수 res폴더는 문자열붙인값(작업폴더, "/res")이고, 문자열이다.
+    만약 포직스디렉터리모두만들기(res폴더) != 0이면
+        안드로이드오류를 (내용: "res 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    만약 문자열바이트길이(아이콘자원) > 0 그리고 안드로이드아이콘폴더인가(아이콘자원)이면
+        안드로이드아이콘폴더복사를 (폴더: 아이콘자원, res폴더: res폴더, 플랫폼jar: 플랫폼jar)로 실행한다.
+    그렇지 않고 문자열바이트길이(아이콘자원) > 0이면
+        안드로이드원본확인을 (경로: 아이콘자원, 설명: "Android 앱 아이콘 자원이 없습니다: ")로 실행한다.
+        상수 mipmap폴더는 문자열붙인값(res폴더, "/mipmap")이고, 문자열이다.
+        상수 adaptiveMipmap폴더는 문자열붙인값(res폴더, "/mipmap-anydpi-v26")이고, 문자열이다.
+        상수 drawable폴더는 문자열붙인값(res폴더, "/drawable-nodpi")이고, 문자열이다.
+        상수 drawableXML폴더는 문자열붙인값(res폴더, "/drawable")이고, 문자열이다.
+        만약 포직스디렉터리모두만들기(mipmap폴더) != 0이면
+            안드로이드오류를 (내용: "res/mipmap 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        만약 포직스디렉터리모두만들기(adaptiveMipmap폴더) != 0이면
+            안드로이드오류를 (내용: "res/mipmap-anydpi-v26 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        만약 포직스디렉터리모두만들기(drawable폴더) != 0이면
+            안드로이드오류를 (내용: "res/drawable-nodpi 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        만약 포직스디렉터리모두만들기(drawableXML폴더) != 0이면
+            안드로이드오류를 (내용: "res/drawable 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        만약 포직스파일원자복사(아이콘자원, 문자열붙인값(mipmap폴더, "/hmje_app_icon.png"), 거짓) != 0이면
+            안드로이드오류를 (내용: "Android 레거시 앱 아이콘 복사 실패", 코드: 1)로 실행한다.
+        만약 포직스파일원자복사(아이콘자원, 문자열붙인값(drawable폴더, "/hmje_app_icon_foreground.png"), 거짓) != 0이면
+            안드로이드오류를 (내용: "Android adaptive icon 전경 복사 실패", 코드: 1)로 실행한다.
+        상수 아이콘배경은 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<shape xmlns:android=\"http://schemas.android.com/apk/res/android\" android:shape=\"rectangle\">\n    <gradient android:angle=\"270\" android:startColor=\"#1A8CFF\" android:endColor=\"#005EE0\" />\n</shape>\n"이고, 문자열이다.
+        만약 안드로이드파일쓰기(문자열붙인값(drawableXML폴더, "/hmje_app_icon_background.xml"), 아이콘배경) == 거짓이면
+            안드로이드오류를 (내용: "Android adaptive icon 배경을 쓰지 못했습니다", 코드: 1)로 실행한다.
+        상수 adaptive아이콘은 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\">\n    <background android:drawable=\"@drawable/hmje_app_icon_background\" />\n    <foreground android:drawable=\"@drawable/hmje_app_icon_foreground\" />\n</adaptive-icon>\n"이고, 문자열이다.
+        만약 안드로이드파일쓰기(문자열붙인값(adaptiveMipmap폴더, "/hmje_app_icon.xml"), adaptive아이콘) == 거짓이면
+            안드로이드오류를 (내용: "Android adaptive icon 정의를 쓰지 못했습니다", 코드: 1)로 실행한다.
+    만약 파일공유켬이면
+        상수 xml폴더는 문자열붙인값(res폴더, "/xml")이고, 문자열이다.
+        만약 포직스디렉터리모두만들기(xml폴더) != 0이면
+            안드로이드오류를 (내용: "res/xml 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        상수 경로목록은 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<paths>\n    <cache-path name=\"hmje-share\" path=\"mojori-share/\" />\n</paths>\n"이고, 문자열이다.
+        만약 안드로이드파일쓰기(문자열붙인값(xml폴더, "/hmje_file_paths.xml"), 경로목록) == 거짓이면
+            안드로이드오류를 (내용: "hmje_file_paths.xml을 쓰지 못했습니다", 코드: 1)로 실행한다.
+    상수 컴파일된res는 문자열붙인값(작업폴더, "/compiled-res.zip")이고, 문자열이다.
+    안드로이드실행을 (인자들: [aapt2, "compile", "--dir", res폴더, "-o", 컴파일된res], 단계: "aapt2 compile")로 실행한다.
+    상수 미서명APK는 문자열붙인값(작업폴더, "/unsigned-base.apk")이고, 문자열이다.
+    변수 링크인자들은 [aapt2, "link", "-o", 미서명APK, "-I", 플랫폼jar, "--manifest", 매니페스트경로]이고, 문자열의 배열이다.
+    만약 안드로이드파일있나(컴파일된res)이면
+        링크인자들에 컴파일된res를 추가한다.
+    안드로이드실행을 (인자들: 링크인자들, 단계: "aapt2 link")로 실행한다.
+    # Java/AAR 경계는 도구체인 소유 packager가 닫힌 잠금 그래프만 읽는다.
+    # 의존 코드의 annotation processor/Gradle 스크립트는 실행하지 않는다.
+    만약 안드로이드자바있는가(계획)이면
+        상수 포장도구폴더는 문자열붙인값(작업폴더, "/jvm-tool")이고, 문자열이다.
+        만약 포직스디렉터리모두만들기(포장도구폴더) != 0이면
+            안드로이드오류를 (내용: "Android JVM 포장 도구 디렉터리 생성 실패", 코드: 1)로 실행한다.
+        상수 포장도구원본은 문자열붙인값(대상폴더, "/AndroidJvmPackager.java")이고, 문자열이다.
+        안드로이드실행을 (인자들: ["javac", "-proc:none", "-encoding", "UTF-8", "-d", 포장도구폴더, 포장도구원본], 단계: "Android JVM 포장 도구 컴파일")로 실행한다.
+        안드로이드실행을 (인자들: ["java", "-cp", 포장도구폴더, "AndroidJvmPackager", "--build", 네이티브계획경로, 문자열붙인값(작업폴더, "/jvm"), 매니페스트경로, 플랫폼jar, aapt2, d8, 최소SDK, 목표SDK, 자바경로, 접근성자바경로], 단계: "Android JVM 선언 입력 포장")로 실행한다.
+
+
+    # ---- 3-4) dex/네이티브 라이브러리/폰트 asset을 APK zip에 직접 추가 ----
+    상수 staging폴더는 문자열붙인값(작업폴더, "/staging")이고, 문자열이다.
+    상수 lib폴더는 문자열붙인값(staging폴더, "/lib/arm64-v8a")이고, 문자열이다.
+    상수 폰트폴더는 문자열붙인값(staging폴더, "/assets/fonts")이고, 문자열이다.
+    만약 포직스디렉터리모두만들기(lib폴더) != 0이면
+        안드로이드오류를 (내용: "APK lib 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    만약 포직스디렉터리모두만들기(폰트폴더) != 0이면
+        안드로이드오류를 (내용: "APK assets 디렉터리 생성 실패", 코드: 1)로 실행한다.
+    만약 포직스파일원자복사(so경로, 문자열붙인값(lib폴더, "/libhmjeapp.so"), 거짓) != 0이면
+        안드로이드오류를 (내용: "libhmjeapp.so 복사 실패", 코드: 1)로 실행한다.
+    만약 포직스파일원자복사(문자열붙인값(dex폴더, "/classes.dex"), 문자열붙인값(staging폴더, "/classes.dex"), 거짓) != 0이면
+        안드로이드오류를 (내용: "classes.dex 복사 실패", 코드: 1)로 실행한다.
+    변수 자원경로들은 []이고, 문자열의 배열이다.
+    만약 문자열바이트길이(네이티브계획경로) > 0이면
+        상수 자원이름들은 안드로이드프로젝트자원복사(계획, 문자열붙인값(staging폴더, "/assets"))이고, 문자열의 배열이다.
+        변수 이름번은 0이고, 자연수이다.
+        이름번 < 자원이름들.길이일 동안
+            자원경로들에 문자열붙인값("assets/", 자원이름들[이름번])를 추가한다.
+            이름번은 이름번 + 1이다.
+    아니면
+        상수 폰트뿌리는 안드로이드폰트뿌리()이고, 문자열이다.
+        상수 폰트들은 안드로이드번들폰트들()이고, 문자열의 배열이다.
+        변수 폰트번호는 0이고, 자연수이다.
+        폰트번호 < 폰트들.길이일 동안
+            상수 폰트원본은 문자열붙인값(문자열붙인값(폰트뿌리, "/"), 폰트들[폰트번호])이고, 문자열이다.
+            만약 안드로이드파일있나(폰트원본) == 거짓이면
+                안드로이드오류를 (내용: 문자열붙인값("Android APK에 필요한 폰트가 없습니다: ", 폰트원본), 코드: 1)로 실행한다.
+            만약 포직스파일원자복사(폰트원본, 문자열붙인값(문자열붙인값(폰트폴더, "/"), 폰트들[폰트번호]), 거짓) != 0이면
+                안드로이드오류를 (내용: "APK 폰트 복사 실패", 코드: 1)로 실행한다.
+            자원경로들에 문자열붙인값("assets/fonts/", 폰트들[폰트번호])를 추가한다.
+            폰트번호는 폰트번호 + 1이다.
+    상수 packedAPK는 문자열붙인값(작업폴더, "/packed.apk")이고, 문자열이다.
+    만약 포직스파일원자복사(미서명APK, packedAPK, 거짓) != 0이면
+        안드로이드오류를 (내용: "APK 사본을 만들지 못했습니다", 코드: 1)로 실행한다.
+    # JDK jar의 -C가 항목별 기준 폴더를 지정하므로 실행 디렉터리나 셸이 필요 없다.
+    변수 zip인자들은 ["jar", "ufM", packedAPK]이고, 문자열의 배열이다.
+    변수 항목들은 []이고, 문자열의 배열이다.
+    만약 안드로이드자바있는가(계획) == 거짓이면
+        항목들에 "classes.dex"를 추가한다.
+    항목들에 "lib/arm64-v8a/libhmjeapp.so"를 추가한다.
+    자원경로들에서 각 자원마다
+        항목들에 자원을 추가한다.
+    항목들에서 각 항목마다
+        zip인자들에 "-C"를 추가한다.
+        zip인자들에 staging폴더를 추가한다.
+        zip인자들에 항목을 추가한다.
+    안드로이드실행을 (인자들: zip인자들, 단계: "APK 콘텐츠 추가")로 실행한다.
+
+    # ---- 3-5) zipalign + 서명(디버그 키스토어, ad-hoc 수준) ----
+    상수 정렬APK는 문자열붙인값(작업폴더, "/aligned.apk")이고, 문자열이다.
+    상수 정렬삭제는 파일삭제(정렬APK)이고, 정수이다.
+    안드로이드실행을 (인자들: [zipalign, "-f", "4", packedAPK, 정렬APK], 단계: "zipalign")로 실행한다.
+    변수 키스토어는 안드로이드환경값("HMJE_ANDROID_KEYSTORE")이고, 문자열이다.
+    변수 서명인자들은 [apksigner, "sign"]이고, 문자열의 배열이다.
+    만약 문자열바이트길이(키스토어) > 0이면
+        안드로이드원본확인을 (경로: 키스토어, 설명: "Android 서명 키스토어가 없습니다: ")로 실행한다.
+        상수 별칭은 안드로이드도구경로("HMJE_ANDROID_KEY_ALIAS")이고, 문자열이다.
+        상수 암호확인은 안드로이드도구경로("HMJE_ANDROID_KEYSTORE_PASSWORD")이고, 문자열이다.
+        서명인자들에 "--ks-key-alias"를 추가한다.
+        서명인자들에 별칭을 추가한다.
+        서명인자들에 "--ks-pass"를 추가한다.
+        서명인자들에 "env:HMJE_ANDROID_KEYSTORE_PASSWORD"를 추가한다.
+        만약 문자열바이트길이(안드로이드환경값("HMJE_ANDROID_KEY_PASSWORD")) > 0이면
+            서명인자들에 "--key-pass"를 추가한다.
+            서명인자들에 "env:HMJE_ANDROID_KEY_PASSWORD"를 추가한다.
+    아니면
+        만약 안드로이드환경값("HMJE_ANDROID_SIGNING") == "release"이면
+            안드로이드오류를 (내용: "릴리스 서명에는 HMJE_ANDROID_KEYSTORE와 HMJE_ANDROID_KEY_ALIAS, HMJE_ANDROID_KEYSTORE_PASSWORD가 필요합니다", 코드: 2)로 실행한다.
+        상수 홈은 안드로이드홈()이고, 문자열이다.
+        키스토어는 문자열붙인값(홈, "/.android/debug.keystore")이다.
+        만약 안드로이드파일있나(키스토어) == 거짓이면
+            만약 포직스디렉터리모두만들기(문자열붙인값(홈, "/.android")) != 0이면
+                안드로이드오류를 (내용: "디버그 키스토어 디렉터리 생성 실패", 코드: 1)로 실행한다.
+            안드로이드실행을 (인자들: ["keytool", "-genkeypair", "-keystore", 키스토어, "-alias", "androiddebugkey", "-storepass", "android", "-keypass", "android", "-keyalg", "RSA", "-keysize", "2048", "-validity", "10950", "-dname", "CN=Android Debug,O=Android,C=US"], 단계: "debug 키스토어 생성")로 실행한다.
+        서명인자들에 "--ks-pass"를 추가한다.
+        서명인자들에 "pass:android"를 추가한다.
+        서명인자들에 "--key-pass"를 추가한다.
+        서명인자들에 "pass:android"를 추가한다.
+    서명인자들에 "--ks"를 추가한다.
+    서명인자들에 키스토어를 추가한다.
+    서명인자들에 "--out"를 추가한다.
+    서명인자들에 출력을 추가한다.
+    서명인자들에 정렬APK를 추가한다.
+    안드로이드실행을 (인자들: 서명인자들, 단계: "apksigner")로 실행한다.
+    안드로이드실행을 (인자들: [apksigner, "verify", 출력], 단계: "APK 서명 검증")로 실행한다.
+    안드로이드원본확인을 (경로: 출력, 설명: "APK 산출물이 없습니다: ")로 실행한다.
+
+# 제품조정기가 부르는 하나의 진입. 출력종류는 "android-exe" 또는 "android-apk".
+함수 안드로이드제품만들기는 (출력종류: 문자열, llvm경로: 문자열, 출력: 문자열, 툴체인루트: 문자열, 작업뿌리: 문자열, 네이티브계획경로: 문자열)를 받아
+    만약 안드로이드윈도우호스트인가()이면
+        안드로이드윈도우도구준비를 (APK인가: 출력종류 == "android-apk")로 실행한다.
+    만약 출력종류 == "android-exe"이면
+        안드로이드EXE만들기를 (llvm경로: llvm경로, 출력: 출력, 툴체인루트: 툴체인루트, 작업폴더: 문자열붙인값(작업뿌리, "/work-android-exe"), 네이티브계획경로: 네이티브계획경로)로 실행한다.
+        반환한다.
+    만약 출력종류 == "android-apk"이면
+        안드로이드APK만들기를 (llvm경로: llvm경로, 출력: 출력, 툴체인루트: 툴체인루트, 작업폴더: 문자열붙인값(작업뿌리, "/work-android-apk"), 네이티브계획경로: 네이티브계획경로)로 실행한다.
+        반환한다.
+    안드로이드오류를 (내용: 문자열붙인값("알 수 없는 Android 산출물 종류입니다: ", 출력종류), 코드: 2)로 실행한다.

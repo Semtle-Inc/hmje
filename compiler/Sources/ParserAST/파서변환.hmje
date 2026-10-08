@@ -1,0 +1,1823 @@
+기반을 가져온다.
+컴파일러AST를 가져온다.
+
+# JSON 경계에서만 종류 문자열을 읽는다. 내부 순회는 닫힌 종류 매칭이다.
+AST파서변환오류의 프로젝트 내부 종류는
+    모양(기대: 문자열)과,
+    필드(종류: AST파서종류, 이름: 문자열)과,
+    모르는종류(이름: 문자열)이다.
+
+프로젝트 내부 구조체 AST파서종류항목의
+    프로젝트 내부 값은 AST파서종류이다.
+
+프로젝트 내부 클래스 AST파서읽기환경의
+    프로젝트 내부 상수 종류들은 문자열로 AST파서종류항목을 찾는 사전이다.
+
+AST파서결과노드의 프로젝트 내부 종류는
+    읽음(값: AST파서노드)과,
+    오류(이유: AST파서변환오류)이다.
+
+AST파서결과배열문장줄의 프로젝트 내부 종류는
+    읽음(값: AST파서문장줄의 배열)과,
+    오류(이유: AST파서변환오류)이다.
+
+함수 AST파서선택포장노드은 (값: AST파서노드)를 받아
+    값을 AST파서노드?로 반환한다.
+
+함수 AST파서객체확인은 (값: JSON값, 허용: 문자열의 배열)를 받아
+    만약 값.종류 != JSON종류_객체 또는 값.객체키들.길이 != 값.객체값들.길이이면
+        거짓을 참거짓으로 반환한다.
+    변수 번은 자연수(0)이고, 자연수이다.
+    번 < 값.객체키들.길이일 동안
+        상수 키는 값.객체키들[번]이고, 문자열이다.
+        변수 있음은 거짓이고, 참거짓이다.
+        허용에서 각 후보마다
+            만약 후보 == 키이면
+                있음은 참이다.
+        만약 있음 == 거짓이면
+            거짓을 참거짓으로 반환한다.
+        변수 앞은 자연수(0)이고, 자연수이다.
+        앞 < 번일 동안
+            만약 값.객체키들[앞] == 키이면
+                거짓을 참거짓으로 반환한다.
+            앞은 앞 + 1이다.
+        번은 번 + 1이다.
+    참을 참거짓으로 반환한다.
+
+함수 AST파서정확객체는 (값: JSON값, 키들: 문자열의 배열)를 받아
+    만약 AST파서객체확인(값, 키들) == 거짓 또는 값.객체키들.길이 != 키들.길이이면
+        거짓을 참거짓으로 반환한다.
+    변수 번은 자연수(0)이고, 자연수이다.
+    번 < 키들.길이일 동안
+        만약 값.객체키들[번] != 키들[번]이면
+            거짓을 참거짓으로 반환한다.
+        번은 번 + 1이다.
+    참을 참거짓으로 반환한다.
+
+AST파서변환오류로 실패할 수 있는 함수 AST파서필드검사는 (값: JSON값, 허용: 문자열의 배열, 필수: 문자열의 배열, 종류: AST파서종류)를 받아
+    만약 AST파서객체확인(값, 허용) == 거짓이면
+        AST파서변환오류.필드(종류: 종류, 이름: "fields")로 실패한다.
+    필수에서 각 키마다
+        만약 JSON값객체키있는가(값, 키) == 거짓이면
+            AST파서변환오류.필드(종류: 종류, 이름: 키)로 실패한다.
+    반환한다.
+
+AST파서변환오류로 실패할 수 있고 문자열을 반환하는 함수 AST파서해석문자열은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_문자열이면
+        AST파서변환오류.모양(기대: "문자열")로 실패한다.
+    입력.문자열값을 문자열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 참거짓?을 반환하는 함수 AST파서해석선택참거짓은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, 참거짓?이다.
+        없음값을 참거짓?로 반환한다.
+    상수 값은 AST파서해석참거짓(입력, 환경)이고, 참거짓이다.
+    값을 참거짓?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 참거짓을 반환하는 함수 AST파서해석참거짓은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_참거짓이면
+        AST파서변환오류.모양(기대: "참거짓")로 실패한다.
+    입력.논리값을 참거짓로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문장경고의 배열?을 반환하는 함수 AST파서해석선택배열문장경고은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, AST파서문장경고의 배열?이다.
+        없음값을 AST파서문장경고의 배열?로 반환한다.
+    상수 값은 AST파서해석배열문장경고(입력, 환경)이고, AST파서문장경고의 배열이다.
+    값을 AST파서문장경고의 배열?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문장경고의 배열을 반환하는 함수 AST파서해석배열문장경고은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열문장경고")로 실패한다.
+    변수 값들은 []이고, AST파서문장경고의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석문장경고(원소, 환경)이고, AST파서문장경고이다.
+        값들에 값을 추가한다.
+    값들을 AST파서문장경고의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문장경고을 반환하는 함수 AST파서해석문장경고은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "문장경고")로 실패한다.
+    상수 값_line는 AST파서해석정수원문(입력.배열값[0], 환경)이고, AST파서정수원문이다.
+    상수 값_message는 AST파서해석문자열(입력.배열값[1], 환경)이고, 문자열이다.
+    AST파서문장경고(값_line: 값_line, 값_message: 값_message)를 AST파서문장경고로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서정수원문을 반환하는 함수 AST파서해석정수원문은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 AST파서정확객체(입력, ["integer"]) == 거짓이면
+        AST파서변환오류.모양(기대: "정수원문")로 실패한다.
+    상수 값_raw는 AST파서해석문자열(AST객체필드(입력, "integer"), 환경)이고, 문자열이다.
+    AST파서정수원문(값_raw: 값_raw)를 AST파서정수원문로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 문자열?을 반환하는 함수 AST파서해석선택문자열은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, 문자열?이다.
+        없음값을 문자열?로 반환한다.
+    상수 값은 AST파서해석문자열(입력, 환경)이고, 문자열이다.
+    값을 문자열?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서정수원문?을 반환하는 함수 AST파서해석선택정수원문은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, AST파서정수원문?이다.
+        없음값을 AST파서정수원문?로 반환한다.
+    상수 값은 AST파서해석정수원문(입력, 환경)이고, AST파서정수원문이다.
+    값을 AST파서정수원문?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서열거원문을 반환하는 함수 AST파서해석열거원문은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 AST파서정확객체(입력, ["enum", "value"]) == 거짓이면
+        AST파서변환오류.모양(기대: "열거원문")로 실패한다.
+    상수 값_enum는 AST파서해석문자열(AST객체필드(입력, "enum"), 환경)이고, 문자열이다.
+    상수 값_value는 AST파서해석문자열(AST객체필드(입력, "value"), 환경)이고, 문자열이다.
+    AST파서열거원문(값_enum: 값_enum, 값_value: 값_value)를 AST파서열거원문로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문자지도을 반환하는 함수 AST파서해석문자지도은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_객체 또는 AST파서객체확인(입력, 입력.객체키들) == 거짓이면
+        AST파서변환오류.모양(기대: "문자지도")로 실패한다.
+    변수 값들은 문자열로 문자열를 찾는 사전이다.
+    변수 번은 자연수(0)이고, 자연수이다.
+    번 < 입력.객체키들.길이일 동안
+        상수 값은 AST파서해석문자열(입력.객체값들[번], 환경)이고, 문자열이다.
+        값들에서 입력.객체키들[번]의 값은 값이다.
+        번은 번 + 1이다.
+    AST파서문자지도(순서: 입력.객체키들, 값들: 값들)을 AST파서문자지도로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 문자열의 배열을 반환하는 함수 AST파서해석배열문자열은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열문자열")로 실패한다.
+    변수 값들은 []이고, 문자열의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석문자열(원소, 환경)이고, 문자열이다.
+        값들에 값을 추가한다.
+    값들을 문자열의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서타입제약의 배열을 반환하는 함수 AST파서해석배열타입제약은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열타입제약")로 실패한다.
+    변수 값들은 []이고, AST파서타입제약의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석타입제약(원소, 환경)이고, AST파서타입제약이다.
+        값들에 값을 추가한다.
+    값들을 AST파서타입제약의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서타입제약을 반환하는 함수 AST파서해석타입제약은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "타입제약")로 실패한다.
+    상수 값_name는 AST파서해석문자열(입력.배열값[0], 환경)이고, 문자열이다.
+    상수 값_traits는 AST파서해석배열문자열(입력.배열값[1], 환경)이고, 문자열의 배열이다.
+    AST파서타입제약(값_name: 값_name, 값_traits: 값_traits)를 AST파서타입제약로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드의 배열을 반환하는 함수 AST파서해석배열노드은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열노드")로 실패한다.
+    변수 값들은 []이고, AST파서노드의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석노드환경(원소, 환경)이고, AST파서노드이다.
+        값들에 값을 추가한다.
+    값들을 AST파서노드의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문장줄의 배열을 반환하는 함수 AST파서해석배열문장줄은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열문장줄")로 실패한다.
+    변수 값들은 []이고, AST파서문장줄의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석문장줄(원소, 환경)이고, AST파서문장줄이다.
+        값들에 값을 추가한다.
+    값들을 AST파서문장줄의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문장줄을 반환하는 함수 AST파서해석문장줄은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "문장줄")로 실패한다.
+    상수 값_line는 AST파서해석정수원문(입력.배열값[0], 환경)이고, AST파서정수원문이다.
+    상수 값_node는 AST파서해석노드환경(입력.배열값[1], 환경)이고, AST파서노드이다.
+    AST파서문장줄(값_line: 값_line, 값_node: 값_node)를 AST파서문장줄로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 문자열의 배열?을 반환하는 함수 AST파서해석선택배열문자열은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, 문자열의 배열?이다.
+        없음값을 문자열의 배열?로 반환한다.
+    상수 값은 AST파서해석배열문자열(입력, 환경)이고, 문자열의 배열이다.
+    값을 문자열의 배열?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드?을 반환하는 함수 AST파서해석선택노드은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, AST파서노드?이다.
+        없음값을 AST파서노드?로 반환한다.
+    상수 값은 AST파서해석노드환경(입력, 환경)이고, AST파서노드이다.
+    값을 AST파서노드?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서식인자의 배열을 반환하는 함수 AST파서해석배열식인자은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열식인자")로 실패한다.
+    변수 값들은 []이고, AST파서식인자의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석식인자(원소, 환경)이고, AST파서식인자이다.
+        값들에 값을 추가한다.
+    값들을 AST파서식인자의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서식인자을 반환하는 함수 AST파서해석식인자은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_배열이면
+        상수 값은 AST파서해석호출인자(입력, 환경)이고, AST파서호출인자이다.
+        AST파서식인자.이름(값: 값)을 AST파서식인자로 반환한다.
+    상수 값은 AST파서해석노드환경(입력, 환경)이고, AST파서노드이다.
+    AST파서식인자.위치(값: 값)을 AST파서식인자로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서호출인자을 반환하는 함수 AST파서해석호출인자은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "호출인자")로 실패한다.
+    상수 값_label는 AST파서해석문자열(입력.배열값[0], 환경)이고, 문자열이다.
+    상수 값_value는 AST파서해석노드환경(입력.배열값[1], 환경)이고, AST파서노드이다.
+    AST파서호출인자(값_label: 값_label, 값_value: 값_value)를 AST파서호출인자로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서분기의 배열을 반환하는 함수 AST파서해석배열분기은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열분기")로 실패한다.
+    변수 값들은 []이고, AST파서분기의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석분기(원소, 환경)이고, AST파서분기이다.
+        값들에 값을 추가한다.
+    값들을 AST파서분기의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서분기을 반환하는 함수 AST파서해석분기은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "분기")로 실패한다.
+    상수 값_condition는 AST파서해석노드환경(입력.배열값[0], 환경)이고, AST파서노드이다.
+    상수 값_body는 AST파서해석배열문장줄(입력.배열값[1], 환경)이고, AST파서문장줄의 배열이다.
+    AST파서분기(값_condition: 값_condition, 값_body: 값_body)를 AST파서분기로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문장줄의 배열?을 반환하는 함수 AST파서해석선택배열문장줄은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 == JSON종류_널이면
+        상수 없음값은 없음이고, AST파서문장줄의 배열?이다.
+        없음값을 AST파서문장줄의 배열?로 반환한다.
+    상수 값은 AST파서해석배열문장줄(입력, 환경)이고, AST파서문장줄의 배열이다.
+    값을 AST파서문장줄의 배열?로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드지도을 반환하는 함수 AST파서해석노드지도은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_객체 또는 AST파서객체확인(입력, 입력.객체키들) == 거짓이면
+        AST파서변환오류.모양(기대: "노드지도")로 실패한다.
+    변수 값들은 문자열로 AST파서노드?를 찾는 사전이다.
+    변수 번은 자연수(0)이고, 자연수이다.
+    번 < 입력.객체키들.길이일 동안
+        상수 값은 AST파서해석노드환경(입력.객체값들[번], 환경)이고, AST파서노드이다.
+        값들에서 입력.객체키들[번]의 값은 AST파서선택포장노드(값)이다.
+        번은 번 + 1이다.
+    AST파서노드지도(순서: 입력.객체키들, 값들: 값들)을 AST파서노드지도로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서호출인자의 배열을 반환하는 함수 AST파서해석배열호출인자은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열호출인자")로 실패한다.
+    변수 값들은 []이고, AST파서호출인자의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석호출인자(원소, 환경)이고, AST파서호출인자이다.
+        값들에 값을 추가한다.
+    값들을 AST파서호출인자의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서실수원문을 반환하는 함수 AST파서해석실수원문은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 AST파서정확객체(입력, ["float"]) == 거짓이면
+        AST파서변환오류.모양(기대: "실수원문")로 실패한다.
+    상수 값_raw는 AST파서해석문자열(AST객체필드(입력, "float"), 환경)이고, 문자열이다.
+    AST파서실수원문(값_raw: 값_raw)를 AST파서실수원문로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서열거사례의 배열을 반환하는 함수 AST파서해석배열열거사례은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열열거사례")로 실패한다.
+    변수 값들은 []이고, AST파서열거사례의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석열거사례(원소, 환경)이고, AST파서열거사례이다.
+        값들에 값을 추가한다.
+    값들을 AST파서열거사례의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서열거사례을 반환하는 함수 AST파서해석열거사례은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 3이면
+        AST파서변환오류.모양(기대: "열거사례")로 실패한다.
+    상수 값_name는 AST파서해석문자열(입력.배열값[0], 환경)이고, 문자열이다.
+    상수 값_value는 AST파서해석선택노드(입력.배열값[1], 환경)이고, AST파서노드?이다.
+    상수 값_params는 AST파서해석배열노드(입력.배열값[2], 환경)이고, AST파서노드의 배열이다.
+    AST파서열거사례(값_name: 값_name, 값_value: 값_value, 값_params: 값_params)를 AST파서열거사례로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서훅의 배열을 반환하는 함수 AST파서해석배열훅은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열훅")로 실패한다.
+    변수 값들은 []이고, AST파서훅의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석훅(원소, 환경)이고, AST파서훅이다.
+        값들에 값을 추가한다.
+    값들을 AST파서훅의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서훅을 반환하는 함수 AST파서해석훅은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "훅")로 실패한다.
+    상수 값_name는 AST파서해석문자열(입력.배열값[0], 환경)이고, 문자열이다.
+    상수 값_body는 AST파서해석배열문장줄(입력.배열값[1], 환경)이고, AST파서문장줄의 배열이다.
+    AST파서훅(값_name: 값_name, 값_body: 값_body)를 AST파서훅로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문자경고의 배열을 반환하는 함수 AST파서해석배열문자경고은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열문자경고")로 실패한다.
+    변수 값들은 []이고, AST파서문자경고의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석문자경고(원소, 환경)이고, AST파서문자경고이다.
+        값들에 값을 추가한다.
+    값들을 AST파서문자경고의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서문자경고을 반환하는 함수 AST파서해석문자경고은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "문자경고")로 실패한다.
+    상수 값_line는 AST파서해석문자열(입력.배열값[0], 환경)이고, 문자열이다.
+    상수 값_message는 AST파서해석문자열(입력.배열값[1], 환경)이고, 문자열이다.
+    AST파서문자경고(값_line: 값_line, 값_message: 값_message)를 AST파서문자경고로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서고유조합의 배열을 반환하는 함수 AST파서해석배열고유조합은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열이면
+        AST파서변환오류.모양(기대: "배열고유조합")로 실패한다.
+    변수 값들은 []이고, AST파서고유조합의 배열이다.
+    입력.배열값에서 각 원소마다
+        상수 값은 AST파서해석고유조합(원소, 환경)이고, AST파서고유조합이다.
+        값들에 값을 추가한다.
+    값들을 AST파서고유조합의 배열로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서고유조합을 반환하는 함수 AST파서해석고유조합은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 입력.종류 != JSON종류_배열 또는 입력.배열값.길이 != 2이면
+        AST파서변환오류.모양(기대: "고유조합")로 실패한다.
+    상수 값_line는 AST파서해석정수원문(입력.배열값[0], 환경)이고, AST파서정수원문이다.
+    상수 값_names는 AST파서해석배열문자열(입력.배열값[1], 환경)이고, 문자열의 배열이다.
+    AST파서고유조합(값_line: 값_line, 값_names: 값_names)를 AST파서고유조합로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료AddressOfExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.AddressOfExpr)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.AddressOfExpr(키순서: 필드들.객체키들, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ArrayBufferViewExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["array", "sentence_warnings"], 필수: ["array"], 종류: AST파서종류.ArrayBufferViewExpr)로 실행한다.
+    상수 값_array는 AST파서해석노드환경(AST객체필드(필드들, "array"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.ArrayBufferViewExpr(키순서: 필드들.객체키들, 값_array: 값_array, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ArrayLiteral은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["elements", "sentence_warnings"], 필수: ["elements"], 종류: AST파서종류.ArrayLiteral)로 실행한다.
+    상수 값_elements는 AST파서해석배열노드(AST객체필드(필드들, "elements"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.ArrayLiteral(키순서: 필드들.객체키들, 값_elements: 값_elements, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Assign은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["target", "expr", "sentence_warnings"], 필수: ["target", "expr"], 종류: AST파서종류.Assign)로 실행한다.
+    상수 값_target는 AST파서해석노드환경(AST객체필드(필드들, "target"), 환경)이고, AST파서노드이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.Assign(키순서: 필드들.객체키들, 값_target: 값_target, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료AsyncRootRun은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["call", "compiler_generated", "sentence_warnings"], 필수: ["call", "compiler_generated"], 종류: AST파서종류.AsyncRootRun)로 실행한다.
+    상수 값_call는 AST파서해석노드환경(AST객체필드(필드들, "call"), 환경)이고, AST파서노드이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.AsyncRootRun(키순서: 필드들.객체키들, 값_call: 값_call, 값_compiler_generated: 값_compiler_generated, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료AwaitExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["call", "sentence_warnings"], 필수: ["call"], 종류: AST파서종류.AwaitExpr)로 실행한다.
+    상수 값_call는 AST파서해석노드환경(AST객체필드(필드들, "call"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.AwaitExpr(키순서: 필드들.객체키들, 값_call: 값_call, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BinaryExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["left", "op", "right", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["left", "op", "right"], 종류: AST파서종류.BinaryExpr)로 실행한다.
+    상수 값_left는 AST파서해석노드환경(AST객체필드(필드들, "left"), 환경)이고, AST파서노드이다.
+    상수 값_op는 AST파서해석문자열(AST객체필드(필드들, "op"), 환경)이고, 문자열이다.
+    상수 값_right는 AST파서해석노드환경(AST객체필드(필드들, "right"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.BinaryExpr(키순서: 필드들.객체키들, 값_left: 값_left, 값_op: 값_op, 값_right: 값_right, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BlockInheritedDecl은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "type_name", "sentence_warnings"], 필수: ["name", "type_name"], 종류: AST파서종류.BlockInheritedDecl)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.BlockInheritedDecl(키순서: 필드들.객체키들, 값_name: 값_name, 값_type_name: 값_type_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BlockModifierDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["phrase", "params", "body", "sentence_warnings"], 필수: ["phrase", "params", "body"], 종류: AST파서종류.BlockModifierDef)로 실행한다.
+    상수 값_phrase는 AST파서해석문자열(AST객체필드(필드들, "phrase"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.BlockModifierDef(키순서: 필드들.객체키들, 값_phrase: 값_phrase, 값_params: 값_params, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BlockModifierParam은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "type_name", "default", "sentence_warnings"], 필수: ["name", "type_name"], 종류: AST파서종류.BlockModifierParam)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_default는 AST파서해석선택노드(AST객체필드(필드들, "default"), 환경)이고, AST파서노드?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.BlockModifierParam(키순서: 필드들.객체키들, 값_name: 값_name, 값_type_name: 값_type_name, 값_default: 값_default, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BoolExprCondition은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "sentence_warnings"], 필수: ["expr"], 종류: AST파서종류.BoolExprCondition)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.BoolExprCondition(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BoolLiteral은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sentence_warnings"], 필수: ["value"], 종류: AST파서종류.BoolLiteral)로 실행한다.
+    상수 값_value는 AST파서해석참거짓(AST객체필드(필드들, "value"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음0(내용: AST파서묶음종류0.BoolLiteral(키순서: 필드들.객체키들, 값_value: 값_value, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음0이다.
+    AST파서노드(내용: AST파서내용.그룹0(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료BorrowDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "address", "type_name", "sentence_warnings"], 필수: ["name", "address", "type_name"], 종류: AST파서종류.BorrowDefine)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_address는 AST파서해석노드환경(AST객체필드(필드들, "address"), 환경)이고, AST파서노드이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.BorrowDefine(키순서: 필드들.객체키들, 값_name: 값_name, 값_address: 값_address, 값_type_name: 값_type_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Break은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["sentence_warnings"], 필수: [], 종류: AST파서종류.Break)로 실행한다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.Break(키순서: 필드들.객체키들, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료CallExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "args", "compiler_generated", "natural", "subject_value", "deprecated", "module_qualifier", "method_call", "wait_statement", "named_args", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["name", "args"], 종류: AST파서종류.CallExpr)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_args는 AST파서해석배열식인자(AST객체필드(필드들, "args"), 환경)이고, AST파서식인자의 배열이다.
+    상수 값_compiler_generated는 AST파서해석선택참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓?이다.
+    상수 값_natural는 AST파서해석선택참거짓(AST객체필드(필드들, "natural"), 환경)이고, 참거짓?이다.
+    상수 값_subject_value는 AST파서해석선택참거짓(AST객체필드(필드들, "subject_value"), 환경)이고, 참거짓?이다.
+    상수 값_deprecated는 AST파서해석선택문자열(AST객체필드(필드들, "deprecated"), 환경)이고, 문자열?이다.
+    상수 값_module_qualifier는 AST파서해석선택문자열(AST객체필드(필드들, "module_qualifier"), 환경)이고, 문자열?이다.
+    상수 값_method_call는 AST파서해석선택참거짓(AST객체필드(필드들, "method_call"), 환경)이고, 참거짓?이다.
+    상수 값_wait_statement는 AST파서해석선택참거짓(AST객체필드(필드들, "wait_statement"), 환경)이고, 참거짓?이다.
+    상수 값_named_args는 AST파서해석선택참거짓(AST객체필드(필드들, "named_args"), 환경)이고, 참거짓?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.CallExpr(키순서: 필드들.객체키들, 값_name: 값_name, 값_args: 값_args, 값_compiler_generated: 값_compiler_generated, 값_natural: 값_natural, 값_subject_value: 값_subject_value, 값_deprecated: 값_deprecated, 값_module_qualifier: 값_module_qualifier, 값_method_call: 값_method_call, 값_wait_statement: 값_wait_statement, 값_named_args: 값_named_args, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료CastExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["type_name", "expr", "compiler_generated", "source_cast_line", "source_cast_column", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["type_name", "expr", "compiler_generated"], 종류: AST파서종류.CastExpr)로 실행한다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_source_cast_line는 AST파서해석선택문자열(AST객체필드(필드들, "source_cast_line"), 환경)이고, 문자열?이다.
+    상수 값_source_cast_column는 AST파서해석선택문자열(AST객체필드(필드들, "source_cast_column"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.CastExpr(키순서: 필드들.객체키들, 값_type_name: 값_type_name, 값_expr: 값_expr, 값_compiler_generated: 값_compiler_generated, 값_source_cast_line: 값_source_cast_line, 값_source_cast_column: 값_source_cast_column, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelAsyncReceiveExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["receiver", "sentence_warnings"], 필수: ["receiver"], 종류: AST파서종류.ChannelAsyncReceiveExpr)로 실행한다.
+    상수 값_receiver는 AST파서해석노드환경(AST객체필드(필드들, "receiver"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelAsyncReceiveExpr(키순서: 필드들.객체키들, 값_receiver: 값_receiver, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelAsyncSendExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sender", "sentence_warnings"], 필수: ["value", "sender"], 종류: AST파서종류.ChannelAsyncSendExpr)로 실행한다.
+    상수 값_value는 AST파서해석노드환경(AST객체필드(필드들, "value"), 환경)이고, AST파서노드이다.
+    상수 값_sender는 AST파서해석노드환경(AST객체필드(필드들, "sender"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelAsyncSendExpr(키순서: 필드들.객체키들, 값_value: 값_value, 값_sender: 값_sender, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelClose은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["sender", "sentence_warnings"], 필수: ["sender"], 종류: AST파서종류.ChannelClose)로 실행한다.
+    상수 값_sender는 AST파서해석노드환경(AST객체필드(필드들, "sender"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelClose(키순서: 필드들.객체키들, 값_sender: 값_sender, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelCreate은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["sender_name", "receiver_name", "capacity", "type_name", "sentence_warnings"], 필수: ["sender_name", "receiver_name", "capacity", "type_name"], 종류: AST파서종류.ChannelCreate)로 실행한다.
+    상수 값_sender_name는 AST파서해석문자열(AST객체필드(필드들, "sender_name"), 환경)이고, 문자열이다.
+    상수 값_receiver_name는 AST파서해석문자열(AST객체필드(필드들, "receiver_name"), 환경)이고, 문자열이다.
+    상수 값_capacity는 AST파서해석노드환경(AST객체필드(필드들, "capacity"), 환경)이고, AST파서노드이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelCreate(키순서: 필드들.객체키들, 값_sender_name: 값_sender_name, 값_receiver_name: 값_receiver_name, 값_capacity: 값_capacity, 값_type_name: 값_type_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelReceiveExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["receiver", "sentence_warnings"], 필수: ["receiver"], 종류: AST파서종류.ChannelReceiveExpr)로 실행한다.
+    상수 값_receiver는 AST파서해석노드환경(AST객체필드(필드들, "receiver"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelReceiveExpr(키순서: 필드들.객체키들, 값_receiver: 값_receiver, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelSend은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sender", "sentence_warnings"], 필수: ["value", "sender"], 종류: AST파서종류.ChannelSend)로 실행한다.
+    상수 값_value는 AST파서해석노드환경(AST객체필드(필드들, "value"), 환경)이고, AST파서노드이다.
+    상수 값_sender는 AST파서해석노드환경(AST객체필드(필드들, "sender"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelSend(키순서: 필드들.객체키들, 값_value: 값_value, 값_sender: 값_sender, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ChannelTrySendExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sender", "sentence_warnings"], 필수: ["value", "sender"], 종류: AST파서종류.ChannelTrySendExpr)로 실행한다.
+    상수 값_value는 AST파서해석노드환경(AST객체필드(필드들, "value"), 환경)이고, AST파서노드이다.
+    상수 값_sender는 AST파서해석노드환경(AST객체필드(필드들, "sender"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ChannelTrySendExpr(키순서: 필드들.객체키들, 값_value: 값_value, 값_sender: 값_sender, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ClassDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "visibility", "modifiers", "type_params", "type_constraints", "fields", "methods", "init_body", "deinit_body", "db_body", "sentence_warnings"], 필수: ["name", "visibility", "modifiers", "type_params", "type_constraints", "fields", "methods"], 종류: AST파서종류.ClassDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_modifiers는 AST파서해석배열문자열(AST객체필드(필드들, "modifiers"), 환경)이고, 문자열의 배열이다.
+    상수 값_type_params는 AST파서해석배열문자열(AST객체필드(필드들, "type_params"), 환경)이고, 문자열의 배열이다.
+    상수 값_type_constraints는 AST파서해석배열타입제약(AST객체필드(필드들, "type_constraints"), 환경)이고, AST파서타입제약의 배열이다.
+    상수 값_fields는 AST파서해석배열노드(AST객체필드(필드들, "fields"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_methods는 AST파서해석배열문장줄(AST객체필드(필드들, "methods"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_init_body는 AST파서해석선택배열문장줄(AST객체필드(필드들, "init_body"), 환경)이고, AST파서문장줄의 배열?이다.
+    상수 값_deinit_body는 AST파서해석선택배열문장줄(AST객체필드(필드들, "deinit_body"), 환경)이고, AST파서문장줄의 배열?이다.
+    상수 값_db_body는 AST파서해석선택노드(AST객체필드(필드들, "db_body"), 환경)이고, AST파서노드?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음1(내용: AST파서묶음종류1.ClassDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_visibility: 값_visibility, 값_modifiers: 값_modifiers, 값_type_params: 값_type_params, 값_type_constraints: 값_type_constraints, 값_fields: 값_fields, 값_methods: 값_methods, 값_init_body: 값_init_body, 값_deinit_body: 값_deinit_body, 값_db_body: 값_db_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음1이다.
+    AST파서노드(내용: AST파서내용.그룹1(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ClassField은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "type_name", "default", "mutability", "weak", "modifier_words", "visibility", "line", "db_field", "sentence_warnings"], 필수: ["name", "type_name", "mutability", "weak", "modifier_words", "visibility", "line"], 종류: AST파서종류.ClassField)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_default는 AST파서해석선택노드(AST객체필드(필드들, "default"), 환경)이고, AST파서노드?이다.
+    상수 값_mutability는 AST파서해석문자열(AST객체필드(필드들, "mutability"), 환경)이고, 문자열이다.
+    상수 값_weak는 AST파서해석참거짓(AST객체필드(필드들, "weak"), 환경)이고, 참거짓이다.
+    상수 값_modifier_words는 AST파서해석문자열(AST객체필드(필드들, "modifier_words"), 환경)이고, 문자열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_line는 AST파서해석정수원문(AST객체필드(필드들, "line"), 환경)이고, AST파서정수원문이다.
+    상수 값_db_field는 AST파서해석선택노드(AST객체필드(필드들, "db_field"), 환경)이고, AST파서노드?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.ClassField(키순서: 필드들.객체키들, 값_name: 값_name, 값_type_name: 값_type_name, 값_default: 값_default, 값_mutability: 값_mutability, 값_weak: 값_weak, 값_modifier_words: 값_modifier_words, 값_visibility: 값_visibility, 값_line: 값_line, 값_db_field: 값_db_field, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료CompareCondition은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["left", "op", "right", "sentence_warnings"], 필수: ["left", "op", "right"], 종류: AST파서종류.CompareCondition)로 실행한다.
+    상수 값_left는 AST파서해석노드환경(AST객체필드(필드들, "left"), 환경)이고, AST파서노드이다.
+    상수 값_op는 AST파서해석문자열(AST객체필드(필드들, "op"), 환경)이고, 문자열이다.
+    상수 값_right는 AST파서해석노드환경(AST객체필드(필드들, "right"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.CompareCondition(키순서: 필드들.객체키들, 값_left: 값_left, 값_op: 값_op, 값_right: 값_right, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ConcurrentBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["body", "sentence_warnings"], 필수: ["body"], 종류: AST파서종류.ConcurrentBlock)로 실행한다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.ConcurrentBlock(키순서: 필드들.객체키들, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Continue은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["sentence_warnings"], 필수: [], 종류: AST파서종류.Continue)로 실행한다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.Continue(키순서: 필드들.객체키들, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DeadlineBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["milliseconds", "body", "sentence_warnings"], 필수: ["milliseconds", "body"], 종류: AST파서종류.DeadlineBlock)로 실행한다.
+    상수 값_milliseconds는 AST파서해석노드환경(AST객체필드(필드들, "milliseconds"), 환경)이고, AST파서노드이다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DeadlineBlock(키순서: 필드들.객체키들, 값_milliseconds: 값_milliseconds, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DeferredDefaultExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["sentence_warnings"], 필수: [], 종류: AST파서종류.DeferredDefaultExpr)로 실행한다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DeferredDefaultExpr(키순서: 필드들.객체키들, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Define은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["mutable", "name", "type_name", "expr", "retain_borrowed_owner", "compiler_generated", "sentence_warnings"], 필수: ["mutable", "name", "expr", "retain_borrowed_owner", "compiler_generated"], 종류: AST파서종류.Define)로 실행한다.
+    상수 값_mutable는 AST파서해석참거짓(AST객체필드(필드들, "mutable"), 환경)이고, 참거짓이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석선택문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열?이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_retain_borrowed_owner는 AST파서해석참거짓(AST객체필드(필드들, "retain_borrowed_owner"), 환경)이고, 참거짓이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.Define(키순서: 필드들.객체키들, 값_mutable: 값_mutable, 값_name: 값_name, 값_type_name: 값_type_name, 값_expr: 값_expr, 값_retain_borrowed_owner: 값_retain_borrowed_owner, 값_compiler_generated: 값_compiler_generated, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DynamicArrayAppend은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "expr", "sentence_warnings"], 필수: ["name", "expr"], 종류: AST파서종류.DynamicArrayAppend)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DynamicArrayAppend(키순서: 필드들.객체키들, 값_name: 값_name, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DynamicArrayClear은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.DynamicArrayClear)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DynamicArrayClear(키순서: 필드들.객체키들, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DynamicArrayInsert은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["target", "expr", "sentence_warnings"], 필수: ["target", "expr"], 종류: AST파서종류.DynamicArrayInsert)로 실행한다.
+    상수 값_target는 AST파서해석노드환경(AST객체필드(필드들, "target"), 환경)이고, AST파서노드이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DynamicArrayInsert(키순서: 필드들.객체키들, 값_target: 값_target, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DynamicArrayPopExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.DynamicArrayPopExpr)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DynamicArrayPopExpr(키순서: 필드들.객체키들, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DynamicArrayRemove은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["target", "sentence_warnings"], 필수: ["target"], 종류: AST파서종류.DynamicArrayRemove)로 실행한다.
+    상수 값_target는 AST파서해석노드환경(AST객체필드(필드들, "target"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음2(내용: AST파서묶음종류2.DynamicArrayRemove(키순서: 필드들.객체키들, 값_target: 값_target, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음2이다.
+    AST파서노드(내용: AST파서내용.그룹2(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료DynamicArrayReserve은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "capacity", "sentence_warnings"], 필수: ["name", "capacity"], 종류: AST파서종류.DynamicArrayReserve)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_capacity는 AST파서해석노드환경(AST객체필드(필드들, "capacity"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.DynamicArrayReserve(키순서: 필드들.객체키들, 값_name: 값_name, 값_capacity: 값_capacity, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료EnumDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "base_type", "cases", "visibility", "deprecated_block", "sentence_warnings"], 필수: ["name", "cases", "visibility", "deprecated_block"], 종류: AST파서종류.EnumDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_base_type는 AST파서해석선택문자열(AST객체필드(필드들, "base_type"), 환경)이고, 문자열?이다.
+    상수 값_cases는 AST파서해석배열열거사례(AST객체필드(필드들, "cases"), 환경)이고, AST파서열거사례의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_deprecated_block는 AST파서해석참거짓(AST객체필드(필드들, "deprecated_block"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.EnumDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_base_type: 값_base_type, 값_cases: 값_cases, 값_visibility: 값_visibility, 값_deprecated_block: 값_deprecated_block, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Execute은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "args", "is_try", "module_qualifier", "method_call", "sentence_warnings"], 필수: ["name", "args", "is_try"], 종류: AST파서종류.Execute)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_args는 AST파서해석배열호출인자(AST객체필드(필드들, "args"), 환경)이고, AST파서호출인자의 배열이다.
+    상수 값_is_try는 AST파서해석참거짓(AST객체필드(필드들, "is_try"), 환경)이고, 참거짓이다.
+    상수 값_module_qualifier는 AST파서해석선택문자열(AST객체필드(필드들, "module_qualifier"), 환경)이고, 문자열?이다.
+    상수 값_method_call는 AST파서해석선택참거짓(AST객체필드(필드들, "method_call"), 환경)이고, 참거짓?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.Execute(키순서: 필드들.객체키들, 값_name: 값_name, 값_args: 값_args, 값_is_try: 값_is_try, 값_module_qualifier: 값_module_qualifier, 값_method_call: 값_method_call, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ExprStmt은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "deprecated_bare_call", "sentence_warnings"], 필수: ["expr"], 종류: AST파서종류.ExprStmt)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_deprecated_bare_call는 AST파서해석선택참거짓(AST객체필드(필드들, "deprecated_bare_call"), 환경)이고, 참거짓?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.ExprStmt(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_deprecated_bare_call: 값_deprecated_bare_call, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ExtensionDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "methods", "sentence_warnings"], 필수: ["name", "methods"], 종류: AST파서종류.ExtensionDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_methods는 AST파서해석배열문장줄(AST객체필드(필드들, "methods"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.ExtensionDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_methods: 값_methods, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ExternalGlobal은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "type_name", "sentence_warnings"], 필수: ["name", "type_name"], 종류: AST파서종류.ExternalGlobal)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.ExternalGlobal(키순서: 필드들.객체키들, 값_name: 값_name, 값_type_name: 값_type_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FieldAccessExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["base", "field", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["base", "field"], 종류: AST파서종류.FieldAccessExpr)로 실행한다.
+    상수 값_base는 AST파서해석노드환경(AST객체필드(필드들, "base"), 환경)이고, AST파서노드이다.
+    상수 값_field는 AST파서해석문자열(AST객체필드(필드들, "field"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.FieldAccessExpr(키순서: 필드들.객체키들, 값_base: 값_base, 값_field: 값_field, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FieldTarget은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["base", "field", "sentence_warnings"], 필수: ["field"], 종류: AST파서종류.FieldTarget)로 실행한다.
+    상수 값_base는 AST파서해석선택노드(AST객체필드(필드들, "base"), 환경)이고, AST파서노드?이다.
+    상수 값_field는 AST파서해석문자열(AST객체필드(필드들, "field"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.FieldTarget(키순서: 필드들.객체키들, 값_base: 값_base, 값_field: 값_field, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FileDataExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["path", "sentence_warnings"], 필수: ["path"], 종류: AST파서종류.FileDataExpr)로 실행한다.
+    상수 값_path는 AST파서해석문자열(AST객체필드(필드들, "path"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.FileDataExpr(키순서: 필드들.객체키들, 값_path: 값_path, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FilterDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["mutable", "name", "array", "item_name", "condition", "sentence_warnings"], 필수: ["mutable", "name", "array", "item_name", "condition"], 종류: AST파서종류.FilterDefine)로 실행한다.
+    상수 값_mutable는 AST파서해석참거짓(AST객체필드(필드들, "mutable"), 환경)이고, 참거짓이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_array는 AST파서해석노드환경(AST객체필드(필드들, "array"), 환경)이고, AST파서노드이다.
+    상수 값_item_name는 AST파서해석문자열(AST객체필드(필드들, "item_name"), 환경)이고, 문자열이다.
+    상수 값_condition는 AST파서해석노드환경(AST객체필드(필드들, "condition"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.FilterDefine(키순서: 필드들.객체키들, 값_mutable: 값_mutable, 값_name: 값_name, 값_array: 값_array, 값_item_name: 값_item_name, 값_condition: 값_condition, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FixedArrayFillExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "type_name", "sentence_warnings"], 필수: ["value", "type_name"], 종류: AST파서종류.FixedArrayFillExpr)로 실행한다.
+    상수 값_value는 AST파서해석노드환경(AST객체필드(필드들, "value"), 환경)이고, AST파서노드이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.FixedArrayFillExpr(키순서: 필드들.객체키들, 값_value: 값_value, 값_type_name: 값_type_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FloatLiteral은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["value"], 종류: AST파서종류.FloatLiteral)로 실행한다.
+    상수 값_value는 AST파서해석실수원문(AST객체필드(필드들, "value"), 환경)이고, AST파서실수원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음3(내용: AST파서묶음종류3.FloatLiteral(키순서: 필드들.객체키들, 값_value: 값_value, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음3이다.
+    AST파서노드(내용: AST파서내용.그룹3(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ForEach은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["array", "item_name", "position_name", "body", "sentence_warnings"], 필수: ["array", "item_name", "body"], 종류: AST파서종류.ForEach)로 실행한다.
+    상수 값_array는 AST파서해석노드환경(AST객체필드(필드들, "array"), 환경)이고, AST파서노드이다.
+    상수 값_item_name는 AST파서해석문자열(AST객체필드(필드들, "item_name"), 환경)이고, 문자열이다.
+    상수 값_position_name는 AST파서해석선택문자열(AST객체필드(필드들, "position_name"), 환경)이고, 문자열?이다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.ForEach(키순서: 필드들.객체키들, 값_array: 값_array, 값_item_name: 값_item_name, 값_position_name: 값_position_name, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Forget은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.Forget)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.Forget(키순서: 필드들.객체키들, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FunctionAddressExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "entry_param_types", "sentence_warnings"], 필수: ["name", "entry_param_types"], 종류: AST파서종류.FunctionAddressExpr)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_entry_param_types는 AST파서해석배열문자열(AST객체필드(필드들, "entry_param_types"), 환경)이고, 문자열의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.FunctionAddressExpr(키순서: 필드들.객체키들, 값_name: 값_name, 값_entry_param_types: 값_entry_param_types, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FunctionDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "params", "body", "return_type", "external_name", "unsafe", "can_fail", "type_params", "type_constraints", "visibility", "compiler_generated", "is_async", "opaque_trait_name", "error_type", "source_path", "nominal_owner", "nominal_key", "sentence_warnings"], 필수: ["name", "params", "body", "unsafe", "can_fail", "type_params", "type_constraints", "visibility", "compiler_generated", "is_async"], 종류: AST파서종류.FunctionDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_return_type는 AST파서해석선택문자열(AST객체필드(필드들, "return_type"), 환경)이고, 문자열?이다.
+    상수 값_external_name는 AST파서해석선택문자열(AST객체필드(필드들, "external_name"), 환경)이고, 문자열?이다.
+    상수 값_unsafe는 AST파서해석참거짓(AST객체필드(필드들, "unsafe"), 환경)이고, 참거짓이다.
+    상수 값_can_fail는 AST파서해석참거짓(AST객체필드(필드들, "can_fail"), 환경)이고, 참거짓이다.
+    상수 값_type_params는 AST파서해석배열문자열(AST객체필드(필드들, "type_params"), 환경)이고, 문자열의 배열이다.
+    상수 값_type_constraints는 AST파서해석배열타입제약(AST객체필드(필드들, "type_constraints"), 환경)이고, AST파서타입제약의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_is_async는 AST파서해석참거짓(AST객체필드(필드들, "is_async"), 환경)이고, 참거짓이다.
+    상수 값_opaque_trait_name는 AST파서해석선택문자열(AST객체필드(필드들, "opaque_trait_name"), 환경)이고, 문자열?이다.
+    상수 값_error_type는 AST파서해석선택문자열(AST객체필드(필드들, "error_type"), 환경)이고, 문자열?이다.
+    상수 값_source_path는 AST파서해석선택문자열(AST객체필드(필드들, "source_path"), 환경)이고, 문자열?이다.
+    상수 값_nominal_owner는 AST파서해석선택문자열(AST객체필드(필드들, "nominal_owner"), 환경)이고, 문자열?이다.
+    상수 값_nominal_key는 AST파서해석선택문자열(AST객체필드(필드들, "nominal_key"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.FunctionDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_params: 값_params, 값_body: 값_body, 값_return_type: 값_return_type, 값_external_name: 값_external_name, 값_unsafe: 값_unsafe, 값_can_fail: 값_can_fail, 값_type_params: 값_type_params, 값_type_constraints: 값_type_constraints, 값_visibility: 값_visibility, 값_compiler_generated: 값_compiler_generated, 값_is_async: 값_is_async, 값_opaque_trait_name: 값_opaque_trait_name, 값_error_type: 값_error_type, 값_source_path: 값_source_path, 값_nominal_owner: 값_nominal_owner, 값_nominal_key: 값_nominal_key, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FunctionModifierDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["phrase", "params", "setup", "finish", "type_params", "type_constraints", "sentence_warnings"], 필수: ["phrase", "params", "setup", "finish", "type_params", "type_constraints"], 종류: AST파서종류.FunctionModifierDef)로 실행한다.
+    상수 값_phrase는 AST파서해석문자열(AST객체필드(필드들, "phrase"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_setup는 AST파서해석배열문장줄(AST객체필드(필드들, "setup"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_finish는 AST파서해석배열문장줄(AST객체필드(필드들, "finish"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_type_params는 AST파서해석배열문자열(AST객체필드(필드들, "type_params"), 환경)이고, 문자열의 배열이다.
+    상수 값_type_constraints는 AST파서해석배열타입제약(AST객체필드(필드들, "type_constraints"), 환경)이고, AST파서타입제약의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.FunctionModifierDef(키순서: 필드들.객체키들, 값_phrase: 값_phrase, 값_params: 값_params, 값_setup: 값_setup, 값_finish: 값_finish, 값_type_params: 값_type_params, 값_type_constraints: 값_type_constraints, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료FunctionValueDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["mutable", "name", "function_name", "params", "return_type", "body", "compiler_generated", "is_async", "sentence_warnings"], 필수: ["mutable", "name", "function_name", "params", "body", "compiler_generated", "is_async"], 종류: AST파서종류.FunctionValueDefine)로 실행한다.
+    상수 값_mutable는 AST파서해석참거짓(AST객체필드(필드들, "mutable"), 환경)이고, 참거짓이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_function_name는 AST파서해석문자열(AST객체필드(필드들, "function_name"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_return_type는 AST파서해석선택문자열(AST객체필드(필드들, "return_type"), 환경)이고, 문자열?이다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_is_async는 AST파서해석참거짓(AST객체필드(필드들, "is_async"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.FunctionValueDefine(키순서: 필드들.객체키들, 값_mutable: 값_mutable, 값_name: 값_name, 값_function_name: 값_function_name, 값_params: 값_params, 값_return_type: 값_return_type, 값_body: 값_body, 값_compiler_generated: 값_compiler_generated, 값_is_async: 값_is_async, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료GlobalDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["mutable", "name", "type_name", "expr", "section", "alignment", "visibility", "sentence_warnings"], 필수: ["mutable", "name", "type_name", "expr", "visibility"], 종류: AST파서종류.GlobalDefine)로 실행한다.
+    상수 값_mutable는 AST파서해석참거짓(AST객체필드(필드들, "mutable"), 환경)이고, 참거짓이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_section는 AST파서해석선택문자열(AST객체필드(필드들, "section"), 환경)이고, 문자열?이다.
+    상수 값_alignment는 AST파서해석선택정수원문(AST객체필드(필드들, "alignment"), 환경)이고, AST파서정수원문?이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.GlobalDefine(키순서: 필드들.객체키들, 값_mutable: 값_mutable, 값_name: 값_name, 값_type_name: 값_type_name, 값_expr: 값_expr, 값_section: 값_section, 값_alignment: 값_alignment, 값_visibility: 값_visibility, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료IdentityCompareExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["left", "right", "negate", "sentence_warnings"], 필수: ["left", "right", "negate"], 종류: AST파서종류.IdentityCompareExpr)로 실행한다.
+    상수 값_left는 AST파서해석노드환경(AST객체필드(필드들, "left"), 환경)이고, AST파서노드이다.
+    상수 값_right는 AST파서해석노드환경(AST객체필드(필드들, "right"), 환경)이고, AST파서노드이다.
+    상수 값_negate는 AST파서해석참거짓(AST객체필드(필드들, "negate"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.IdentityCompareExpr(키순서: 필드들.객체키들, 값_left: 값_left, 값_right: 값_right, 값_negate: 값_negate, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료If은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["branches", "else_body", "sentence_warnings"], 필수: ["branches"], 종류: AST파서종류.If)로 실행한다.
+    상수 값_branches는 AST파서해석배열분기(AST객체필드(필드들, "branches"), 환경)이고, AST파서분기의 배열이다.
+    상수 값_else_body는 AST파서해석선택배열문장줄(AST객체필드(필드들, "else_body"), 환경)이고, AST파서문장줄의 배열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.If(키순서: 필드들.객체키들, 값_branches: 값_branches, 값_else_body: 값_else_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Import은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["path", "sentence_warnings"], 필수: ["path"], 종류: AST파서종류.Import)로 실행한다.
+    상수 값_path는 AST파서해석문자열(AST객체필드(필드들, "path"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.Import(키순서: 필드들.객체키들, 값_path: 값_path, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료IndexAccessExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["base", "index", "natural", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["base", "index", "natural"], 종류: AST파서종류.IndexAccessExpr)로 실행한다.
+    상수 값_base는 AST파서해석노드환경(AST객체필드(필드들, "base"), 환경)이고, AST파서노드이다.
+    상수 값_index는 AST파서해석노드환경(AST객체필드(필드들, "index"), 환경)이고, AST파서노드이다.
+    상수 값_natural는 AST파서해석참거짓(AST객체필드(필드들, "natural"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.IndexAccessExpr(키순서: 필드들.객체키들, 값_base: 값_base, 값_index: 값_index, 값_natural: 값_natural, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료IndexTarget은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["base", "index", "natural", "sentence_warnings"], 필수: ["index", "natural"], 종류: AST파서종류.IndexTarget)로 실행한다.
+    상수 값_base는 AST파서해석선택노드(AST객체필드(필드들, "base"), 환경)이고, AST파서노드?이다.
+    상수 값_index는 AST파서해석노드환경(AST객체필드(필드들, "index"), 환경)이고, AST파서노드이다.
+    상수 값_natural는 AST파서해석참거짓(AST객체필드(필드들, "natural"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음4(내용: AST파서묶음종류4.IndexTarget(키순서: 필드들.객체키들, 값_base: 값_base, 값_index: 값_index, 값_natural: 값_natural, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음4이다.
+    AST파서노드(내용: AST파서내용.그룹4(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료IntLiteral은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sentence_warnings"], 필수: ["value"], 종류: AST파서종류.IntLiteral)로 실행한다.
+    상수 값_value는 AST파서해석정수원문(AST객체필드(필드들, "value"), 환경)이고, AST파서정수원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.IntLiteral(키순서: 필드들.객체키들, 값_value: 값_value, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료LogicalCondition은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["left", "op", "right", "sentence_warnings"], 필수: ["left", "op", "right"], 종류: AST파서종류.LogicalCondition)로 실행한다.
+    상수 값_left는 AST파서해석노드환경(AST객체필드(필드들, "left"), 환경)이고, AST파서노드이다.
+    상수 값_op는 AST파서해석문자열(AST객체필드(필드들, "op"), 환경)이고, 문자열이다.
+    상수 값_right는 AST파서해석노드환경(AST객체필드(필드들, "right"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.LogicalCondition(키순서: 필드들.객체키들, 값_left: 값_left, 값_op: 값_op, 값_right: 값_right, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료LoopModifierDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["phrase", "params", "setup", "step", "finish", "sentence_warnings"], 필수: ["phrase", "params", "setup", "step", "finish"], 종류: AST파서종류.LoopModifierDef)로 실행한다.
+    상수 값_phrase는 AST파서해석문자열(AST객체필드(필드들, "phrase"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_setup는 AST파서해석배열문장줄(AST객체필드(필드들, "setup"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_step는 AST파서해석배열문장줄(AST객체필드(필드들, "step"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_finish는 AST파서해석배열문장줄(AST객체필드(필드들, "finish"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.LoopModifierDef(키순서: 필드들.객체키들, 값_phrase: 값_phrase, 값_params: 값_params, 값_setup: 값_setup, 값_step: 값_step, 값_finish: 값_finish, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ManualRelease은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.ManualRelease)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.ManualRelease(키순서: 필드들.객체키들, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료MapDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["mutable", "name", "array", "item_name", "expr", "sentence_warnings"], 필수: ["mutable", "name", "array", "item_name", "expr"], 종류: AST파서종류.MapDefine)로 실행한다.
+    상수 값_mutable는 AST파서해석참거짓(AST객체필드(필드들, "mutable"), 환경)이고, 참거짓이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_array는 AST파서해석노드환경(AST객체필드(필드들, "array"), 환경)이고, AST파서노드이다.
+    상수 값_item_name는 AST파서해석문자열(AST객체필드(필드들, "item_name"), 환경)이고, 문자열이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.MapDefine(키순서: 필드들.객체키들, 값_mutable: 값_mutable, 값_name: 값_name, 값_array: 값_array, 값_item_name: 값_item_name, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료MemoryReadExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["base", "index", "value_type", "sentence_warnings"], 필수: ["base", "index", "value_type"], 종류: AST파서종류.MemoryReadExpr)로 실행한다.
+    상수 값_base는 AST파서해석노드환경(AST객체필드(필드들, "base"), 환경)이고, AST파서노드이다.
+    상수 값_index는 AST파서해석노드환경(AST객체필드(필드들, "index"), 환경)이고, AST파서노드이다.
+    상수 값_value_type는 AST파서해석문자열(AST객체필드(필드들, "value_type"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.MemoryReadExpr(키순서: 필드들.객체키들, 값_base: 값_base, 값_index: 값_index, 값_value_type: 값_value_type, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료MemoryTarget은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["base", "index", "value_type", "sentence_warnings"], 필수: ["base", "index", "value_type"], 종류: AST파서종류.MemoryTarget)로 실행한다.
+    상수 값_base는 AST파서해석노드환경(AST객체필드(필드들, "base"), 환경)이고, AST파서노드이다.
+    상수 값_index는 AST파서해석노드환경(AST객체필드(필드들, "index"), 환경)이고, AST파서노드이다.
+    상수 값_value_type는 AST파서해석문자열(AST객체필드(필드들, "value_type"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.MemoryTarget(키순서: 필드들.객체키들, 값_base: 값_base, 값_index: 값_index, 값_value_type: 값_value_type, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ModifierDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["kind", "phrase", "conjugation", "targets", "field_type", "count", "thread", "role", "hooks", "visibility", "quoted_properties", "sentence_warnings"], 필수: ["kind", "phrase", "conjugation", "targets", "field_type", "count", "thread", "role", "hooks", "visibility", "quoted_properties"], 종류: AST파서종류.ModifierDef)로 실행한다.
+    상수 값_kind는 AST파서해석문자열(AST객체필드(필드들, "kind"), 환경)이고, 문자열이다.
+    상수 값_phrase는 AST파서해석문자열(AST객체필드(필드들, "phrase"), 환경)이고, 문자열이다.
+    상수 값_conjugation는 AST파서해석문자열(AST객체필드(필드들, "conjugation"), 환경)이고, 문자열이다.
+    상수 값_targets는 AST파서해석문자열(AST객체필드(필드들, "targets"), 환경)이고, 문자열이다.
+    상수 값_field_type는 AST파서해석문자열(AST객체필드(필드들, "field_type"), 환경)이고, 문자열이다.
+    상수 값_count는 AST파서해석문자열(AST객체필드(필드들, "count"), 환경)이고, 문자열이다.
+    상수 값_thread는 AST파서해석문자열(AST객체필드(필드들, "thread"), 환경)이고, 문자열이다.
+    상수 값_role는 AST파서해석문자열(AST객체필드(필드들, "role"), 환경)이고, 문자열이다.
+    상수 값_hooks는 AST파서해석배열훅(AST객체필드(필드들, "hooks"), 환경)이고, AST파서훅의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_quoted_properties는 AST파서해석배열문자경고(AST객체필드(필드들, "quoted_properties"), 환경)이고, AST파서문자경고의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.ModifierDef(키순서: 필드들.객체키들, 값_kind: 값_kind, 값_phrase: 값_phrase, 값_conjugation: 값_conjugation, 값_targets: 값_targets, 값_field_type: 값_field_type, 값_count: 값_count, 값_thread: 값_thread, 값_role: 값_role, 값_hooks: 값_hooks, 값_visibility: 값_visibility, 값_quoted_properties: 값_quoted_properties, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ModuleImport은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["module_name", "reexport", "sentence_warnings"], 필수: ["module_name"], 종류: AST파서종류.ModuleImport)로 실행한다.
+    상수 값_module_name는 AST파서해석문자열(AST객체필드(필드들, "module_name"), 환경)이고, 문자열이다.
+    상수 값_reexport는 AST파서해석선택참거짓(AST객체필드(필드들, "reexport"), 환경)이고, 참거짓?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.ModuleImport(키순서: 필드들.객체키들, 값_module_name: 값_module_name, 값_reexport: 값_reexport, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ModuleReexport은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["module_name", "names", "sentence_warnings"], 필수: ["module_name", "names"], 종류: AST파서종류.ModuleReexport)로 실행한다.
+    상수 값_module_name는 AST파서해석문자열(AST객체필드(필드들, "module_name"), 환경)이고, 문자열이다.
+    상수 값_names는 AST파서해석배열문자열(AST객체필드(필드들, "names"), 환경)이고, 문자열의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.ModuleReexport(키순서: 필드들.객체키들, 값_module_name: 값_module_name, 값_names: 값_names, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료MoveDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["source", "name", "sentence_warnings"], 필수: ["source", "name"], 종류: AST파서종류.MoveDefine)로 실행한다.
+    상수 값_source는 AST파서해석문자열(AST객체필드(필드들, "source"), 환경)이고, 문자열이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.MoveDefine(키순서: 필드들.객체키들, 값_source: 값_source, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료NameExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "compiler_generated", "module_qualifier", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["name"], 종류: AST파서종류.NameExpr)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_compiler_generated는 AST파서해석선택참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓?이다.
+    상수 값_module_qualifier는 AST파서해석선택문자열(AST객체필드(필드들, "module_qualifier"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음5(내용: AST파서묶음종류5.NameExpr(키순서: 필드들.객체키들, 값_name: 값_name, 값_compiler_generated: 값_compiler_generated, 값_module_qualifier: 값_module_qualifier, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음5이다.
+    AST파서노드(내용: AST파서내용.그룹5(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료NameTarget은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "module_qualifier", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.NameTarget)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_module_qualifier는 AST파서해석선택문자열(AST객체필드(필드들, "module_qualifier"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.NameTarget(키순서: 필드들.객체키들, 값_name: 값_name, 값_module_qualifier: 값_module_qualifier, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료NotCondition은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["condition", "sentence_warnings"], 필수: ["condition"], 종류: AST파서종류.NotCondition)로 실행한다.
+    상수 값_condition는 AST파서해석노드환경(AST객체필드(필드들, "condition"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.NotCondition(키순서: 필드들.객체키들, 값_condition: 값_condition, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OffsetMemoryReadExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["address", "value_type", "sentence_warnings"], 필수: ["address", "value_type"], 종류: AST파서종류.OffsetMemoryReadExpr)로 실행한다.
+    상수 값_address는 AST파서해석노드환경(AST객체필드(필드들, "address"), 환경)이고, AST파서노드이다.
+    상수 값_value_type는 AST파서해석문자열(AST객체필드(필드들, "value_type"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OffsetMemoryReadExpr(키순서: 필드들.객체키들, 값_address: 값_address, 값_value_type: 값_value_type, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OffsetMemoryTarget은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["address", "value_type", "sentence_warnings"], 필수: ["address", "value_type"], 종류: AST파서종류.OffsetMemoryTarget)로 실행한다.
+    상수 값_address는 AST파서해석노드환경(AST객체필드(필드들, "address"), 환경)이고, AST파서노드이다.
+    상수 값_value_type는 AST파서해석문자열(AST객체필드(필드들, "value_type"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OffsetMemoryTarget(키순서: 필드들.객체키들, 값_address: 값_address, 값_value_type: 값_value_type, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OptionalBindCondition은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "name", "narrowed", "deprecated", "sentence_warnings"], 필수: ["expr", "name"], 종류: AST파서종류.OptionalBindCondition)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_narrowed는 AST파서해석선택참거짓(AST객체필드(필드들, "narrowed"), 환경)이고, 참거짓?이다.
+    상수 값_deprecated는 AST파서해석선택문자열(AST객체필드(필드들, "deprecated"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OptionalBindCondition(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_name: 값_name, 값_narrowed: 값_narrowed, 값_deprecated: 값_deprecated, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OptionalHasValueCondition은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "has_value", "sentence_warnings"], 필수: ["expr", "has_value"], 종류: AST파서종류.OptionalHasValueCondition)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_has_value는 AST파서해석참거짓(AST객체필드(필드들, "has_value"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OptionalHasValueCondition(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_has_value: 값_has_value, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OptionalNoneExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["sentence_warnings"], 필수: [], 종류: AST파서종류.OptionalNoneExpr)로 실행한다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OptionalNoneExpr(키순서: 필드들.객체키들, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OptionalUnwrapExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["expr"], 종류: AST파서종류.OptionalUnwrapExpr)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OptionalUnwrapExpr(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료OverlayBindExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["buffer", "struct_name", "is_array", "sentence_warnings"], 필수: ["buffer", "struct_name", "is_array"], 종류: AST파서종류.OverlayBindExpr)로 실행한다.
+    상수 값_buffer는 AST파서해석노드환경(AST객체필드(필드들, "buffer"), 환경)이고, AST파서노드이다.
+    상수 값_struct_name는 AST파서해석문자열(AST객체필드(필드들, "struct_name"), 환경)이고, 문자열이다.
+    상수 값_is_array는 AST파서해석참거짓(AST객체필드(필드들, "is_array"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.OverlayBindExpr(키순서: 필드들.객체키들, 값_buffer: 값_buffer, 값_struct_name: 값_struct_name, 값_is_array: 값_is_array, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Parameter은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "type_name", "consuming", "compiler_generated", "sentence_warnings"], 필수: ["name", "type_name", "consuming", "compiler_generated"], 종류: AST파서종류.Parameter)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_consuming는 AST파서해석참거짓(AST객체필드(필드들, "consuming"), 환경)이고, 참거짓이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.Parameter(키순서: 필드들.객체키들, 값_name: 값_name, 값_type_name: 값_type_name, 값_consuming: 값_consuming, 값_compiler_generated: 값_compiler_generated, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료PinAddress은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "sentence_warnings"], 필수: ["name"], 종류: AST파서종류.PinAddress)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.PinAddress(키순서: 필드들.객체키들, 값_name: 값_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료PreemptDisableBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["body", "sentence_warnings"], 필수: ["body"], 종류: AST파서종류.PreemptDisableBlock)로 실행한다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음6(내용: AST파서묶음종류6.PreemptDisableBlock(키순서: 필드들.객체키들, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음6이다.
+    AST파서노드(내용: AST파서내용.그룹6(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료ReferenceDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "expr", "sentence_warnings"], 필수: ["name", "expr"], 종류: AST파서종류.ReferenceDefine)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.ReferenceDefine(키순서: 필드들.객체키들, 값_name: 값_name, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Return은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "type_name", "compiler_generated", "opaque_trait_name", "sentence_warnings"], 필수: ["compiler_generated"], 종류: AST파서종류.Return)로 실행한다.
+    상수 값_expr는 AST파서해석선택노드(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드?이다.
+    상수 값_type_name는 AST파서해석선택문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열?이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_opaque_trait_name는 AST파서해석선택문자열(AST객체필드(필드들, "opaque_trait_name"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.Return(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_type_name: 값_type_name, 값_compiler_generated: 값_compiler_generated, 값_opaque_trait_name: 값_opaque_trait_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SortDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["mutable", "name", "array", "left_name", "right_name", "condition", "item_name", "key_expr", "descending", "sentence_warnings"], 필수: ["mutable", "name", "array", "descending"], 종류: AST파서종류.SortDefine)로 실행한다.
+    상수 값_mutable는 AST파서해석참거짓(AST객체필드(필드들, "mutable"), 환경)이고, 참거짓이다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_array는 AST파서해석노드환경(AST객체필드(필드들, "array"), 환경)이고, AST파서노드이다.
+    상수 값_left_name는 AST파서해석선택문자열(AST객체필드(필드들, "left_name"), 환경)이고, 문자열?이다.
+    상수 값_right_name는 AST파서해석선택문자열(AST객체필드(필드들, "right_name"), 환경)이고, 문자열?이다.
+    상수 값_condition는 AST파서해석선택노드(AST객체필드(필드들, "condition"), 환경)이고, AST파서노드?이다.
+    상수 값_item_name는 AST파서해석선택문자열(AST객체필드(필드들, "item_name"), 환경)이고, 문자열?이다.
+    상수 값_key_expr는 AST파서해석선택노드(AST객체필드(필드들, "key_expr"), 환경)이고, AST파서노드?이다.
+    상수 값_descending는 AST파서해석참거짓(AST객체필드(필드들, "descending"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.SortDefine(키순서: 필드들.객체키들, 값_mutable: 값_mutable, 값_name: 값_name, 값_array: 값_array, 값_left_name: 값_left_name, 값_right_name: 값_right_name, 값_condition: 값_condition, 값_item_name: 값_item_name, 값_key_expr: 값_key_expr, 값_descending: 값_descending, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SourceLine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["line_no", "indent", "text", "sentence_warnings"], 필수: ["line_no", "indent", "text"], 종류: AST파서종류.SourceLine)로 실행한다.
+    상수 값_line_no는 AST파서해석정수원문(AST객체필드(필드들, "line_no"), 환경)이고, AST파서정수원문이다.
+    상수 값_indent는 AST파서해석정수원문(AST객체필드(필드들, "indent"), 환경)이고, AST파서정수원문이다.
+    상수 값_text는 AST파서해석문자열(AST객체필드(필드들, "text"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.SourceLine(키순서: 필드들.객체키들, 값_line_no: 값_line_no, 값_indent: 값_indent, 값_text: 값_text, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StorageModifierDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["phrase", "params", "setup", "read", "write", "write_params", "finish", "type_params", "type_constraints", "sentence_warnings"], 필수: ["phrase", "params", "setup", "read", "write", "write_params", "finish", "type_params", "type_constraints"], 종류: AST파서종류.StorageModifierDef)로 실행한다.
+    상수 값_phrase는 AST파서해석문자열(AST객체필드(필드들, "phrase"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_setup는 AST파서해석배열문장줄(AST객체필드(필드들, "setup"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_read는 AST파서해석배열문장줄(AST객체필드(필드들, "read"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_write는 AST파서해석배열문장줄(AST객체필드(필드들, "write"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_write_params는 AST파서해석배열노드(AST객체필드(필드들, "write_params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_finish는 AST파서해석배열문장줄(AST객체필드(필드들, "finish"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_type_params는 AST파서해석배열문자열(AST객체필드(필드들, "type_params"), 환경)이고, 문자열의 배열이다.
+    상수 값_type_constraints는 AST파서해석배열타입제약(AST객체필드(필드들, "type_constraints"), 환경)이고, AST파서타입제약의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StorageModifierDef(키순서: 필드들.객체키들, 값_phrase: 값_phrase, 값_params: 값_params, 값_setup: 값_setup, 값_read: 값_read, 값_write: 값_write, 값_write_params: 값_write_params, 값_finish: 값_finish, 값_type_params: 값_type_params, 값_type_constraints: 값_type_constraints, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StoredBody은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["table", "line", "unique_sets", "sentence_warnings"], 필수: ["line", "unique_sets"], 종류: AST파서종류.StoredBody)로 실행한다.
+    상수 값_table는 AST파서해석선택노드(AST객체필드(필드들, "table"), 환경)이고, AST파서노드?이다.
+    상수 값_line는 AST파서해석정수원문(AST객체필드(필드들, "line"), 환경)이고, AST파서정수원문이다.
+    상수 값_unique_sets는 AST파서해석배열고유조합(AST객체필드(필드들, "unique_sets"), 환경)이고, AST파서고유조합의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StoredBody(키순서: 필드들.객체키들, 값_table: 값_table, 값_line: 값_line, 값_unique_sets: 값_unique_sets, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StoredField은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["column", "primary_key", "unique", "auto", "db_default", "default_case", "sentence_warnings"], 필수: ["primary_key", "unique", "auto", "default_case"], 종류: AST파서종류.StoredField)로 실행한다.
+    상수 값_column는 AST파서해석선택문자열(AST객체필드(필드들, "column"), 환경)이고, 문자열?이다.
+    상수 값_primary_key는 AST파서해석참거짓(AST객체필드(필드들, "primary_key"), 환경)이고, 참거짓이다.
+    상수 값_unique는 AST파서해석참거짓(AST객체필드(필드들, "unique"), 환경)이고, 참거짓이다.
+    상수 값_auto는 AST파서해석참거짓(AST객체필드(필드들, "auto"), 환경)이고, 참거짓이다.
+    상수 값_db_default는 AST파서해석선택노드(AST객체필드(필드들, "db_default"), 환경)이고, AST파서노드?이다.
+    상수 값_default_case는 AST파서해석문자열(AST객체필드(필드들, "default_case"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StoredField(키순서: 필드들.객체키들, 값_column: 값_column, 값_primary_key: 값_primary_key, 값_unique: 값_unique, 값_auto: 값_auto, 값_db_default: 값_db_default, 값_default_case: 값_default_case, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StringLiteral은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["value", "sentence_warnings"], 필수: ["value"], 종류: AST파서종류.StringLiteral)로 실행한다.
+    상수 값_value는 AST파서해석문자열(AST객체필드(필드들, "value"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StringLiteral(키순서: 필드들.객체키들, 값_value: 값_value, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StructDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "fields", "packed", "endian", "type_params", "type_constraints", "visibility", "field_metadata", "initializers", "member_functions", "compiler_generated", "compiler_generated_fields", "sentence_warnings"], 필수: ["name", "fields", "packed", "type_params", "type_constraints", "visibility", "field_metadata", "initializers", "member_functions", "compiler_generated", "compiler_generated_fields"], 종류: AST파서종류.StructDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_fields는 AST파서해석문자지도(AST객체필드(필드들, "fields"), 환경)이고, AST파서문자지도이다.
+    상수 값_packed는 AST파서해석참거짓(AST객체필드(필드들, "packed"), 환경)이고, 참거짓이다.
+    상수 값_endian는 AST파서해석선택문자열(AST객체필드(필드들, "endian"), 환경)이고, 문자열?이다.
+    상수 값_type_params는 AST파서해석배열문자열(AST객체필드(필드들, "type_params"), 환경)이고, 문자열의 배열이다.
+    상수 값_type_constraints는 AST파서해석배열타입제약(AST객체필드(필드들, "type_constraints"), 환경)이고, AST파서타입제약의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_field_metadata는 AST파서해석배열노드(AST객체필드(필드들, "field_metadata"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_initializers는 AST파서해석배열노드(AST객체필드(필드들, "initializers"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_member_functions는 AST파서해석배열문장줄(AST객체필드(필드들, "member_functions"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_compiler_generated_fields는 AST파서해석배열문자열(AST객체필드(필드들, "compiler_generated_fields"), 환경)이고, 문자열의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StructDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_fields: 값_fields, 값_packed: 값_packed, 값_endian: 값_endian, 값_type_params: 값_type_params, 값_type_constraints: 값_type_constraints, 값_visibility: 값_visibility, 값_field_metadata: 값_field_metadata, 값_initializers: 값_initializers, 값_member_functions: 값_member_functions, 값_compiler_generated: 값_compiler_generated, 값_compiler_generated_fields: 값_compiler_generated_fields, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StructFieldMetadata은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "type_name", "visibility", "mutability", "line", "modifier_words", "sentence_warnings"], 필수: ["name", "type_name", "visibility", "mutability", "line"], 종류: AST파서종류.StructFieldMetadata)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_mutability는 AST파서해석문자열(AST객체필드(필드들, "mutability"), 환경)이고, 문자열이다.
+    상수 값_line는 AST파서해석정수원문(AST객체필드(필드들, "line"), 환경)이고, AST파서정수원문이다.
+    상수 값_modifier_words는 AST파서해석선택배열문자열(AST객체필드(필드들, "modifier_words"), 환경)이고, 문자열의 배열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StructFieldMetadata(키순서: 필드들.객체키들, 값_name: 값_name, 값_type_name: 값_type_name, 값_visibility: 값_visibility, 값_mutability: 값_mutability, 값_line: 값_line, 값_modifier_words: 값_modifier_words, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StructInitExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "fields", "unsafe", "base", "compiler_generated", "module_qualifier", "sentence_warnings"], 필수: ["name", "fields", "unsafe", "compiler_generated"], 종류: AST파서종류.StructInitExpr)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_fields는 AST파서해석노드지도(AST객체필드(필드들, "fields"), 환경)이고, AST파서노드지도이다.
+    상수 값_unsafe는 AST파서해석참거짓(AST객체필드(필드들, "unsafe"), 환경)이고, 참거짓이다.
+    상수 값_base는 AST파서해석선택노드(AST객체필드(필드들, "base"), 환경)이고, AST파서노드?이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_module_qualifier는 AST파서해석선택문자열(AST객체필드(필드들, "module_qualifier"), 환경)이고, 문자열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StructInitExpr(키순서: 필드들.객체키들, 값_name: 값_name, 값_fields: 값_fields, 값_unsafe: 값_unsafe, 값_base: 값_base, 값_compiler_generated: 값_compiler_generated, 값_module_qualifier: 값_module_qualifier, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StructInitializerAssignment은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["field_name", "expr", "sentence_warnings"], 필수: ["field_name", "expr"], 종류: AST파서종류.StructInitializerAssignment)로 실행한다.
+    상수 값_field_name는 AST파서해석문자열(AST객체필드(필드들, "field_name"), 환경)이고, 문자열이다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음7(내용: AST파서묶음종류7.StructInitializerAssignment(키순서: 필드들.객체키들, 값_field_name: 값_field_name, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음7이다.
+    AST파서노드(내용: AST파서내용.그룹7(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료StructInitializerDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["params", "assignments", "visibility", "sentence_warnings"], 필수: ["params", "assignments", "visibility"], 종류: AST파서종류.StructInitializerDef)로 실행한다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_assignments는 AST파서해석배열노드(AST객체필드(필드들, "assignments"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.StructInitializerDef(키순서: 필드들.객체키들, 값_params: 값_params, 값_assignments: 값_assignments, 값_visibility: 값_visibility, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceDatabaseBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["header", "lines", "sentence_warnings"], 필수: ["header", "lines"], 종류: AST파서종류.SurfaceDatabaseBlock)로 실행한다.
+    상수 값_header는 AST파서해석문자열(AST객체필드(필드들, "header"), 환경)이고, 문자열이다.
+    상수 값_lines는 AST파서해석배열노드(AST객체필드(필드들, "lines"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceDatabaseBlock(키순서: 필드들.객체키들, 값_header: 값_header, 값_lines: 값_lines, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceDatabaseStatement은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["header", "sentence_warnings"], 필수: ["header"], 종류: AST파서종류.SurfaceDatabaseStatement)로 실행한다.
+    상수 값_header는 AST파서해석문자열(AST객체필드(필드들, "header"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceDatabaseStatement(키순서: 필드들.객체키들, 값_header: 값_header, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceDisplayFunctionDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "header", "lines", "visibility", "sentence_warnings"], 필수: ["name", "header", "lines", "visibility"], 종류: AST파서종류.SurfaceDisplayFunctionDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_header는 AST파서해석문자열(AST객체필드(필드들, "header"), 환경)이고, 문자열이다.
+    상수 값_lines는 AST파서해석배열노드(AST객체필드(필드들, "lines"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceDisplayFunctionDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_header: 값_header, 값_lines: 값_lines, 값_visibility: 값_visibility, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceInheritDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "init", "type_name", "visibility", "legacy", "sentence_warnings"], 필수: ["name", "init", "type_name", "visibility", "legacy"], 종류: AST파서종류.SurfaceInheritDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_init는 AST파서해석문자열(AST객체필드(필드들, "init"), 환경)이고, 문자열이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_legacy는 AST파서해석문자열(AST객체필드(필드들, "legacy"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceInheritDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_init: 값_init, 값_type_name: 값_type_name, 값_visibility: 값_visibility, 값_legacy: 값_legacy, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfacePreviewDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "lines", "sentence_warnings"], 필수: ["name", "lines"], 종류: AST파서종류.SurfacePreviewDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_lines는 AST파서해석배열노드(AST객체필드(필드들, "lines"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfacePreviewDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_lines: 값_lines, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceRouteBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["header", "lines", "sentence_warnings"], 필수: ["header", "lines"], 종류: AST파서종류.SurfaceRouteBlock)로 실행한다.
+    상수 값_header는 AST파서해석문자열(AST객체필드(필드들, "header"), 환경)이고, 문자열이다.
+    상수 값_lines는 AST파서해석배열노드(AST객체필드(필드들, "lines"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceRouteBlock(키순서: 필드들.객체키들, 값_header: 값_header, 값_lines: 값_lines, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceRouteMount은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["header", "sentence_warnings"], 필수: ["header"], 종류: AST파서종류.SurfaceRouteMount)로 실행한다.
+    상수 값_header는 AST파서해석문자열(AST객체필드(필드들, "header"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceRouteMount(키순서: 필드들.객체키들, 값_header: 값_header, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceScreenDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "lines", "visibility", "sentence_warnings"], 필수: ["name", "lines", "visibility"], 종류: AST파서종류.SurfaceScreenDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_lines는 AST파서해석배열노드(AST객체필드(필드들, "lines"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceScreenDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_lines: 값_lines, 값_visibility: 값_visibility, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료SurfaceWindowFunctionDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "header", "params", "lines", "visibility", "sentence_warnings"], 필수: ["name", "header", "params", "lines", "visibility"], 종류: AST파서종류.SurfaceWindowFunctionDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_header는 AST파서해석문자열(AST객체필드(필드들, "header"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_lines는 AST파서해석배열노드(AST객체필드(필드들, "lines"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.SurfaceWindowFunctionDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_header: 값_header, 값_params: 값_params, 값_lines: 값_lines, 값_visibility: 값_visibility, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Switch은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["branches", "else_body", "sentence_warnings"], 필수: ["branches"], 종류: AST파서종류.Switch)로 실행한다.
+    상수 값_branches는 AST파서해석배열분기(AST객체필드(필드들, "branches"), 환경)이고, AST파서분기의 배열이다.
+    상수 값_else_body는 AST파서해석선택배열문장줄(AST객체필드(필드들, "else_body"), 환경)이고, AST파서문장줄의 배열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.Switch(키순서: 필드들.객체키들, 값_branches: 값_branches, 값_else_body: 값_else_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료TakeDefine은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "address", "type_name", "sentence_warnings"], 필수: ["name", "address", "type_name"], 종류: AST파서종류.TakeDefine)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_address는 AST파서해석노드환경(AST객체필드(필드들, "address"), 환경)이고, AST파서노드이다.
+    상수 값_type_name는 AST파서해석문자열(AST객체필드(필드들, "type_name"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음8(내용: AST파서묶음종류8.TakeDefine(키순서: 필드들.객체키들, 값_name: 값_name, 값_address: 값_address, 값_type_name: 값_type_name, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음8이다.
+    AST파서노드(내용: AST파서내용.그룹8(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료Throw은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "sentence_warnings"], 필수: ["expr"], 종류: AST파서종류.Throw)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.Throw(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료TraitDef은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "self_type", "supertraits", "associated_types", "associated_type_bounds", "requirements", "visibility", "sentence_warnings"], 필수: ["name", "self_type", "supertraits", "associated_types", "associated_type_bounds", "requirements", "visibility"], 종류: AST파서종류.TraitDef)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_self_type는 AST파서해석문자열(AST객체필드(필드들, "self_type"), 환경)이고, 문자열이다.
+    상수 값_supertraits는 AST파서해석배열문자열(AST객체필드(필드들, "supertraits"), 환경)이고, 문자열의 배열이다.
+    상수 값_associated_types는 AST파서해석배열문자열(AST객체필드(필드들, "associated_types"), 환경)이고, 문자열의 배열이다.
+    상수 값_associated_type_bounds는 AST파서해석배열타입제약(AST객체필드(필드들, "associated_type_bounds"), 환경)이고, AST파서타입제약의 배열이다.
+    상수 값_requirements는 AST파서해석배열노드(AST객체필드(필드들, "requirements"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_visibility는 AST파서해석열거원문(AST객체필드(필드들, "visibility"), 환경)이고, AST파서열거원문이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.TraitDef(키순서: 필드들.객체키들, 값_name: 값_name, 값_self_type: 값_self_type, 값_supertraits: 값_supertraits, 값_associated_types: 값_associated_types, 값_associated_type_bounds: 값_associated_type_bounds, 값_requirements: 값_requirements, 값_visibility: 값_visibility, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료TraitRequirement은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "params", "return_type", "sentence_warnings"], 필수: ["name", "params", "return_type"], 종류: AST파서종류.TraitRequirement)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_params는 AST파서해석배열노드(AST객체필드(필드들, "params"), 환경)이고, AST파서노드의 배열이다.
+    상수 값_return_type는 AST파서해석문자열(AST객체필드(필드들, "return_type"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.TraitRequirement(키순서: 필드들.객체키들, 값_name: 값_name, 값_params: 값_params, 값_return_type: 값_return_type, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료TransferOwnership은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["name", "target", "sentence_warnings"], 필수: ["name", "target"], 종류: AST파서종류.TransferOwnership)로 실행한다.
+    상수 값_name는 AST파서해석문자열(AST객체필드(필드들, "name"), 환경)이고, 문자열이다.
+    상수 값_target는 AST파서해석문자열(AST객체필드(필드들, "target"), 환경)이고, 문자열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.TransferOwnership(키순서: 필드들.객체키들, 값_name: 값_name, 값_target: 값_target, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료TryBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["body", "failure_body", "finally_body", "sentence_warnings"], 필수: ["body"], 종류: AST파서종류.TryBlock)로 실행한다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_failure_body는 AST파서해석선택배열문장줄(AST객체필드(필드들, "failure_body"), 환경)이고, AST파서문장줄의 배열?이다.
+    상수 값_finally_body는 AST파서해석선택배열문장줄(AST객체필드(필드들, "finally_body"), 환경)이고, AST파서문장줄의 배열?이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.TryBlock(키순서: 필드들.객체키들, 값_body: 값_body, 값_failure_body: 값_failure_body, 값_finally_body: 값_finally_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료TryExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["expr", "sentence_warnings"], 필수: ["expr"], 종류: AST파서종류.TryExpr)로 실행한다.
+    상수 값_expr는 AST파서해석노드환경(AST객체필드(필드들, "expr"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.TryExpr(키순서: 필드들.객체키들, 값_expr: 값_expr, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료UnaryExpr은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["op", "operand", "sentence_warnings", "source_expr_line", "source_expr_column", "source_expr_end_line", "source_expr_end_column", "source_expr_tokens"], 필수: ["op", "operand"], 종류: AST파서종류.UnaryExpr)로 실행한다.
+    상수 값_op는 AST파서해석문자열(AST객체필드(필드들, "op"), 환경)이고, 문자열이다.
+    상수 값_operand는 AST파서해석노드환경(AST객체필드(필드들, "operand"), 환경)이고, AST파서노드이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 값_표현식위치는 AST파서해석표현식위치(필드들, 환경)이고, AST파서표현식위치?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.UnaryExpr(키순서: 필드들.객체키들, 값_op: 값_op, 값_operand: 값_operand, 값_sentence_warnings: 값_sentence_warnings, 값_표현식위치: 값_표현식위치))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료UnsafeBlock은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["body", "sentence_warnings"], 필수: ["body"], 종류: AST파서종류.UnsafeBlock)로 실행한다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.UnsafeBlock(키순서: 필드들.객체키들, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료UnstructuredTaskStart은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["call", "compiler_generated", "sentence_warnings"], 필수: ["call", "compiler_generated"], 종류: AST파서종류.UnstructuredTaskStart)로 실행한다.
+    상수 값_call는 AST파서해석노드환경(AST객체필드(필드들, "call"), 환경)이고, AST파서노드이다.
+    상수 값_compiler_generated는 AST파서해석참거짓(AST객체필드(필드들, "compiler_generated"), 환경)이고, 참거짓이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.UnstructuredTaskStart(키순서: 필드들.객체키들, 값_call: 값_call, 값_compiler_generated: 값_compiler_generated, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석자료While은 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    AST파서필드검사를 (값: 필드들, 허용: ["condition", "body", "sentence_warnings"], 필수: ["condition", "body"], 종류: AST파서종류.While)로 실행한다.
+    상수 값_condition는 AST파서해석노드환경(AST객체필드(필드들, "condition"), 환경)이고, AST파서노드이다.
+    상수 값_body는 AST파서해석배열문장줄(AST객체필드(필드들, "body"), 환경)이고, AST파서문장줄의 배열이다.
+    상수 값_sentence_warnings는 AST파서해석선택배열문장경고(AST객체필드(필드들, "sentence_warnings"), 환경)이고, AST파서문장경고의 배열?이다.
+    상수 묶음은 AST파서묶음9(내용: AST파서묶음종류9.While(키순서: 필드들.객체키들, 값_condition: 값_condition, 값_body: 값_body, 값_sentence_warnings: 값_sentence_warnings))이고, AST파서묶음9이다.
+    AST파서노드(내용: AST파서내용.그룹9(값: 묶음))를 AST파서노드로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서노드을 반환하는 함수 AST파서해석노드환경은 (입력: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 AST파서정확객체(입력, ["kind", "fields"]) == 거짓이면
+        AST파서변환오류.모양(기대: "node")로 실패한다.
+    상수 종류값은 AST객체필드(입력, "kind")이고, JSON값이다.
+    만약 종류값.종류 != JSON종류_문자열이면
+        AST파서변환오류.모양(기대: "kind")로 실패한다.
+    상수 등록종류는 환경.종류들이고, 문자열로 AST파서종류항목을 찾는 사전이다.
+    상수 등록값은 사전에서찾기(등록종류, 종류값.문자열값, AST파서종류항목(값: AST파서종류.알수없음))이고, AST파서종류항목이다.
+    상수 종류는 등록값.값이고, AST파서종류이다.
+    상수 필드들은 AST객체필드(입력, "fields")이고, JSON값이다.
+    종류가 AddressOfExpr인 경우
+        AST파서해석자료AddressOfExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ArrayBufferViewExpr인 경우
+        AST파서해석자료ArrayBufferViewExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ArrayLiteral인 경우
+        AST파서해석자료ArrayLiteral(필드들, 환경)을 AST파서노드로 반환한다.
+    Assign인 경우
+        AST파서해석자료Assign(필드들, 환경)을 AST파서노드로 반환한다.
+    AsyncRootRun인 경우
+        AST파서해석자료AsyncRootRun(필드들, 환경)을 AST파서노드로 반환한다.
+    AwaitExpr인 경우
+        AST파서해석자료AwaitExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    BinaryExpr인 경우
+        AST파서해석자료BinaryExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    BlockInheritedDecl인 경우
+        AST파서해석자료BlockInheritedDecl(필드들, 환경)을 AST파서노드로 반환한다.
+    BlockModifierDef인 경우
+        AST파서해석자료BlockModifierDef(필드들, 환경)을 AST파서노드로 반환한다.
+    BlockModifierParam인 경우
+        AST파서해석자료BlockModifierParam(필드들, 환경)을 AST파서노드로 반환한다.
+    BoolExprCondition인 경우
+        AST파서해석자료BoolExprCondition(필드들, 환경)을 AST파서노드로 반환한다.
+    BoolLiteral인 경우
+        AST파서해석자료BoolLiteral(필드들, 환경)을 AST파서노드로 반환한다.
+    BorrowDefine인 경우
+        AST파서해석자료BorrowDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    Break인 경우
+        AST파서해석자료Break(필드들, 환경)을 AST파서노드로 반환한다.
+    CallExpr인 경우
+        AST파서해석자료CallExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    CastExpr인 경우
+        AST파서해석자료CastExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelAsyncReceiveExpr인 경우
+        AST파서해석자료ChannelAsyncReceiveExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelAsyncSendExpr인 경우
+        AST파서해석자료ChannelAsyncSendExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelClose인 경우
+        AST파서해석자료ChannelClose(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelCreate인 경우
+        AST파서해석자료ChannelCreate(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelReceiveExpr인 경우
+        AST파서해석자료ChannelReceiveExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelSend인 경우
+        AST파서해석자료ChannelSend(필드들, 환경)을 AST파서노드로 반환한다.
+    ChannelTrySendExpr인 경우
+        AST파서해석자료ChannelTrySendExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    ClassDef인 경우
+        AST파서해석자료ClassDef(필드들, 환경)을 AST파서노드로 반환한다.
+    ClassField인 경우
+        AST파서해석자료ClassField(필드들, 환경)을 AST파서노드로 반환한다.
+    CompareCondition인 경우
+        AST파서해석자료CompareCondition(필드들, 환경)을 AST파서노드로 반환한다.
+    ConcurrentBlock인 경우
+        AST파서해석자료ConcurrentBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    Continue인 경우
+        AST파서해석자료Continue(필드들, 환경)을 AST파서노드로 반환한다.
+    DeadlineBlock인 경우
+        AST파서해석자료DeadlineBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    DeferredDefaultExpr인 경우
+        AST파서해석자료DeferredDefaultExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    Define인 경우
+        AST파서해석자료Define(필드들, 환경)을 AST파서노드로 반환한다.
+    DynamicArrayAppend인 경우
+        AST파서해석자료DynamicArrayAppend(필드들, 환경)을 AST파서노드로 반환한다.
+    DynamicArrayClear인 경우
+        AST파서해석자료DynamicArrayClear(필드들, 환경)을 AST파서노드로 반환한다.
+    DynamicArrayInsert인 경우
+        AST파서해석자료DynamicArrayInsert(필드들, 환경)을 AST파서노드로 반환한다.
+    DynamicArrayPopExpr인 경우
+        AST파서해석자료DynamicArrayPopExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    DynamicArrayRemove인 경우
+        AST파서해석자료DynamicArrayRemove(필드들, 환경)을 AST파서노드로 반환한다.
+    DynamicArrayReserve인 경우
+        AST파서해석자료DynamicArrayReserve(필드들, 환경)을 AST파서노드로 반환한다.
+    EnumDef인 경우
+        AST파서해석자료EnumDef(필드들, 환경)을 AST파서노드로 반환한다.
+    Execute인 경우
+        AST파서해석자료Execute(필드들, 환경)을 AST파서노드로 반환한다.
+    ExprStmt인 경우
+        AST파서해석자료ExprStmt(필드들, 환경)을 AST파서노드로 반환한다.
+    ExtensionDef인 경우
+        AST파서해석자료ExtensionDef(필드들, 환경)을 AST파서노드로 반환한다.
+    ExternalGlobal인 경우
+        AST파서해석자료ExternalGlobal(필드들, 환경)을 AST파서노드로 반환한다.
+    FieldAccessExpr인 경우
+        AST파서해석자료FieldAccessExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    FieldTarget인 경우
+        AST파서해석자료FieldTarget(필드들, 환경)을 AST파서노드로 반환한다.
+    FileDataExpr인 경우
+        AST파서해석자료FileDataExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    FilterDefine인 경우
+        AST파서해석자료FilterDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    FixedArrayFillExpr인 경우
+        AST파서해석자료FixedArrayFillExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    FloatLiteral인 경우
+        AST파서해석자료FloatLiteral(필드들, 환경)을 AST파서노드로 반환한다.
+    ForEach인 경우
+        AST파서해석자료ForEach(필드들, 환경)을 AST파서노드로 반환한다.
+    Forget인 경우
+        AST파서해석자료Forget(필드들, 환경)을 AST파서노드로 반환한다.
+    FunctionAddressExpr인 경우
+        AST파서해석자료FunctionAddressExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    FunctionDef인 경우
+        AST파서해석자료FunctionDef(필드들, 환경)을 AST파서노드로 반환한다.
+    FunctionModifierDef인 경우
+        AST파서해석자료FunctionModifierDef(필드들, 환경)을 AST파서노드로 반환한다.
+    FunctionValueDefine인 경우
+        AST파서해석자료FunctionValueDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    GlobalDefine인 경우
+        AST파서해석자료GlobalDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    IdentityCompareExpr인 경우
+        AST파서해석자료IdentityCompareExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    If인 경우
+        AST파서해석자료If(필드들, 환경)을 AST파서노드로 반환한다.
+    Import인 경우
+        AST파서해석자료Import(필드들, 환경)을 AST파서노드로 반환한다.
+    IndexAccessExpr인 경우
+        AST파서해석자료IndexAccessExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    IndexTarget인 경우
+        AST파서해석자료IndexTarget(필드들, 환경)을 AST파서노드로 반환한다.
+    IntLiteral인 경우
+        AST파서해석자료IntLiteral(필드들, 환경)을 AST파서노드로 반환한다.
+    LogicalCondition인 경우
+        AST파서해석자료LogicalCondition(필드들, 환경)을 AST파서노드로 반환한다.
+    LoopModifierDef인 경우
+        AST파서해석자료LoopModifierDef(필드들, 환경)을 AST파서노드로 반환한다.
+    ManualRelease인 경우
+        AST파서해석자료ManualRelease(필드들, 환경)을 AST파서노드로 반환한다.
+    MapDefine인 경우
+        AST파서해석자료MapDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    MemoryReadExpr인 경우
+        AST파서해석자료MemoryReadExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    MemoryTarget인 경우
+        AST파서해석자료MemoryTarget(필드들, 환경)을 AST파서노드로 반환한다.
+    ModifierDef인 경우
+        AST파서해석자료ModifierDef(필드들, 환경)을 AST파서노드로 반환한다.
+    ModuleImport인 경우
+        AST파서해석자료ModuleImport(필드들, 환경)을 AST파서노드로 반환한다.
+    ModuleReexport인 경우
+        AST파서해석자료ModuleReexport(필드들, 환경)을 AST파서노드로 반환한다.
+    MoveDefine인 경우
+        AST파서해석자료MoveDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    NameExpr인 경우
+        AST파서해석자료NameExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    NameTarget인 경우
+        AST파서해석자료NameTarget(필드들, 환경)을 AST파서노드로 반환한다.
+    NotCondition인 경우
+        AST파서해석자료NotCondition(필드들, 환경)을 AST파서노드로 반환한다.
+    OffsetMemoryReadExpr인 경우
+        AST파서해석자료OffsetMemoryReadExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    OffsetMemoryTarget인 경우
+        AST파서해석자료OffsetMemoryTarget(필드들, 환경)을 AST파서노드로 반환한다.
+    OptionalBindCondition인 경우
+        AST파서해석자료OptionalBindCondition(필드들, 환경)을 AST파서노드로 반환한다.
+    OptionalHasValueCondition인 경우
+        AST파서해석자료OptionalHasValueCondition(필드들, 환경)을 AST파서노드로 반환한다.
+    OptionalNoneExpr인 경우
+        AST파서해석자료OptionalNoneExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    OptionalUnwrapExpr인 경우
+        AST파서해석자료OptionalUnwrapExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    OverlayBindExpr인 경우
+        AST파서해석자료OverlayBindExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    Parameter인 경우
+        AST파서해석자료Parameter(필드들, 환경)을 AST파서노드로 반환한다.
+    PinAddress인 경우
+        AST파서해석자료PinAddress(필드들, 환경)을 AST파서노드로 반환한다.
+    PreemptDisableBlock인 경우
+        AST파서해석자료PreemptDisableBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    ReferenceDefine인 경우
+        AST파서해석자료ReferenceDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    Return인 경우
+        AST파서해석자료Return(필드들, 환경)을 AST파서노드로 반환한다.
+    SortDefine인 경우
+        AST파서해석자료SortDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    SourceLine인 경우
+        AST파서해석자료SourceLine(필드들, 환경)을 AST파서노드로 반환한다.
+    StorageModifierDef인 경우
+        AST파서해석자료StorageModifierDef(필드들, 환경)을 AST파서노드로 반환한다.
+    StoredBody인 경우
+        AST파서해석자료StoredBody(필드들, 환경)을 AST파서노드로 반환한다.
+    StoredField인 경우
+        AST파서해석자료StoredField(필드들, 환경)을 AST파서노드로 반환한다.
+    StringLiteral인 경우
+        AST파서해석자료StringLiteral(필드들, 환경)을 AST파서노드로 반환한다.
+    StructDef인 경우
+        AST파서해석자료StructDef(필드들, 환경)을 AST파서노드로 반환한다.
+    StructFieldMetadata인 경우
+        AST파서해석자료StructFieldMetadata(필드들, 환경)을 AST파서노드로 반환한다.
+    StructInitExpr인 경우
+        AST파서해석자료StructInitExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    StructInitializerAssignment인 경우
+        AST파서해석자료StructInitializerAssignment(필드들, 환경)을 AST파서노드로 반환한다.
+    StructInitializerDef인 경우
+        AST파서해석자료StructInitializerDef(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceDatabaseBlock인 경우
+        AST파서해석자료SurfaceDatabaseBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceDatabaseStatement인 경우
+        AST파서해석자료SurfaceDatabaseStatement(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceDisplayFunctionDef인 경우
+        AST파서해석자료SurfaceDisplayFunctionDef(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceInheritDef인 경우
+        AST파서해석자료SurfaceInheritDef(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfacePreviewDef인 경우
+        AST파서해석자료SurfacePreviewDef(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceRouteBlock인 경우
+        AST파서해석자료SurfaceRouteBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceRouteMount인 경우
+        AST파서해석자료SurfaceRouteMount(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceScreenDef인 경우
+        AST파서해석자료SurfaceScreenDef(필드들, 환경)을 AST파서노드로 반환한다.
+    SurfaceWindowFunctionDef인 경우
+        AST파서해석자료SurfaceWindowFunctionDef(필드들, 환경)을 AST파서노드로 반환한다.
+    Switch인 경우
+        AST파서해석자료Switch(필드들, 환경)을 AST파서노드로 반환한다.
+    TakeDefine인 경우
+        AST파서해석자료TakeDefine(필드들, 환경)을 AST파서노드로 반환한다.
+    Throw인 경우
+        AST파서해석자료Throw(필드들, 환경)을 AST파서노드로 반환한다.
+    TraitDef인 경우
+        AST파서해석자료TraitDef(필드들, 환경)을 AST파서노드로 반환한다.
+    TraitRequirement인 경우
+        AST파서해석자료TraitRequirement(필드들, 환경)을 AST파서노드로 반환한다.
+    TransferOwnership인 경우
+        AST파서해석자료TransferOwnership(필드들, 환경)을 AST파서노드로 반환한다.
+    TryBlock인 경우
+        AST파서해석자료TryBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    TryExpr인 경우
+        AST파서해석자료TryExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    UnaryExpr인 경우
+        AST파서해석자료UnaryExpr(필드들, 환경)을 AST파서노드로 반환한다.
+    UnsafeBlock인 경우
+        AST파서해석자료UnsafeBlock(필드들, 환경)을 AST파서노드로 반환한다.
+    UnstructuredTaskStart인 경우
+        AST파서해석자료UnstructuredTaskStart(필드들, 환경)을 AST파서노드로 반환한다.
+    While인 경우
+        AST파서해석자료While(필드들, 환경)을 AST파서노드로 반환한다.
+    알수없음인 경우
+        AST파서변환오류.모르는종류(이름: 종류값.문자열값)로 실패한다.
+    AST파서변환오류.모양(기대: "kind")로 실패한다.
+
+함수 AST파서종류사전은
+    변수 종류들은 문자열로 AST파서종류항목을 찾는 사전이다.
+    종류들에서 "AddressOfExpr"의 값은 AST파서종류항목(값: AST파서종류.AddressOfExpr)이다.
+    종류들에서 "ArrayBufferViewExpr"의 값은 AST파서종류항목(값: AST파서종류.ArrayBufferViewExpr)이다.
+    종류들에서 "ArrayLiteral"의 값은 AST파서종류항목(값: AST파서종류.ArrayLiteral)이다.
+    종류들에서 "Assign"의 값은 AST파서종류항목(값: AST파서종류.Assign)이다.
+    종류들에서 "AsyncRootRun"의 값은 AST파서종류항목(값: AST파서종류.AsyncRootRun)이다.
+    종류들에서 "AwaitExpr"의 값은 AST파서종류항목(값: AST파서종류.AwaitExpr)이다.
+    종류들에서 "BinaryExpr"의 값은 AST파서종류항목(값: AST파서종류.BinaryExpr)이다.
+    종류들에서 "BlockInheritedDecl"의 값은 AST파서종류항목(값: AST파서종류.BlockInheritedDecl)이다.
+    종류들에서 "BlockModifierDef"의 값은 AST파서종류항목(값: AST파서종류.BlockModifierDef)이다.
+    종류들에서 "BlockModifierParam"의 값은 AST파서종류항목(값: AST파서종류.BlockModifierParam)이다.
+    종류들에서 "BoolExprCondition"의 값은 AST파서종류항목(값: AST파서종류.BoolExprCondition)이다.
+    종류들에서 "BoolLiteral"의 값은 AST파서종류항목(값: AST파서종류.BoolLiteral)이다.
+    종류들에서 "BorrowDefine"의 값은 AST파서종류항목(값: AST파서종류.BorrowDefine)이다.
+    종류들에서 "Break"의 값은 AST파서종류항목(값: AST파서종류.Break)이다.
+    종류들에서 "CallExpr"의 값은 AST파서종류항목(값: AST파서종류.CallExpr)이다.
+    종류들에서 "CastExpr"의 값은 AST파서종류항목(값: AST파서종류.CastExpr)이다.
+    종류들에서 "ChannelAsyncReceiveExpr"의 값은 AST파서종류항목(값: AST파서종류.ChannelAsyncReceiveExpr)이다.
+    종류들에서 "ChannelAsyncSendExpr"의 값은 AST파서종류항목(값: AST파서종류.ChannelAsyncSendExpr)이다.
+    종류들에서 "ChannelClose"의 값은 AST파서종류항목(값: AST파서종류.ChannelClose)이다.
+    종류들에서 "ChannelCreate"의 값은 AST파서종류항목(값: AST파서종류.ChannelCreate)이다.
+    종류들에서 "ChannelReceiveExpr"의 값은 AST파서종류항목(값: AST파서종류.ChannelReceiveExpr)이다.
+    종류들에서 "ChannelSend"의 값은 AST파서종류항목(값: AST파서종류.ChannelSend)이다.
+    종류들에서 "ChannelTrySendExpr"의 값은 AST파서종류항목(값: AST파서종류.ChannelTrySendExpr)이다.
+    종류들에서 "ClassDef"의 값은 AST파서종류항목(값: AST파서종류.ClassDef)이다.
+    종류들에서 "ClassField"의 값은 AST파서종류항목(값: AST파서종류.ClassField)이다.
+    종류들에서 "CompareCondition"의 값은 AST파서종류항목(값: AST파서종류.CompareCondition)이다.
+    종류들에서 "ConcurrentBlock"의 값은 AST파서종류항목(값: AST파서종류.ConcurrentBlock)이다.
+    종류들에서 "Continue"의 값은 AST파서종류항목(값: AST파서종류.Continue)이다.
+    종류들에서 "DeadlineBlock"의 값은 AST파서종류항목(값: AST파서종류.DeadlineBlock)이다.
+    종류들에서 "DeferredDefaultExpr"의 값은 AST파서종류항목(값: AST파서종류.DeferredDefaultExpr)이다.
+    종류들에서 "Define"의 값은 AST파서종류항목(값: AST파서종류.Define)이다.
+    종류들에서 "DynamicArrayAppend"의 값은 AST파서종류항목(값: AST파서종류.DynamicArrayAppend)이다.
+    종류들에서 "DynamicArrayClear"의 값은 AST파서종류항목(값: AST파서종류.DynamicArrayClear)이다.
+    종류들에서 "DynamicArrayInsert"의 값은 AST파서종류항목(값: AST파서종류.DynamicArrayInsert)이다.
+    종류들에서 "DynamicArrayPopExpr"의 값은 AST파서종류항목(값: AST파서종류.DynamicArrayPopExpr)이다.
+    종류들에서 "DynamicArrayRemove"의 값은 AST파서종류항목(값: AST파서종류.DynamicArrayRemove)이다.
+    종류들에서 "DynamicArrayReserve"의 값은 AST파서종류항목(값: AST파서종류.DynamicArrayReserve)이다.
+    종류들에서 "EnumDef"의 값은 AST파서종류항목(값: AST파서종류.EnumDef)이다.
+    종류들에서 "Execute"의 값은 AST파서종류항목(값: AST파서종류.Execute)이다.
+    종류들에서 "ExprStmt"의 값은 AST파서종류항목(값: AST파서종류.ExprStmt)이다.
+    종류들에서 "ExtensionDef"의 값은 AST파서종류항목(값: AST파서종류.ExtensionDef)이다.
+    종류들에서 "ExternalGlobal"의 값은 AST파서종류항목(값: AST파서종류.ExternalGlobal)이다.
+    종류들에서 "FieldAccessExpr"의 값은 AST파서종류항목(값: AST파서종류.FieldAccessExpr)이다.
+    종류들에서 "FieldTarget"의 값은 AST파서종류항목(값: AST파서종류.FieldTarget)이다.
+    종류들에서 "FileDataExpr"의 값은 AST파서종류항목(값: AST파서종류.FileDataExpr)이다.
+    종류들에서 "FilterDefine"의 값은 AST파서종류항목(값: AST파서종류.FilterDefine)이다.
+    종류들에서 "FixedArrayFillExpr"의 값은 AST파서종류항목(값: AST파서종류.FixedArrayFillExpr)이다.
+    종류들에서 "FloatLiteral"의 값은 AST파서종류항목(값: AST파서종류.FloatLiteral)이다.
+    종류들에서 "ForEach"의 값은 AST파서종류항목(값: AST파서종류.ForEach)이다.
+    종류들에서 "Forget"의 값은 AST파서종류항목(값: AST파서종류.Forget)이다.
+    종류들에서 "FunctionAddressExpr"의 값은 AST파서종류항목(값: AST파서종류.FunctionAddressExpr)이다.
+    종류들에서 "FunctionDef"의 값은 AST파서종류항목(값: AST파서종류.FunctionDef)이다.
+    종류들에서 "FunctionModifierDef"의 값은 AST파서종류항목(값: AST파서종류.FunctionModifierDef)이다.
+    종류들에서 "FunctionValueDefine"의 값은 AST파서종류항목(값: AST파서종류.FunctionValueDefine)이다.
+    종류들에서 "GlobalDefine"의 값은 AST파서종류항목(값: AST파서종류.GlobalDefine)이다.
+    종류들에서 "IdentityCompareExpr"의 값은 AST파서종류항목(값: AST파서종류.IdentityCompareExpr)이다.
+    종류들에서 "If"의 값은 AST파서종류항목(값: AST파서종류.If)이다.
+    종류들에서 "Import"의 값은 AST파서종류항목(값: AST파서종류.Import)이다.
+    종류들에서 "IndexAccessExpr"의 값은 AST파서종류항목(값: AST파서종류.IndexAccessExpr)이다.
+    종류들에서 "IndexTarget"의 값은 AST파서종류항목(값: AST파서종류.IndexTarget)이다.
+    종류들에서 "IntLiteral"의 값은 AST파서종류항목(값: AST파서종류.IntLiteral)이다.
+    종류들에서 "LogicalCondition"의 값은 AST파서종류항목(값: AST파서종류.LogicalCondition)이다.
+    종류들에서 "LoopModifierDef"의 값은 AST파서종류항목(값: AST파서종류.LoopModifierDef)이다.
+    종류들에서 "ManualRelease"의 값은 AST파서종류항목(값: AST파서종류.ManualRelease)이다.
+    종류들에서 "MapDefine"의 값은 AST파서종류항목(값: AST파서종류.MapDefine)이다.
+    종류들에서 "MemoryReadExpr"의 값은 AST파서종류항목(값: AST파서종류.MemoryReadExpr)이다.
+    종류들에서 "MemoryTarget"의 값은 AST파서종류항목(값: AST파서종류.MemoryTarget)이다.
+    종류들에서 "ModifierDef"의 값은 AST파서종류항목(값: AST파서종류.ModifierDef)이다.
+    종류들에서 "ModuleImport"의 값은 AST파서종류항목(값: AST파서종류.ModuleImport)이다.
+    종류들에서 "ModuleReexport"의 값은 AST파서종류항목(값: AST파서종류.ModuleReexport)이다.
+    종류들에서 "MoveDefine"의 값은 AST파서종류항목(값: AST파서종류.MoveDefine)이다.
+    종류들에서 "NameExpr"의 값은 AST파서종류항목(값: AST파서종류.NameExpr)이다.
+    종류들에서 "NameTarget"의 값은 AST파서종류항목(값: AST파서종류.NameTarget)이다.
+    종류들에서 "NotCondition"의 값은 AST파서종류항목(값: AST파서종류.NotCondition)이다.
+    종류들에서 "OffsetMemoryReadExpr"의 값은 AST파서종류항목(값: AST파서종류.OffsetMemoryReadExpr)이다.
+    종류들에서 "OffsetMemoryTarget"의 값은 AST파서종류항목(값: AST파서종류.OffsetMemoryTarget)이다.
+    종류들에서 "OptionalBindCondition"의 값은 AST파서종류항목(값: AST파서종류.OptionalBindCondition)이다.
+    종류들에서 "OptionalHasValueCondition"의 값은 AST파서종류항목(값: AST파서종류.OptionalHasValueCondition)이다.
+    종류들에서 "OptionalNoneExpr"의 값은 AST파서종류항목(값: AST파서종류.OptionalNoneExpr)이다.
+    종류들에서 "OptionalUnwrapExpr"의 값은 AST파서종류항목(값: AST파서종류.OptionalUnwrapExpr)이다.
+    종류들에서 "OverlayBindExpr"의 값은 AST파서종류항목(값: AST파서종류.OverlayBindExpr)이다.
+    종류들에서 "Parameter"의 값은 AST파서종류항목(값: AST파서종류.Parameter)이다.
+    종류들에서 "PinAddress"의 값은 AST파서종류항목(값: AST파서종류.PinAddress)이다.
+    종류들에서 "PreemptDisableBlock"의 값은 AST파서종류항목(값: AST파서종류.PreemptDisableBlock)이다.
+    종류들에서 "ReferenceDefine"의 값은 AST파서종류항목(값: AST파서종류.ReferenceDefine)이다.
+    종류들에서 "Return"의 값은 AST파서종류항목(값: AST파서종류.Return)이다.
+    종류들에서 "SortDefine"의 값은 AST파서종류항목(값: AST파서종류.SortDefine)이다.
+    종류들에서 "SourceLine"의 값은 AST파서종류항목(값: AST파서종류.SourceLine)이다.
+    종류들에서 "StorageModifierDef"의 값은 AST파서종류항목(값: AST파서종류.StorageModifierDef)이다.
+    종류들에서 "StoredBody"의 값은 AST파서종류항목(값: AST파서종류.StoredBody)이다.
+    종류들에서 "StoredField"의 값은 AST파서종류항목(값: AST파서종류.StoredField)이다.
+    종류들에서 "StringLiteral"의 값은 AST파서종류항목(값: AST파서종류.StringLiteral)이다.
+    종류들에서 "StructDef"의 값은 AST파서종류항목(값: AST파서종류.StructDef)이다.
+    종류들에서 "StructFieldMetadata"의 값은 AST파서종류항목(값: AST파서종류.StructFieldMetadata)이다.
+    종류들에서 "StructInitExpr"의 값은 AST파서종류항목(값: AST파서종류.StructInitExpr)이다.
+    종류들에서 "StructInitializerAssignment"의 값은 AST파서종류항목(값: AST파서종류.StructInitializerAssignment)이다.
+    종류들에서 "StructInitializerDef"의 값은 AST파서종류항목(값: AST파서종류.StructInitializerDef)이다.
+    종류들에서 "SurfaceDatabaseBlock"의 값은 AST파서종류항목(값: AST파서종류.SurfaceDatabaseBlock)이다.
+    종류들에서 "SurfaceDatabaseStatement"의 값은 AST파서종류항목(값: AST파서종류.SurfaceDatabaseStatement)이다.
+    종류들에서 "SurfaceDisplayFunctionDef"의 값은 AST파서종류항목(값: AST파서종류.SurfaceDisplayFunctionDef)이다.
+    종류들에서 "SurfaceInheritDef"의 값은 AST파서종류항목(값: AST파서종류.SurfaceInheritDef)이다.
+    종류들에서 "SurfacePreviewDef"의 값은 AST파서종류항목(값: AST파서종류.SurfacePreviewDef)이다.
+    종류들에서 "SurfaceRouteBlock"의 값은 AST파서종류항목(값: AST파서종류.SurfaceRouteBlock)이다.
+    종류들에서 "SurfaceRouteMount"의 값은 AST파서종류항목(값: AST파서종류.SurfaceRouteMount)이다.
+    종류들에서 "SurfaceScreenDef"의 값은 AST파서종류항목(값: AST파서종류.SurfaceScreenDef)이다.
+    종류들에서 "SurfaceWindowFunctionDef"의 값은 AST파서종류항목(값: AST파서종류.SurfaceWindowFunctionDef)이다.
+    종류들에서 "Switch"의 값은 AST파서종류항목(값: AST파서종류.Switch)이다.
+    종류들에서 "TakeDefine"의 값은 AST파서종류항목(값: AST파서종류.TakeDefine)이다.
+    종류들에서 "Throw"의 값은 AST파서종류항목(값: AST파서종류.Throw)이다.
+    종류들에서 "TraitDef"의 값은 AST파서종류항목(값: AST파서종류.TraitDef)이다.
+    종류들에서 "TraitRequirement"의 값은 AST파서종류항목(값: AST파서종류.TraitRequirement)이다.
+    종류들에서 "TransferOwnership"의 값은 AST파서종류항목(값: AST파서종류.TransferOwnership)이다.
+    종류들에서 "TryBlock"의 값은 AST파서종류항목(값: AST파서종류.TryBlock)이다.
+    종류들에서 "TryExpr"의 값은 AST파서종류항목(값: AST파서종류.TryExpr)이다.
+    종류들에서 "UnaryExpr"의 값은 AST파서종류항목(값: AST파서종류.UnaryExpr)이다.
+    종류들에서 "UnsafeBlock"의 값은 AST파서종류항목(값: AST파서종류.UnsafeBlock)이다.
+    종류들에서 "UnstructuredTaskStart"의 값은 AST파서종류항목(값: AST파서종류.UnstructuredTaskStart)이다.
+    종류들에서 "While"의 값은 AST파서종류항목(값: AST파서종류.While)이다.
+    종류들을 문자열로 AST파서종류항목을 찾는 사전으로 반환한다.
+
+프로젝트 내부 함수 AST파서읽기노드는 (입력: JSON값)를 받아
+    상수 환경은 AST파서읽기환경(종류들: AST파서종류사전())이고, AST파서읽기환경이다.
+    시도할 작업은
+        상수 값은 AST파서해석노드환경(입력, 환경)이고, AST파서노드이다.
+        AST파서결과노드.읽음(값: 값)을 AST파서결과노드로 반환한다.
+    실패하면
+        AST파서결과노드.오류(이유: 실패값)를 AST파서결과노드로 반환한다.
+    AST파서결과노드.오류(이유: AST파서변환오류.모양(기대: "boundary"))를 AST파서결과노드로 반환한다.
+
+프로젝트 내부 함수 AST파서읽기문장들는 (입력: JSON값의 배열)를 받아
+    상수 환경은 AST파서읽기환경(종류들: AST파서종류사전())이고, AST파서읽기환경이다.
+    시도할 작업은
+        상수 값은 AST파서해석배열문장줄(JSON배열값(입력), 환경)이고, AST파서문장줄의 배열이다.
+        AST파서결과배열문장줄.읽음(값: 값)을 AST파서결과배열문장줄로 반환한다.
+    실패하면
+        AST파서결과배열문장줄.오류(이유: 실패값)를 AST파서결과배열문장줄로 반환한다.
+    AST파서결과배열문장줄.오류(이유: AST파서변환오류.모양(기대: "boundary"))를 AST파서결과배열문장줄로 반환한다.
+
+AST파서변환오류로 실패할 수 있고 AST파서표현식위치?을 반환하는 함수 AST파서해석표현식위치는 (필드들: JSON값, 환경: AST파서읽기환경)를 받아
+    만약 JSON값객체키있는가(필드들, "source_expr_line") == 거짓 그리고 JSON값객체키있는가(필드들, "source_expr_column") == 거짓 그리고 JSON값객체키있는가(필드들, "source_expr_end_line") == 거짓 그리고 JSON값객체키있는가(필드들, "source_expr_end_column") == 거짓 그리고 JSON값객체키있는가(필드들, "source_expr_tokens") == 거짓이면
+        상수 없음값은 없음이고, AST파서표현식위치?이다.
+        없음값을 AST파서표현식위치?로 반환한다.
+    상수 값_source_expr_line는 AST파서해석선택문자열(AST객체필드(필드들, "source_expr_line"), 환경)이고, 문자열?이다.
+    상수 값_source_expr_column는 AST파서해석선택문자열(AST객체필드(필드들, "source_expr_column"), 환경)이고, 문자열?이다.
+    상수 값_source_expr_end_line는 AST파서해석선택문자열(AST객체필드(필드들, "source_expr_end_line"), 환경)이고, 문자열?이다.
+    상수 값_source_expr_end_column는 AST파서해석선택문자열(AST객체필드(필드들, "source_expr_end_column"), 환경)이고, 문자열?이다.
+    상수 값_source_expr_tokens는 AST파서해석선택문자열(AST객체필드(필드들, "source_expr_tokens"), 환경)이고, 문자열?이다.
+    상수 위치는 AST파서표현식위치(값_source_expr_line: 값_source_expr_line, 값_source_expr_column: 값_source_expr_column, 값_source_expr_end_line: 값_source_expr_end_line, 값_source_expr_end_column: 값_source_expr_end_column, 값_source_expr_tokens: 값_source_expr_tokens)이고, AST파서표현식위치이다.
+    위치를 AST파서표현식위치?로 반환한다.

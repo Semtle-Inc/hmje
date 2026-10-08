@@ -1,0 +1,241 @@
+# 생성 파일. 재생성: python3 tools/gen_semtleos_text.py
+
+
+
+# aarch64_app_entry_llvm
+함수 aarch64텍스트앱진입은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.start,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global _start\""를 추가한다.
+    줄들에 "module asm \"_start:\""를 추가한다.
+    줄들에 "module asm \"\\09bl main\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #93\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"1:\""를 추가한다.
+    줄들에 "module asm \"\\09b 1b\""를 추가한다.
+    줄들에 "module asm \".global hmje_app_write\""를 추가한다.
+    줄들에 "module asm \"hmje_app_write:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #64\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_app_exit\""를 추가한다.
+    줄들에 "module asm \"hmje_app_exit:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #93\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_stdapp_footer_llvm
+함수 aarch64텍스트표준앱꼬리은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.start,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global _start\""를 추가한다.
+    줄들에 "module asm \"_start:\""를 추가한다.
+    줄들에 "module asm \"\\09bl main\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"1:\""를 추가한다.
+    줄들에 "module asm \"\\09b 1b\""를 추가한다.
+    줄들에 "module asm \".global hmje_arch_syscall0\""를 추가한다.
+    줄들에 "module asm \"hmje_arch_syscall0:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x5, #0\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_arch_syscall1\""를 추가한다.
+    줄들에 "module asm \"hmje_arch_syscall1:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x5, #0\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_arch_syscall3\""를 추가한다.
+    줄들에 "module asm \"hmje_arch_syscall3:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, x3\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x5, #0\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_arch_syscall6\""를 추가한다.
+    줄들에 "module asm \"hmje_arch_syscall6:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, x3\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, x4\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, x5\""를 추가한다.
+    줄들에 "module asm \"\\09mov x5, x6\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_platform_performance_cpu_count\""를 추가한다.
+    줄들에 "module asm \"hmje_platform_performance_cpu_count:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #82\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x0, #1\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge .Lhmje_cpu_count_done\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #1\""를 추가한다.
+    줄들에 "module asm \".Lhmje_cpu_count_done:\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global pthread_create\""를 추가한다.
+    줄들에 "module asm \"pthread_create:\""를 추가한다.
+    줄들에 "module asm \"\\09stp x29, x30, [sp, #-64]!\""를 추가한다.
+    줄들에 "module asm \"\\09stp x19, x20, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x21, x22, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09str x23, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x19, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x20, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x23, x3\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #16, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #4\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09b.le .Lhmje_pthread_create_fail\""를 추가한다.
+    줄들에 "module asm \"\\09mov x21, x0\""를 추가한다.
+    줄들에 "module asm \"\\09movz x9, #16, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09add x22, x21, x9\""를 추가한다.
+    줄들에 "module asm \"\\09sub x22, x22, #32\""를 추가한다.
+    줄들에 "module asm \"\\09str x20, [x22, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09str x23, [x22, #8]\""를 추가한다.
+    줄들에 "module asm \"\\09str x21, [x22, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09adr x0, .Lhmje_thread_start\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, x22\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, x22\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #77\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09b.le .Lhmje_pthread_create_fail_free\""를 추가한다.
+    줄들에 "module asm \"\\09str x0, [x19]\""를 추가한다.
+    줄들에 "module asm \"\\09mov w0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09b .Lhmje_pthread_create_done\""를 추가한다.
+    줄들에 "module asm \".Lhmje_pthread_create_fail_free:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x21\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #6\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \".Lhmje_pthread_create_fail:\""를 추가한다.
+    줄들에 "module asm \"\\09mov w0, #1\""를 추가한다.
+    줄들에 "module asm \".Lhmje_pthread_create_done:\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x23, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x21, x22, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x19, x20, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x29, x30, [sp], #64\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global pthread_join\""를 추가한다.
+    줄들에 "module asm \"pthread_join:\""를 추가한다.
+    줄들에 "module asm \"\\09stp x19, x30, [sp, #-16]!\""를 추가한다.
+    줄들에 "module asm \"\\09mov x19, x1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #79\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x19, .Lhmje_pthread_join_done\""를 추가한다.
+    줄들에 "module asm \"\\09str x0, [x19]\""를 추가한다.
+    줄들에 "module asm \".Lhmje_pthread_join_done:\""를 추가한다.
+    줄들에 "module asm \"\\09mov w0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x19, x30, [sp], #16\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global pthread_detach\""를 추가한다.
+    줄들에 "module asm \"pthread_detach:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #80\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09mov w0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".Lhmje_thread_start:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #81\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09b.le .Lhmje_thread_exit\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x0, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x0, [x0, #8]\""를 추가한다.
+    줄들에 "module asm \"\\09blr x9\""를 추가한다.
+    줄들에 "module asm \".Lhmje_thread_exit:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #78\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \".Lhmje_thread_halt:\""를 추가한다.
+    줄들에 "module asm \"\\09wfe\""를 추가한다.
+    줄들에 "module asm \"\\09b .Lhmje_thread_halt\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_freestanding_memlib_llvm
+함수 aarch64텍스트메모리라이브러리은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define ptr @memset(ptr %dest, i32 %val, i64 %len) noinline optnone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %v8 = trunc i32 %val to i8"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "cond:"를 추가한다.
+    줄들에 "  %i = phi i64 [ 0, %entry ], [ %inext, %body ]"를 추가한다.
+    줄들에 "  %c = icmp ult i64 %i, %len"를 추가한다.
+    줄들에 "  br i1 %c, label %body, label %done"를 추가한다.
+    줄들에 "body:"를 추가한다.
+    줄들에 "  %p = getelementptr i8, ptr %dest, i64 %i"를 추가한다.
+    줄들에 "  store i8 %v8, ptr %p"를 추가한다.
+    줄들에 "  %inext = add i64 %i, 1"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret ptr %dest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define ptr @memcpy(ptr %dest, ptr %src, i64 %len) noinline optnone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "cond:"를 추가한다.
+    줄들에 "  %i = phi i64 [ 0, %entry ], [ %inext, %body ]"를 추가한다.
+    줄들에 "  %c = icmp ult i64 %i, %len"를 추가한다.
+    줄들에 "  br i1 %c, label %body, label %done"를 추가한다.
+    줄들에 "body:"를 추가한다.
+    줄들에 "  %sp = getelementptr i8, ptr %src, i64 %i"를 추가한다.
+    줄들에 "  %b = load i8, ptr %sp"를 추가한다.
+    줄들에 "  %dp = getelementptr i8, ptr %dest, i64 %i"를 추가한다.
+    줄들에 "  store i8 %b, ptr %dp"를 추가한다.
+    줄들에 "  %inext = add i64 %i, 1"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret ptr %dest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define ptr @memmove(ptr %dest, ptr %src, i64 %len) noinline optnone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %d = ptrtoint ptr %dest to i64"를 추가한다.
+    줄들에 "  %s = ptrtoint ptr %src to i64"를 추가한다.
+    줄들에 "  %fwd = icmp ule i64 %d, %s"를 추가한다.
+    줄들에 "  br i1 %fwd, label %fcond, label %bentry"를 추가한다.
+    줄들에 "fcond:"를 추가한다.
+    줄들에 "  %fi = phi i64 [ 0, %entry ], [ %finext, %fbody ]"를 추가한다.
+    줄들에 "  %fc = icmp ult i64 %fi, %len"를 추가한다.
+    줄들에 "  br i1 %fc, label %fbody, label %done"를 추가한다.
+    줄들에 "fbody:"를 추가한다.
+    줄들에 "  %fsp = getelementptr i8, ptr %src, i64 %fi"를 추가한다.
+    줄들에 "  %fb = load i8, ptr %fsp"를 추가한다.
+    줄들에 "  %fdp = getelementptr i8, ptr %dest, i64 %fi"를 추가한다.
+    줄들에 "  store i8 %fb, ptr %fdp"를 추가한다.
+    줄들에 "  %finext = add i64 %fi, 1"를 추가한다.
+    줄들에 "  br label %fcond"를 추가한다.
+    줄들에 "bentry:"를 추가한다.
+    줄들에 "  br label %bcond"를 추가한다.
+    줄들에 "bcond:"를 추가한다.
+    줄들에 "  %bi = phi i64 [ %len, %bentry ], [ %binext, %bbody ]"를 추가한다.
+    줄들에 "  %bc = icmp ugt i64 %bi, 0"를 추가한다.
+    줄들에 "  br i1 %bc, label %bbody, label %done"를 추가한다.
+    줄들에 "bbody:"를 추가한다.
+    줄들에 "  %binext = sub i64 %bi, 1"를 추가한다.
+    줄들에 "  %bsp = getelementptr i8, ptr %src, i64 %binext"를 추가한다.
+    줄들에 "  %bb = load i8, ptr %bsp"를 추가한다.
+    줄들에 "  %bdp = getelementptr i8, ptr %dest, i64 %binext"를 추가한다.
+    줄들에 "  store i8 %bb, ptr %bdp"를 추가한다.
+    줄들에 "  br label %bcond"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret ptr %dest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.

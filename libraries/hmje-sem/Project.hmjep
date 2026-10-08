@@ -1,0 +1,75 @@
+프로젝트 hmje-sem의
+    버전은 "0.1.0"이다.
+
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+
+모듈 HmjeSem의
+    원본 경로는 "Sources/HmjeSem"이고,
+    의존 라이브러리는 기반이고,
+    외부 구현은 HmjeSemMetal이다.
+
+모듈 HmjeSemMetalTest의
+    원본 경로는 "Sources/HmjeSemMetalTest"이고,
+    의존 모듈은 HmjeSem이다.
+
+# Metal 어댑터와 MSL 커널. 모듈에 붙였으므로 HmjeSem을 쓰는 최종 산출물까지
+# 전이된다. Apple 플랫폼에서만 선택된다.
+외부 구현 HmjeSemMetal의
+    원본 경로는 "Native/Metal"이다.
+
+    macOS 설정의
+        원본 파일은
+            "sem_metal.mm"과,
+            "sem_kernels.metal"이고,
+        시스템 프레임워크는
+            Metal과,
+            Foundation이다.
+
+    iOS 설정의
+        원본 파일은
+            "sem_metal.mm"과,
+            "sem_kernels.metal"이고,
+        시스템 프레임워크는
+            Metal과,
+            Foundation이다.
+
+라이브러리 HmjeSem의
+    내보내는 모듈은 HmjeSem이다.
+
+모듈 HmjeSemMetalBench의
+    원본 경로는 "Sources/HmjeSemMetalBench"이고,
+    의존 모듈은 HmjeSem이다.
+
+모듈 HmjeSemTapeTest의
+    원본 경로는 "Sources/HmjeSemTapeTest"이고,
+    의존 모듈은 HmjeSem이다.
+
+실행 파일 SemTapeTest의
+    시작 모듈은 HmjeSemTapeTest이다.
+
+실행 파일 SemMetalTest의
+    시작 모듈은 HmjeSemMetalTest이다.
+
+실행 파일 SemMetalBench의
+    시작 모듈은 HmjeSemMetalBench이다.
+
+모듈 HmjeSemDecodeBench의
+    원본 경로는 "Sources/HmjeSemDecodeBench"이고,
+    의존 모듈은 HmjeSem이다.
+
+실행 파일 SemDecodeBench의
+    시작 모듈은 HmjeSemDecodeBench이다.
+
+모듈 SemPlanNumericTest의
+    원본 경로는 "Sources/SemPlanNumericTest"이고,
+    의존 모듈은 HmjeSem이다.
+
+실행 파일 SemPlanNumericTest의
+    시작 모듈은 SemPlanNumericTest이다.
+모듈 SemQ4NumericTest의
+    원본 경로는 "Sources/SemQ4NumericTest"이고,
+    의존 모듈은 HmjeSem이다.
+
+실행 파일 SemQ4NumericTest의
+    시작 모듈은 SemQ4NumericTest이다.

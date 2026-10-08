@@ -1,0 +1,2147 @@
+기반을 가져온다.
+컴파일러AST를 가져온다.
+컴파일러파서모형을 가져온다.
+컴파일러문법을 가져온다.
+
+# typed 값을 새 JSON으로 바꾸는 후속 단계의 명시적 경계.
+
+함수 AST파서쓰기문자열은 (값: 문자열)를 받아
+    JSON문자열값(값)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택참거짓은 (값: 참거짓?)를 받아
+    만약 값이 있으면
+        AST파서쓰기참거짓(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기참거짓은 (값: 참거짓)를 받아
+    JSON참거짓값(값)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택배열문장경고은 (값: AST파서문장경고의 배열?)를 받아
+    만약 값이 있으면
+        AST파서쓰기배열문장경고(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열문장경고은 (값: AST파서문장경고의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기문장경고(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기문장경고은 (값: AST파서문장경고)를 받아
+    JSON배열값([AST파서쓰기정수원문(값.값_line), AST파서쓰기문자열(값.값_message)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기정수원문은 (값: AST파서정수원문)를 받아
+    JSON객체값(["integer"], [AST파서쓰기문자열(값.값_raw)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택문자열은 (값: 문자열?)를 받아
+    만약 값이 있으면
+        AST파서쓰기문자열(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택정수원문은 (값: AST파서정수원문?)를 받아
+    만약 값이 있으면
+        AST파서쓰기정수원문(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기열거원문은 (값: AST파서열거원문)를 받아
+    JSON객체값(["enum", "value"], [AST파서쓰기문자열(값.값_enum), AST파서쓰기문자열(값.값_value)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기문자지도은 (값: AST파서문자지도)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    상수 사전값들은 값.값들이고, 문자열로 문자열를 찾는 사전이다.
+    값.순서에서 각 키마다
+        상수 원소는 사전에서찾기(사전값들, 키, "")이고, 문자열이다.
+        값들에 AST파서쓰기문자열(원소)를 추가한다.
+    JSON객체값(값.순서, 값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열문자열은 (값: 문자열의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기문자열(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열타입제약은 (값: AST파서타입제약의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기타입제약(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기타입제약은 (값: AST파서타입제약)를 받아
+    JSON배열값([AST파서쓰기문자열(값.값_name), AST파서쓰기배열문자열(값.값_traits)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열노드은 (값: AST파서노드의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기노드(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열문장줄은 (값: AST파서문장줄의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기문장줄(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기문장줄은 (값: AST파서문장줄)를 받아
+    JSON배열값([AST파서쓰기정수원문(값.값_line), AST파서쓰기노드(값.값_node)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택배열문자열은 (값: 문자열의 배열?)를 받아
+    만약 값이 있으면
+        AST파서쓰기배열문자열(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택노드은 (값: AST파서노드?)를 받아
+    만약 값이 있으면
+        AST파서쓰기노드(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열식인자은 (값: AST파서식인자의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기식인자(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기식인자은 (값: AST파서식인자)를 받아
+    값이 위치(노드)인 경우
+        AST파서쓰기노드(노드)를 JSON값으로 반환한다.
+    이름(인자)인 경우
+        AST파서쓰기호출인자(인자)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기호출인자은 (값: AST파서호출인자)를 받아
+    JSON배열값([AST파서쓰기문자열(값.값_label), AST파서쓰기노드(값.값_value)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열분기은 (값: AST파서분기의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기분기(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기분기은 (값: AST파서분기)를 받아
+    JSON배열값([AST파서쓰기노드(값.값_condition), AST파서쓰기배열문장줄(값.값_body)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기선택배열문장줄은 (값: AST파서문장줄의 배열?)를 받아
+    만약 값이 있으면
+        AST파서쓰기배열문장줄(값!)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기노드지도은 (값: AST파서노드지도)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    상수 기본값은 없음이고, AST파서노드?이다.
+    상수 사전값들은 값.값들이고, 문자열로 AST파서노드?를 찾는 사전이다.
+    값.순서에서 각 키마다
+        상수 원소는 사전에서찾기(사전값들, 키, 기본값)이고, AST파서노드?이다.
+        값들에 AST파서쓰기노드(원소!)를 추가한다.
+    JSON객체값(값.순서, 값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열호출인자은 (값: AST파서호출인자의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기호출인자(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기실수원문은 (값: AST파서실수원문)를 받아
+    JSON객체값(["float"], [AST파서쓰기문자열(값.값_raw)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열열거사례은 (값: AST파서열거사례의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기열거사례(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기열거사례은 (값: AST파서열거사례)를 받아
+    JSON배열값([AST파서쓰기문자열(값.값_name), AST파서쓰기선택노드(값.값_value), AST파서쓰기배열노드(값.값_params)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열훅은 (값: AST파서훅의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기훅(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기훅은 (값: AST파서훅)를 받아
+    JSON배열값([AST파서쓰기문자열(값.값_name), AST파서쓰기배열문장줄(값.값_body)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열문자경고은 (값: AST파서문자경고의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기문자경고(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기문자경고은 (값: AST파서문자경고)를 받아
+    JSON배열값([AST파서쓰기문자열(값.값_line), AST파서쓰기문자열(값.값_message)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기배열고유조합은 (값: AST파서고유조합의 배열)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    값에서 각 원소마다
+        값들에 AST파서쓰기고유조합(원소)를 추가한다.
+    JSON배열값(값들)을 JSON값으로 반환한다.
+
+함수 AST파서쓰기고유조합은 (값: AST파서고유조합)를 받아
+    JSON배열값([AST파서쓰기정수원문(값.값_line), AST파서쓰기배열문자열(값.값_names)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료AddressOfExpr은 (키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("AddressOfExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ArrayBufferViewExpr은 (키순서: 문자열의 배열, 값_array: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "array"이면
+            값들에 AST파서쓰기노드(값_array)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ArrayBufferViewExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ArrayLiteral은 (키순서: 문자열의 배열, 값_elements: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "elements"이면
+            값들에 AST파서쓰기배열노드(값_elements)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ArrayLiteral"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Assign은 (키순서: 문자열의 배열, 값_target: AST파서노드, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "target"이면
+            값들에 AST파서쓰기노드(값_target)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Assign"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료AsyncRootRun은 (키순서: 문자열의 배열, 값_call: AST파서노드, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "call"이면
+            값들에 AST파서쓰기노드(값_call)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("AsyncRootRun"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료AwaitExpr은 (키순서: 문자열의 배열, 값_call: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "call"이면
+            값들에 AST파서쓰기노드(값_call)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("AwaitExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BinaryExpr은 (키순서: 문자열의 배열, 값_left: AST파서노드, 값_op: 문자열, 값_right: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "left"이면
+            값들에 AST파서쓰기노드(값_left)를 추가한다.
+        만약 키 == "op"이면
+            값들에 AST파서쓰기문자열(값_op)를 추가한다.
+        만약 키 == "right"이면
+            값들에 AST파서쓰기노드(값_right)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BinaryExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BlockInheritedDecl은 (키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BlockInheritedDecl"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BlockModifierDef은 (키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "phrase"이면
+            값들에 AST파서쓰기문자열(값_phrase)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BlockModifierDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BlockModifierParam은 (키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_default: AST파서노드?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "default"이면
+            값들에 AST파서쓰기선택노드(값_default)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BlockModifierParam"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BoolExprCondition은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BoolExprCondition"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BoolLiteral은 (키순서: 문자열의 배열, 값_value: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기참거짓(값_value)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BoolLiteral"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음0은 (묶음: AST파서묶음0)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류0이다.
+    내용이 AddressOfExpr(키순서, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료AddressOfExpr(키순서, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ArrayBufferViewExpr(키순서, 값_array, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ArrayBufferViewExpr(키순서, 값_array, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ArrayLiteral(키순서, 값_elements, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ArrayLiteral(키순서, 값_elements, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Assign(키순서, 값_target, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Assign(키순서, 값_target, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    AsyncRootRun(키순서, 값_call, 값_compiler_generated, 값_sentence_warnings)인 경우
+        AST파서쓰기자료AsyncRootRun(키순서, 값_call, 값_compiler_generated, 값_sentence_warnings)를 JSON값으로 반환한다.
+    AwaitExpr(키순서, 값_call, 값_sentence_warnings)인 경우
+        AST파서쓰기자료AwaitExpr(키순서, 값_call, 값_sentence_warnings)를 JSON값으로 반환한다.
+    BinaryExpr(키순서, 값_left, 값_op, 값_right, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료BinaryExpr(키순서, 값_left, 값_op, 값_right, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    BlockInheritedDecl(키순서, 값_name, 값_type_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료BlockInheritedDecl(키순서, 값_name, 값_type_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    BlockModifierDef(키순서, 값_phrase, 값_params, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료BlockModifierDef(키순서, 값_phrase, 값_params, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    BlockModifierParam(키순서, 값_name, 값_type_name, 값_default, 값_sentence_warnings)인 경우
+        AST파서쓰기자료BlockModifierParam(키순서, 값_name, 값_type_name, 값_default, 값_sentence_warnings)를 JSON값으로 반환한다.
+    BoolExprCondition(키순서, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료BoolExprCondition(키순서, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    BoolLiteral(키순서, 값_value, 값_sentence_warnings)인 경우
+        AST파서쓰기자료BoolLiteral(키순서, 값_value, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료BorrowDefine은 (키순서: 문자열의 배열, 값_name: 문자열, 값_address: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "address"이면
+            값들에 AST파서쓰기노드(값_address)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("BorrowDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Break은 (키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Break"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료CallExpr은 (키순서: 문자열의 배열, 값_name: 문자열, 값_args: AST파서식인자의 배열, 값_compiler_generated: 참거짓?, 값_natural: 참거짓?, 값_subject_value: 참거짓?, 값_deprecated: 문자열?, 값_module_qualifier: 문자열?, 값_method_call: 참거짓?, 값_wait_statement: 참거짓?, 값_named_args: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "args"이면
+            값들에 AST파서쓰기배열식인자(값_args)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기선택참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "natural"이면
+            값들에 AST파서쓰기선택참거짓(값_natural)를 추가한다.
+        만약 키 == "subject_value"이면
+            값들에 AST파서쓰기선택참거짓(값_subject_value)를 추가한다.
+        만약 키 == "deprecated"이면
+            값들에 AST파서쓰기선택문자열(값_deprecated)를 추가한다.
+        만약 키 == "module_qualifier"이면
+            값들에 AST파서쓰기선택문자열(값_module_qualifier)를 추가한다.
+        만약 키 == "method_call"이면
+            값들에 AST파서쓰기선택참거짓(값_method_call)를 추가한다.
+        만약 키 == "wait_statement"이면
+            값들에 AST파서쓰기선택참거짓(값_wait_statement)를 추가한다.
+        만약 키 == "named_args"이면
+            값들에 AST파서쓰기선택참거짓(값_named_args)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("CallExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료CastExpr은 (키순서: 문자열의 배열, 값_type_name: 문자열, 값_expr: AST파서노드, 값_compiler_generated: 참거짓, 값_source_cast_line: 문자열?, 값_source_cast_column: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "source_cast_line"이면
+            값들에 AST파서쓰기선택문자열(값_source_cast_line)를 추가한다.
+        만약 키 == "source_cast_column"이면
+            값들에 AST파서쓰기선택문자열(값_source_cast_column)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("CastExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelAsyncReceiveExpr은 (키순서: 문자열의 배열, 값_receiver: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "receiver"이면
+            값들에 AST파서쓰기노드(값_receiver)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelAsyncReceiveExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelAsyncSendExpr은 (키순서: 문자열의 배열, 값_value: AST파서노드, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기노드(값_value)를 추가한다.
+        만약 키 == "sender"이면
+            값들에 AST파서쓰기노드(값_sender)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelAsyncSendExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelClose은 (키순서: 문자열의 배열, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "sender"이면
+            값들에 AST파서쓰기노드(값_sender)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelClose"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelCreate은 (키순서: 문자열의 배열, 값_sender_name: 문자열, 값_receiver_name: 문자열, 값_capacity: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "sender_name"이면
+            값들에 AST파서쓰기문자열(값_sender_name)를 추가한다.
+        만약 키 == "receiver_name"이면
+            값들에 AST파서쓰기문자열(값_receiver_name)를 추가한다.
+        만약 키 == "capacity"이면
+            값들에 AST파서쓰기노드(값_capacity)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelCreate"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelReceiveExpr은 (키순서: 문자열의 배열, 값_receiver: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "receiver"이면
+            값들에 AST파서쓰기노드(값_receiver)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelReceiveExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelSend은 (키순서: 문자열의 배열, 값_value: AST파서노드, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기노드(값_value)를 추가한다.
+        만약 키 == "sender"이면
+            값들에 AST파서쓰기노드(값_sender)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelSend"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ChannelTrySendExpr은 (키순서: 문자열의 배열, 값_value: AST파서노드, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기노드(값_value)를 추가한다.
+        만약 키 == "sender"이면
+            값들에 AST파서쓰기노드(값_sender)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ChannelTrySendExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ClassDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_visibility: AST파서열거원문, 값_modifiers: 문자열의 배열, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_fields: AST파서노드의 배열, 값_methods: AST파서문장줄의 배열, 값_init_body: AST파서문장줄의 배열?, 값_deinit_body: AST파서문장줄의 배열?, 값_db_body: AST파서노드?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "modifiers"이면
+            값들에 AST파서쓰기배열문자열(값_modifiers)를 추가한다.
+        만약 키 == "type_params"이면
+            값들에 AST파서쓰기배열문자열(값_type_params)를 추가한다.
+        만약 키 == "type_constraints"이면
+            값들에 AST파서쓰기배열타입제약(값_type_constraints)를 추가한다.
+        만약 키 == "fields"이면
+            값들에 AST파서쓰기배열노드(값_fields)를 추가한다.
+        만약 키 == "methods"이면
+            값들에 AST파서쓰기배열문장줄(값_methods)를 추가한다.
+        만약 키 == "init_body"이면
+            값들에 AST파서쓰기선택배열문장줄(값_init_body)를 추가한다.
+        만약 키 == "deinit_body"이면
+            값들에 AST파서쓰기선택배열문장줄(값_deinit_body)를 추가한다.
+        만약 키 == "db_body"이면
+            값들에 AST파서쓰기선택노드(값_db_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ClassDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음1은 (묶음: AST파서묶음1)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류1이다.
+    내용이 BorrowDefine(키순서, 값_name, 값_address, 값_type_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료BorrowDefine(키순서, 값_name, 값_address, 값_type_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Break(키순서, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Break(키순서, 값_sentence_warnings)를 JSON값으로 반환한다.
+    CallExpr(키순서, 값_name, 값_args, 값_compiler_generated, 값_natural, 값_subject_value, 값_deprecated, 값_module_qualifier, 값_method_call, 값_wait_statement, 값_named_args, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료CallExpr(키순서, 값_name, 값_args, 값_compiler_generated, 값_natural, 값_subject_value, 값_deprecated, 값_module_qualifier, 값_method_call, 값_wait_statement, 값_named_args, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    CastExpr(키순서, 값_type_name, 값_expr, 값_compiler_generated, 값_source_cast_line, 값_source_cast_column, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료CastExpr(키순서, 값_type_name, 값_expr, 값_compiler_generated, 값_source_cast_line, 값_source_cast_column, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    ChannelAsyncReceiveExpr(키순서, 값_receiver, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelAsyncReceiveExpr(키순서, 값_receiver, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ChannelAsyncSendExpr(키순서, 값_value, 값_sender, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelAsyncSendExpr(키순서, 값_value, 값_sender, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ChannelClose(키순서, 값_sender, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelClose(키순서, 값_sender, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ChannelCreate(키순서, 값_sender_name, 값_receiver_name, 값_capacity, 값_type_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelCreate(키순서, 값_sender_name, 값_receiver_name, 값_capacity, 값_type_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ChannelReceiveExpr(키순서, 값_receiver, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelReceiveExpr(키순서, 값_receiver, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ChannelSend(키순서, 값_value, 값_sender, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelSend(키순서, 값_value, 값_sender, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ChannelTrySendExpr(키순서, 값_value, 값_sender, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ChannelTrySendExpr(키순서, 값_value, 값_sender, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ClassDef(키순서, 값_name, 값_visibility, 값_modifiers, 값_type_params, 값_type_constraints, 값_fields, 값_methods, 값_init_body, 값_deinit_body, 값_db_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ClassDef(키순서, 값_name, 값_visibility, 값_modifiers, 값_type_params, 값_type_constraints, 값_fields, 값_methods, 값_init_body, 값_deinit_body, 값_db_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ClassField은 (키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_default: AST파서노드?, 값_mutability: 문자열, 값_weak: 참거짓, 값_modifier_words: 문자열, 값_visibility: AST파서열거원문, 값_line: AST파서정수원문, 값_db_field: AST파서노드?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "default"이면
+            값들에 AST파서쓰기선택노드(값_default)를 추가한다.
+        만약 키 == "mutability"이면
+            값들에 AST파서쓰기문자열(값_mutability)를 추가한다.
+        만약 키 == "weak"이면
+            값들에 AST파서쓰기참거짓(값_weak)를 추가한다.
+        만약 키 == "modifier_words"이면
+            값들에 AST파서쓰기문자열(값_modifier_words)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "line"이면
+            값들에 AST파서쓰기정수원문(값_line)를 추가한다.
+        만약 키 == "db_field"이면
+            값들에 AST파서쓰기선택노드(값_db_field)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ClassField"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료CompareCondition은 (키순서: 문자열의 배열, 값_left: AST파서노드, 값_op: 문자열, 값_right: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "left"이면
+            값들에 AST파서쓰기노드(값_left)를 추가한다.
+        만약 키 == "op"이면
+            값들에 AST파서쓰기문자열(값_op)를 추가한다.
+        만약 키 == "right"이면
+            값들에 AST파서쓰기노드(값_right)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("CompareCondition"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ConcurrentBlock은 (키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ConcurrentBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Continue은 (키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Continue"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DeadlineBlock은 (키순서: 문자열의 배열, 값_milliseconds: AST파서노드, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "milliseconds"이면
+            값들에 AST파서쓰기노드(값_milliseconds)를 추가한다.
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DeadlineBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DeferredDefaultExpr은 (키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DeferredDefaultExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Define은 (키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_type_name: 문자열?, 값_expr: AST파서노드, 값_retain_borrowed_owner: 참거짓, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "mutable"이면
+            값들에 AST파서쓰기참거짓(값_mutable)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기선택문자열(값_type_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "retain_borrowed_owner"이면
+            값들에 AST파서쓰기참거짓(값_retain_borrowed_owner)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Define"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DynamicArrayAppend은 (키순서: 문자열의 배열, 값_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DynamicArrayAppend"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DynamicArrayClear은 (키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DynamicArrayClear"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DynamicArrayInsert은 (키순서: 문자열의 배열, 값_target: AST파서노드, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "target"이면
+            값들에 AST파서쓰기노드(값_target)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DynamicArrayInsert"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DynamicArrayPopExpr은 (키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DynamicArrayPopExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DynamicArrayRemove은 (키순서: 문자열의 배열, 값_target: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "target"이면
+            값들에 AST파서쓰기노드(값_target)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DynamicArrayRemove"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음2은 (묶음: AST파서묶음2)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류2이다.
+    내용이 ClassField(키순서, 값_name, 값_type_name, 값_default, 값_mutability, 값_weak, 값_modifier_words, 값_visibility, 값_line, 값_db_field, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ClassField(키순서, 값_name, 값_type_name, 값_default, 값_mutability, 값_weak, 값_modifier_words, 값_visibility, 값_line, 값_db_field, 값_sentence_warnings)를 JSON값으로 반환한다.
+    CompareCondition(키순서, 값_left, 값_op, 값_right, 값_sentence_warnings)인 경우
+        AST파서쓰기자료CompareCondition(키순서, 값_left, 값_op, 값_right, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ConcurrentBlock(키순서, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ConcurrentBlock(키순서, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Continue(키순서, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Continue(키순서, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DeadlineBlock(키순서, 값_milliseconds, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DeadlineBlock(키순서, 값_milliseconds, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DeferredDefaultExpr(키순서, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DeferredDefaultExpr(키순서, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Define(키순서, 값_mutable, 값_name, 값_type_name, 값_expr, 값_retain_borrowed_owner, 값_compiler_generated, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Define(키순서, 값_mutable, 값_name, 값_type_name, 값_expr, 값_retain_borrowed_owner, 값_compiler_generated, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DynamicArrayAppend(키순서, 값_name, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DynamicArrayAppend(키순서, 값_name, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DynamicArrayClear(키순서, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DynamicArrayClear(키순서, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DynamicArrayInsert(키순서, 값_target, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DynamicArrayInsert(키순서, 값_target, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DynamicArrayPopExpr(키순서, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DynamicArrayPopExpr(키순서, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    DynamicArrayRemove(키순서, 값_target, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DynamicArrayRemove(키순서, 값_target, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료DynamicArrayReserve은 (키순서: 문자열의 배열, 값_name: 문자열, 값_capacity: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "capacity"이면
+            값들에 AST파서쓰기노드(값_capacity)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("DynamicArrayReserve"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료EnumDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_base_type: 문자열?, 값_cases: AST파서열거사례의 배열, 값_visibility: AST파서열거원문, 값_deprecated_block: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "base_type"이면
+            값들에 AST파서쓰기선택문자열(값_base_type)를 추가한다.
+        만약 키 == "cases"이면
+            값들에 AST파서쓰기배열열거사례(값_cases)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "deprecated_block"이면
+            값들에 AST파서쓰기참거짓(값_deprecated_block)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("EnumDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Execute은 (키순서: 문자열의 배열, 값_name: 문자열, 값_args: AST파서호출인자의 배열, 값_is_try: 참거짓, 값_module_qualifier: 문자열?, 값_method_call: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "args"이면
+            값들에 AST파서쓰기배열호출인자(값_args)를 추가한다.
+        만약 키 == "is_try"이면
+            값들에 AST파서쓰기참거짓(값_is_try)를 추가한다.
+        만약 키 == "module_qualifier"이면
+            값들에 AST파서쓰기선택문자열(값_module_qualifier)를 추가한다.
+        만약 키 == "method_call"이면
+            값들에 AST파서쓰기선택참거짓(값_method_call)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Execute"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ExprStmt은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_deprecated_bare_call: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "deprecated_bare_call"이면
+            값들에 AST파서쓰기선택참거짓(값_deprecated_bare_call)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ExprStmt"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ExtensionDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_methods: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "methods"이면
+            값들에 AST파서쓰기배열문장줄(값_methods)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ExtensionDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ExternalGlobal은 (키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ExternalGlobal"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FieldAccessExpr은 (키순서: 문자열의 배열, 값_base: AST파서노드, 값_field: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "base"이면
+            값들에 AST파서쓰기노드(값_base)를 추가한다.
+        만약 키 == "field"이면
+            값들에 AST파서쓰기문자열(값_field)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FieldAccessExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FieldTarget은 (키순서: 문자열의 배열, 값_base: AST파서노드?, 값_field: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "base"이면
+            값들에 AST파서쓰기선택노드(값_base)를 추가한다.
+        만약 키 == "field"이면
+            값들에 AST파서쓰기문자열(값_field)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FieldTarget"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FileDataExpr은 (키순서: 문자열의 배열, 값_path: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "path"이면
+            값들에 AST파서쓰기문자열(값_path)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FileDataExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FilterDefine은 (키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_array: AST파서노드, 값_item_name: 문자열, 값_condition: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "mutable"이면
+            값들에 AST파서쓰기참거짓(값_mutable)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "array"이면
+            값들에 AST파서쓰기노드(값_array)를 추가한다.
+        만약 키 == "item_name"이면
+            값들에 AST파서쓰기문자열(값_item_name)를 추가한다.
+        만약 키 == "condition"이면
+            값들에 AST파서쓰기노드(값_condition)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FilterDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FixedArrayFillExpr은 (키순서: 문자열의 배열, 값_value: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기노드(값_value)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FixedArrayFillExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FloatLiteral은 (키순서: 문자열의 배열, 값_value: AST파서실수원문, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기실수원문(값_value)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FloatLiteral"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음3은 (묶음: AST파서묶음3)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류3이다.
+    내용이 DynamicArrayReserve(키순서, 값_name, 값_capacity, 값_sentence_warnings)인 경우
+        AST파서쓰기자료DynamicArrayReserve(키순서, 값_name, 값_capacity, 값_sentence_warnings)를 JSON값으로 반환한다.
+    EnumDef(키순서, 값_name, 값_base_type, 값_cases, 값_visibility, 값_deprecated_block, 값_sentence_warnings)인 경우
+        AST파서쓰기자료EnumDef(키순서, 값_name, 값_base_type, 값_cases, 값_visibility, 값_deprecated_block, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Execute(키순서, 값_name, 값_args, 값_is_try, 값_module_qualifier, 값_method_call, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Execute(키순서, 값_name, 값_args, 값_is_try, 값_module_qualifier, 값_method_call, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ExprStmt(키순서, 값_expr, 값_deprecated_bare_call, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ExprStmt(키순서, 값_expr, 값_deprecated_bare_call, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ExtensionDef(키순서, 값_name, 값_methods, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ExtensionDef(키순서, 값_name, 값_methods, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ExternalGlobal(키순서, 값_name, 값_type_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ExternalGlobal(키순서, 값_name, 값_type_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FieldAccessExpr(키순서, 값_base, 값_field, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료FieldAccessExpr(키순서, 값_base, 값_field, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    FieldTarget(키순서, 값_base, 값_field, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FieldTarget(키순서, 값_base, 값_field, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FileDataExpr(키순서, 값_path, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FileDataExpr(키순서, 값_path, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FilterDefine(키순서, 값_mutable, 값_name, 값_array, 값_item_name, 값_condition, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FilterDefine(키순서, 값_mutable, 값_name, 값_array, 값_item_name, 값_condition, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FixedArrayFillExpr(키순서, 값_value, 값_type_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FixedArrayFillExpr(키순서, 값_value, 값_type_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FloatLiteral(키순서, 값_value, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료FloatLiteral(키순서, 값_value, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ForEach은 (키순서: 문자열의 배열, 값_array: AST파서노드, 값_item_name: 문자열, 값_position_name: 문자열?, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "array"이면
+            값들에 AST파서쓰기노드(값_array)를 추가한다.
+        만약 키 == "item_name"이면
+            값들에 AST파서쓰기문자열(값_item_name)를 추가한다.
+        만약 키 == "position_name"이면
+            값들에 AST파서쓰기선택문자열(값_position_name)를 추가한다.
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ForEach"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Forget은 (키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Forget"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FunctionAddressExpr은 (키순서: 문자열의 배열, 값_name: 문자열, 값_entry_param_types: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "entry_param_types"이면
+            값들에 AST파서쓰기배열문자열(값_entry_param_types)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FunctionAddressExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FunctionDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_params: AST파서노드의 배열, 값_body: AST파서문장줄의 배열, 값_return_type: 문자열?, 값_external_name: 문자열?, 값_unsafe: 참거짓, 값_can_fail: 참거짓, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_visibility: AST파서열거원문, 값_compiler_generated: 참거짓, 값_is_async: 참거짓, 값_opaque_trait_name: 문자열?, 값_error_type: 문자열?, 값_source_path: 문자열?, 값_nominal_owner: 문자열?, 값_nominal_key: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "return_type"이면
+            값들에 AST파서쓰기선택문자열(값_return_type)를 추가한다.
+        만약 키 == "external_name"이면
+            값들에 AST파서쓰기선택문자열(값_external_name)를 추가한다.
+        만약 키 == "unsafe"이면
+            값들에 AST파서쓰기참거짓(값_unsafe)를 추가한다.
+        만약 키 == "can_fail"이면
+            값들에 AST파서쓰기참거짓(값_can_fail)를 추가한다.
+        만약 키 == "type_params"이면
+            값들에 AST파서쓰기배열문자열(값_type_params)를 추가한다.
+        만약 키 == "type_constraints"이면
+            값들에 AST파서쓰기배열타입제약(값_type_constraints)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "is_async"이면
+            값들에 AST파서쓰기참거짓(값_is_async)를 추가한다.
+        만약 키 == "opaque_trait_name"이면
+            값들에 AST파서쓰기선택문자열(값_opaque_trait_name)를 추가한다.
+        만약 키 == "error_type"이면
+            값들에 AST파서쓰기선택문자열(값_error_type)를 추가한다.
+        만약 키 == "source_path"이면
+            값들에 AST파서쓰기선택문자열(값_source_path)를 추가한다.
+        만약 키 == "nominal_owner"이면
+            값들에 AST파서쓰기선택문자열(값_nominal_owner)를 추가한다.
+        만약 키 == "nominal_key"이면
+            값들에 AST파서쓰기선택문자열(값_nominal_key)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FunctionDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FunctionModifierDef은 (키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_setup: AST파서문장줄의 배열, 값_finish: AST파서문장줄의 배열, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "phrase"이면
+            값들에 AST파서쓰기문자열(값_phrase)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "setup"이면
+            값들에 AST파서쓰기배열문장줄(값_setup)를 추가한다.
+        만약 키 == "finish"이면
+            값들에 AST파서쓰기배열문장줄(값_finish)를 추가한다.
+        만약 키 == "type_params"이면
+            값들에 AST파서쓰기배열문자열(값_type_params)를 추가한다.
+        만약 키 == "type_constraints"이면
+            값들에 AST파서쓰기배열타입제약(값_type_constraints)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FunctionModifierDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료FunctionValueDefine은 (키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_function_name: 문자열, 값_params: AST파서노드의 배열, 값_return_type: 문자열?, 값_body: AST파서문장줄의 배열, 값_compiler_generated: 참거짓, 값_is_async: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "mutable"이면
+            값들에 AST파서쓰기참거짓(값_mutable)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "function_name"이면
+            값들에 AST파서쓰기문자열(값_function_name)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "return_type"이면
+            값들에 AST파서쓰기선택문자열(값_return_type)를 추가한다.
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "is_async"이면
+            값들에 AST파서쓰기참거짓(값_is_async)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("FunctionValueDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료GlobalDefine은 (키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_type_name: 문자열, 값_expr: AST파서노드, 값_section: 문자열?, 값_alignment: AST파서정수원문?, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "mutable"이면
+            값들에 AST파서쓰기참거짓(값_mutable)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "section"이면
+            값들에 AST파서쓰기선택문자열(값_section)를 추가한다.
+        만약 키 == "alignment"이면
+            값들에 AST파서쓰기선택정수원문(값_alignment)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("GlobalDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료IdentityCompareExpr은 (키순서: 문자열의 배열, 값_left: AST파서노드, 값_right: AST파서노드, 값_negate: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "left"이면
+            값들에 AST파서쓰기노드(값_left)를 추가한다.
+        만약 키 == "right"이면
+            값들에 AST파서쓰기노드(값_right)를 추가한다.
+        만약 키 == "negate"이면
+            값들에 AST파서쓰기참거짓(값_negate)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("IdentityCompareExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료If은 (키순서: 문자열의 배열, 값_branches: AST파서분기의 배열, 값_else_body: AST파서문장줄의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "branches"이면
+            값들에 AST파서쓰기배열분기(값_branches)를 추가한다.
+        만약 키 == "else_body"이면
+            값들에 AST파서쓰기선택배열문장줄(값_else_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("If"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Import은 (키순서: 문자열의 배열, 값_path: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "path"이면
+            값들에 AST파서쓰기문자열(값_path)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Import"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료IndexAccessExpr은 (키순서: 문자열의 배열, 값_base: AST파서노드, 값_index: AST파서노드, 값_natural: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "base"이면
+            값들에 AST파서쓰기노드(값_base)를 추가한다.
+        만약 키 == "index"이면
+            값들에 AST파서쓰기노드(값_index)를 추가한다.
+        만약 키 == "natural"이면
+            값들에 AST파서쓰기참거짓(값_natural)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("IndexAccessExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료IndexTarget은 (키순서: 문자열의 배열, 값_base: AST파서노드?, 값_index: AST파서노드, 값_natural: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "base"이면
+            값들에 AST파서쓰기선택노드(값_base)를 추가한다.
+        만약 키 == "index"이면
+            값들에 AST파서쓰기노드(값_index)를 추가한다.
+        만약 키 == "natural"이면
+            값들에 AST파서쓰기참거짓(값_natural)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("IndexTarget"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음4은 (묶음: AST파서묶음4)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류4이다.
+    내용이 ForEach(키순서, 값_array, 값_item_name, 값_position_name, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ForEach(키순서, 값_array, 값_item_name, 값_position_name, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Forget(키순서, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Forget(키순서, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FunctionAddressExpr(키순서, 값_name, 값_entry_param_types, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FunctionAddressExpr(키순서, 값_name, 값_entry_param_types, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FunctionDef(키순서, 값_name, 값_params, 값_body, 값_return_type, 값_external_name, 값_unsafe, 값_can_fail, 값_type_params, 값_type_constraints, 값_visibility, 값_compiler_generated, 값_is_async, 값_opaque_trait_name, 값_error_type, 값_source_path, 값_nominal_owner, 값_nominal_key, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FunctionDef(키순서, 값_name, 값_params, 값_body, 값_return_type, 값_external_name, 값_unsafe, 값_can_fail, 값_type_params, 값_type_constraints, 값_visibility, 값_compiler_generated, 값_is_async, 값_opaque_trait_name, 값_error_type, 값_source_path, 값_nominal_owner, 값_nominal_key, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FunctionModifierDef(키순서, 값_phrase, 값_params, 값_setup, 값_finish, 값_type_params, 값_type_constraints, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FunctionModifierDef(키순서, 값_phrase, 값_params, 값_setup, 값_finish, 값_type_params, 값_type_constraints, 값_sentence_warnings)를 JSON값으로 반환한다.
+    FunctionValueDefine(키순서, 값_mutable, 값_name, 값_function_name, 값_params, 값_return_type, 값_body, 값_compiler_generated, 값_is_async, 값_sentence_warnings)인 경우
+        AST파서쓰기자료FunctionValueDefine(키순서, 값_mutable, 값_name, 값_function_name, 값_params, 값_return_type, 값_body, 값_compiler_generated, 값_is_async, 값_sentence_warnings)를 JSON값으로 반환한다.
+    GlobalDefine(키순서, 값_mutable, 값_name, 값_type_name, 값_expr, 값_section, 값_alignment, 값_visibility, 값_sentence_warnings)인 경우
+        AST파서쓰기자료GlobalDefine(키순서, 값_mutable, 값_name, 값_type_name, 값_expr, 값_section, 값_alignment, 값_visibility, 값_sentence_warnings)를 JSON값으로 반환한다.
+    IdentityCompareExpr(키순서, 값_left, 값_right, 값_negate, 값_sentence_warnings)인 경우
+        AST파서쓰기자료IdentityCompareExpr(키순서, 값_left, 값_right, 값_negate, 값_sentence_warnings)를 JSON값으로 반환한다.
+    If(키순서, 값_branches, 값_else_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료If(키순서, 값_branches, 값_else_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Import(키순서, 값_path, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Import(키순서, 값_path, 값_sentence_warnings)를 JSON값으로 반환한다.
+    IndexAccessExpr(키순서, 값_base, 값_index, 값_natural, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료IndexAccessExpr(키순서, 값_base, 값_index, 값_natural, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    IndexTarget(키순서, 값_base, 값_index, 값_natural, 값_sentence_warnings)인 경우
+        AST파서쓰기자료IndexTarget(키순서, 값_base, 값_index, 값_natural, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료IntLiteral은 (키순서: 문자열의 배열, 값_value: AST파서정수원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기정수원문(값_value)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("IntLiteral"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료LogicalCondition은 (키순서: 문자열의 배열, 값_left: AST파서노드, 값_op: 문자열, 값_right: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "left"이면
+            값들에 AST파서쓰기노드(값_left)를 추가한다.
+        만약 키 == "op"이면
+            값들에 AST파서쓰기문자열(값_op)를 추가한다.
+        만약 키 == "right"이면
+            값들에 AST파서쓰기노드(값_right)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("LogicalCondition"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료LoopModifierDef은 (키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_setup: AST파서문장줄의 배열, 값_step: AST파서문장줄의 배열, 값_finish: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "phrase"이면
+            값들에 AST파서쓰기문자열(값_phrase)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "setup"이면
+            값들에 AST파서쓰기배열문장줄(값_setup)를 추가한다.
+        만약 키 == "step"이면
+            값들에 AST파서쓰기배열문장줄(값_step)를 추가한다.
+        만약 키 == "finish"이면
+            값들에 AST파서쓰기배열문장줄(값_finish)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("LoopModifierDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ManualRelease은 (키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ManualRelease"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료MapDefine은 (키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_array: AST파서노드, 값_item_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "mutable"이면
+            값들에 AST파서쓰기참거짓(값_mutable)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "array"이면
+            값들에 AST파서쓰기노드(값_array)를 추가한다.
+        만약 키 == "item_name"이면
+            값들에 AST파서쓰기문자열(값_item_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("MapDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료MemoryReadExpr은 (키순서: 문자열의 배열, 값_base: AST파서노드, 값_index: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "base"이면
+            값들에 AST파서쓰기노드(값_base)를 추가한다.
+        만약 키 == "index"이면
+            값들에 AST파서쓰기노드(값_index)를 추가한다.
+        만약 키 == "value_type"이면
+            값들에 AST파서쓰기문자열(값_value_type)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("MemoryReadExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료MemoryTarget은 (키순서: 문자열의 배열, 값_base: AST파서노드, 값_index: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "base"이면
+            값들에 AST파서쓰기노드(값_base)를 추가한다.
+        만약 키 == "index"이면
+            값들에 AST파서쓰기노드(값_index)를 추가한다.
+        만약 키 == "value_type"이면
+            값들에 AST파서쓰기문자열(값_value_type)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("MemoryTarget"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ModifierDef은 (키순서: 문자열의 배열, 값_kind: 문자열, 값_phrase: 문자열, 값_conjugation: 문자열, 값_targets: 문자열, 값_field_type: 문자열, 값_count: 문자열, 값_thread: 문자열, 값_role: 문자열, 값_hooks: AST파서훅의 배열, 값_visibility: AST파서열거원문, 값_quoted_properties: AST파서문자경고의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "kind"이면
+            값들에 AST파서쓰기문자열(값_kind)를 추가한다.
+        만약 키 == "phrase"이면
+            값들에 AST파서쓰기문자열(값_phrase)를 추가한다.
+        만약 키 == "conjugation"이면
+            값들에 AST파서쓰기문자열(값_conjugation)를 추가한다.
+        만약 키 == "targets"이면
+            값들에 AST파서쓰기문자열(값_targets)를 추가한다.
+        만약 키 == "field_type"이면
+            값들에 AST파서쓰기문자열(값_field_type)를 추가한다.
+        만약 키 == "count"이면
+            값들에 AST파서쓰기문자열(값_count)를 추가한다.
+        만약 키 == "thread"이면
+            값들에 AST파서쓰기문자열(값_thread)를 추가한다.
+        만약 키 == "role"이면
+            값들에 AST파서쓰기문자열(값_role)를 추가한다.
+        만약 키 == "hooks"이면
+            값들에 AST파서쓰기배열훅(값_hooks)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "quoted_properties"이면
+            값들에 AST파서쓰기배열문자경고(값_quoted_properties)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ModifierDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ModuleImport은 (키순서: 문자열의 배열, 값_module_name: 문자열, 값_reexport: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "module_name"이면
+            값들에 AST파서쓰기문자열(값_module_name)를 추가한다.
+        만약 키 == "reexport"이면
+            값들에 AST파서쓰기선택참거짓(값_reexport)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ModuleImport"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ModuleReexport은 (키순서: 문자열의 배열, 값_module_name: 문자열, 값_names: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "module_name"이면
+            값들에 AST파서쓰기문자열(값_module_name)를 추가한다.
+        만약 키 == "names"이면
+            값들에 AST파서쓰기배열문자열(값_names)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ModuleReexport"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료MoveDefine은 (키순서: 문자열의 배열, 값_source: 문자열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "source"이면
+            값들에 AST파서쓰기문자열(값_source)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("MoveDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료NameExpr은 (키순서: 문자열의 배열, 값_name: 문자열, 값_compiler_generated: 참거짓?, 값_module_qualifier: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기선택참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "module_qualifier"이면
+            값들에 AST파서쓰기선택문자열(값_module_qualifier)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("NameExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음5은 (묶음: AST파서묶음5)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류5이다.
+    내용이 IntLiteral(키순서, 값_value, 값_sentence_warnings)인 경우
+        AST파서쓰기자료IntLiteral(키순서, 값_value, 값_sentence_warnings)를 JSON값으로 반환한다.
+    LogicalCondition(키순서, 값_left, 값_op, 값_right, 값_sentence_warnings)인 경우
+        AST파서쓰기자료LogicalCondition(키순서, 값_left, 값_op, 값_right, 값_sentence_warnings)를 JSON값으로 반환한다.
+    LoopModifierDef(키순서, 값_phrase, 값_params, 값_setup, 값_step, 값_finish, 값_sentence_warnings)인 경우
+        AST파서쓰기자료LoopModifierDef(키순서, 값_phrase, 값_params, 값_setup, 값_step, 값_finish, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ManualRelease(키순서, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ManualRelease(키순서, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    MapDefine(키순서, 값_mutable, 값_name, 값_array, 값_item_name, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료MapDefine(키순서, 값_mutable, 값_name, 값_array, 값_item_name, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    MemoryReadExpr(키순서, 값_base, 값_index, 값_value_type, 값_sentence_warnings)인 경우
+        AST파서쓰기자료MemoryReadExpr(키순서, 값_base, 값_index, 값_value_type, 값_sentence_warnings)를 JSON값으로 반환한다.
+    MemoryTarget(키순서, 값_base, 값_index, 값_value_type, 값_sentence_warnings)인 경우
+        AST파서쓰기자료MemoryTarget(키순서, 값_base, 값_index, 값_value_type, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ModifierDef(키순서, 값_kind, 값_phrase, 값_conjugation, 값_targets, 값_field_type, 값_count, 값_thread, 값_role, 값_hooks, 값_visibility, 값_quoted_properties, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ModifierDef(키순서, 값_kind, 값_phrase, 값_conjugation, 값_targets, 값_field_type, 값_count, 값_thread, 값_role, 값_hooks, 값_visibility, 값_quoted_properties, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ModuleImport(키순서, 값_module_name, 값_reexport, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ModuleImport(키순서, 값_module_name, 값_reexport, 값_sentence_warnings)를 JSON값으로 반환한다.
+    ModuleReexport(키순서, 값_module_name, 값_names, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ModuleReexport(키순서, 값_module_name, 값_names, 값_sentence_warnings)를 JSON값으로 반환한다.
+    MoveDefine(키순서, 값_source, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료MoveDefine(키순서, 값_source, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    NameExpr(키순서, 값_name, 값_compiler_generated, 값_module_qualifier, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료NameExpr(키순서, 값_name, 값_compiler_generated, 값_module_qualifier, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료NameTarget은 (키순서: 문자열의 배열, 값_name: 문자열, 값_module_qualifier: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "module_qualifier"이면
+            값들에 AST파서쓰기선택문자열(값_module_qualifier)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("NameTarget"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료NotCondition은 (키순서: 문자열의 배열, 값_condition: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "condition"이면
+            값들에 AST파서쓰기노드(값_condition)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("NotCondition"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OffsetMemoryReadExpr은 (키순서: 문자열의 배열, 값_address: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "address"이면
+            값들에 AST파서쓰기노드(값_address)를 추가한다.
+        만약 키 == "value_type"이면
+            값들에 AST파서쓰기문자열(값_value_type)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OffsetMemoryReadExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OffsetMemoryTarget은 (키순서: 문자열의 배열, 값_address: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "address"이면
+            값들에 AST파서쓰기노드(값_address)를 추가한다.
+        만약 키 == "value_type"이면
+            값들에 AST파서쓰기문자열(값_value_type)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OffsetMemoryTarget"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OptionalBindCondition은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_name: 문자열, 값_narrowed: 참거짓?, 값_deprecated: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "narrowed"이면
+            값들에 AST파서쓰기선택참거짓(값_narrowed)를 추가한다.
+        만약 키 == "deprecated"이면
+            값들에 AST파서쓰기선택문자열(값_deprecated)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OptionalBindCondition"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OptionalHasValueCondition은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_has_value: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "has_value"이면
+            값들에 AST파서쓰기참거짓(값_has_value)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OptionalHasValueCondition"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OptionalNoneExpr은 (키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OptionalNoneExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OptionalUnwrapExpr은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OptionalUnwrapExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료OverlayBindExpr은 (키순서: 문자열의 배열, 값_buffer: AST파서노드, 값_struct_name: 문자열, 값_is_array: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "buffer"이면
+            값들에 AST파서쓰기노드(값_buffer)를 추가한다.
+        만약 키 == "struct_name"이면
+            값들에 AST파서쓰기문자열(값_struct_name)를 추가한다.
+        만약 키 == "is_array"이면
+            값들에 AST파서쓰기참거짓(값_is_array)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("OverlayBindExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Parameter은 (키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_consuming: 참거짓, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "consuming"이면
+            값들에 AST파서쓰기참거짓(값_consuming)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Parameter"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료PinAddress은 (키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("PinAddress"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료PreemptDisableBlock은 (키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("PreemptDisableBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음6은 (묶음: AST파서묶음6)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류6이다.
+    내용이 NameTarget(키순서, 값_name, 값_module_qualifier, 값_sentence_warnings)인 경우
+        AST파서쓰기자료NameTarget(키순서, 값_name, 값_module_qualifier, 값_sentence_warnings)를 JSON값으로 반환한다.
+    NotCondition(키순서, 값_condition, 값_sentence_warnings)인 경우
+        AST파서쓰기자료NotCondition(키순서, 값_condition, 값_sentence_warnings)를 JSON값으로 반환한다.
+    OffsetMemoryReadExpr(키순서, 값_address, 값_value_type, 값_sentence_warnings)인 경우
+        AST파서쓰기자료OffsetMemoryReadExpr(키순서, 값_address, 값_value_type, 값_sentence_warnings)를 JSON값으로 반환한다.
+    OffsetMemoryTarget(키순서, 값_address, 값_value_type, 값_sentence_warnings)인 경우
+        AST파서쓰기자료OffsetMemoryTarget(키순서, 값_address, 값_value_type, 값_sentence_warnings)를 JSON값으로 반환한다.
+    OptionalBindCondition(키순서, 값_expr, 값_name, 값_narrowed, 값_deprecated, 값_sentence_warnings)인 경우
+        AST파서쓰기자료OptionalBindCondition(키순서, 값_expr, 값_name, 값_narrowed, 값_deprecated, 값_sentence_warnings)를 JSON값으로 반환한다.
+    OptionalHasValueCondition(키순서, 값_expr, 값_has_value, 값_sentence_warnings)인 경우
+        AST파서쓰기자료OptionalHasValueCondition(키순서, 값_expr, 값_has_value, 값_sentence_warnings)를 JSON값으로 반환한다.
+    OptionalNoneExpr(키순서, 값_sentence_warnings)인 경우
+        AST파서쓰기자료OptionalNoneExpr(키순서, 값_sentence_warnings)를 JSON값으로 반환한다.
+    OptionalUnwrapExpr(키순서, 값_expr, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료OptionalUnwrapExpr(키순서, 값_expr, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    OverlayBindExpr(키순서, 값_buffer, 값_struct_name, 값_is_array, 값_sentence_warnings)인 경우
+        AST파서쓰기자료OverlayBindExpr(키순서, 값_buffer, 값_struct_name, 값_is_array, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Parameter(키순서, 값_name, 값_type_name, 값_consuming, 값_compiler_generated, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Parameter(키순서, 값_name, 값_type_name, 값_consuming, 값_compiler_generated, 값_sentence_warnings)를 JSON값으로 반환한다.
+    PinAddress(키순서, 값_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료PinAddress(키순서, 값_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    PreemptDisableBlock(키순서, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료PreemptDisableBlock(키순서, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료ReferenceDefine은 (키순서: 문자열의 배열, 값_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("ReferenceDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Return은 (키순서: 문자열의 배열, 값_expr: AST파서노드?, 값_type_name: 문자열?, 값_compiler_generated: 참거짓, 값_opaque_trait_name: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기선택노드(값_expr)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기선택문자열(값_type_name)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "opaque_trait_name"이면
+            값들에 AST파서쓰기선택문자열(값_opaque_trait_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Return"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SortDefine은 (키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_array: AST파서노드, 값_left_name: 문자열?, 값_right_name: 문자열?, 값_condition: AST파서노드?, 값_item_name: 문자열?, 값_key_expr: AST파서노드?, 값_descending: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "mutable"이면
+            값들에 AST파서쓰기참거짓(값_mutable)를 추가한다.
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "array"이면
+            값들에 AST파서쓰기노드(값_array)를 추가한다.
+        만약 키 == "left_name"이면
+            값들에 AST파서쓰기선택문자열(값_left_name)를 추가한다.
+        만약 키 == "right_name"이면
+            값들에 AST파서쓰기선택문자열(값_right_name)를 추가한다.
+        만약 키 == "condition"이면
+            값들에 AST파서쓰기선택노드(값_condition)를 추가한다.
+        만약 키 == "item_name"이면
+            값들에 AST파서쓰기선택문자열(값_item_name)를 추가한다.
+        만약 키 == "key_expr"이면
+            값들에 AST파서쓰기선택노드(값_key_expr)를 추가한다.
+        만약 키 == "descending"이면
+            값들에 AST파서쓰기참거짓(값_descending)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SortDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SourceLine은 (키순서: 문자열의 배열, 값_line_no: AST파서정수원문, 값_indent: AST파서정수원문, 값_text: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "line_no"이면
+            값들에 AST파서쓰기정수원문(값_line_no)를 추가한다.
+        만약 키 == "indent"이면
+            값들에 AST파서쓰기정수원문(값_indent)를 추가한다.
+        만약 키 == "text"이면
+            값들에 AST파서쓰기문자열(값_text)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SourceLine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StorageModifierDef은 (키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_setup: AST파서문장줄의 배열, 값_read: AST파서문장줄의 배열, 값_write: AST파서문장줄의 배열, 값_write_params: AST파서노드의 배열, 값_finish: AST파서문장줄의 배열, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "phrase"이면
+            값들에 AST파서쓰기문자열(값_phrase)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "setup"이면
+            값들에 AST파서쓰기배열문장줄(값_setup)를 추가한다.
+        만약 키 == "read"이면
+            값들에 AST파서쓰기배열문장줄(값_read)를 추가한다.
+        만약 키 == "write"이면
+            값들에 AST파서쓰기배열문장줄(값_write)를 추가한다.
+        만약 키 == "write_params"이면
+            값들에 AST파서쓰기배열노드(값_write_params)를 추가한다.
+        만약 키 == "finish"이면
+            값들에 AST파서쓰기배열문장줄(값_finish)를 추가한다.
+        만약 키 == "type_params"이면
+            값들에 AST파서쓰기배열문자열(값_type_params)를 추가한다.
+        만약 키 == "type_constraints"이면
+            값들에 AST파서쓰기배열타입제약(값_type_constraints)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StorageModifierDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StoredBody은 (키순서: 문자열의 배열, 값_table: AST파서노드?, 값_line: AST파서정수원문, 값_unique_sets: AST파서고유조합의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "table"이면
+            값들에 AST파서쓰기선택노드(값_table)를 추가한다.
+        만약 키 == "line"이면
+            값들에 AST파서쓰기정수원문(값_line)를 추가한다.
+        만약 키 == "unique_sets"이면
+            값들에 AST파서쓰기배열고유조합(값_unique_sets)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StoredBody"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StoredField은 (키순서: 문자열의 배열, 값_column: 문자열?, 값_primary_key: 참거짓, 값_unique: 참거짓, 값_auto: 참거짓, 값_db_default: AST파서노드?, 값_default_case: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "column"이면
+            값들에 AST파서쓰기선택문자열(값_column)를 추가한다.
+        만약 키 == "primary_key"이면
+            값들에 AST파서쓰기참거짓(값_primary_key)를 추가한다.
+        만약 키 == "unique"이면
+            값들에 AST파서쓰기참거짓(값_unique)를 추가한다.
+        만약 키 == "auto"이면
+            값들에 AST파서쓰기참거짓(값_auto)를 추가한다.
+        만약 키 == "db_default"이면
+            값들에 AST파서쓰기선택노드(값_db_default)를 추가한다.
+        만약 키 == "default_case"이면
+            값들에 AST파서쓰기문자열(값_default_case)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StoredField"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StringLiteral은 (키순서: 문자열의 배열, 값_value: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "value"이면
+            값들에 AST파서쓰기문자열(값_value)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StringLiteral"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StructDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_fields: AST파서문자지도, 값_packed: 참거짓, 값_endian: 문자열?, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_visibility: AST파서열거원문, 값_field_metadata: AST파서노드의 배열, 값_initializers: AST파서노드의 배열, 값_member_functions: AST파서문장줄의 배열, 값_compiler_generated: 참거짓, 값_compiler_generated_fields: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "fields"이면
+            값들에 AST파서쓰기문자지도(값_fields)를 추가한다.
+        만약 키 == "packed"이면
+            값들에 AST파서쓰기참거짓(값_packed)를 추가한다.
+        만약 키 == "endian"이면
+            값들에 AST파서쓰기선택문자열(값_endian)를 추가한다.
+        만약 키 == "type_params"이면
+            값들에 AST파서쓰기배열문자열(값_type_params)를 추가한다.
+        만약 키 == "type_constraints"이면
+            값들에 AST파서쓰기배열타입제약(값_type_constraints)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "field_metadata"이면
+            값들에 AST파서쓰기배열노드(값_field_metadata)를 추가한다.
+        만약 키 == "initializers"이면
+            값들에 AST파서쓰기배열노드(값_initializers)를 추가한다.
+        만약 키 == "member_functions"이면
+            값들에 AST파서쓰기배열문장줄(값_member_functions)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "compiler_generated_fields"이면
+            값들에 AST파서쓰기배열문자열(값_compiler_generated_fields)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StructDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StructFieldMetadata은 (키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_visibility: AST파서열거원문, 값_mutability: 문자열, 값_line: AST파서정수원문, 값_modifier_words: 문자열의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "mutability"이면
+            값들에 AST파서쓰기문자열(값_mutability)를 추가한다.
+        만약 키 == "line"이면
+            값들에 AST파서쓰기정수원문(값_line)를 추가한다.
+        만약 키 == "modifier_words"이면
+            값들에 AST파서쓰기선택배열문자열(값_modifier_words)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StructFieldMetadata"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StructInitExpr은 (키순서: 문자열의 배열, 값_name: 문자열, 값_fields: AST파서노드지도, 값_unsafe: 참거짓, 값_base: AST파서노드?, 값_compiler_generated: 참거짓, 값_module_qualifier: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "fields"이면
+            값들에 AST파서쓰기노드지도(값_fields)를 추가한다.
+        만약 키 == "unsafe"이면
+            값들에 AST파서쓰기참거짓(값_unsafe)를 추가한다.
+        만약 키 == "base"이면
+            값들에 AST파서쓰기선택노드(값_base)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "module_qualifier"이면
+            값들에 AST파서쓰기선택문자열(값_module_qualifier)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StructInitExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StructInitializerAssignment은 (키순서: 문자열의 배열, 값_field_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "field_name"이면
+            값들에 AST파서쓰기문자열(값_field_name)를 추가한다.
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StructInitializerAssignment"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음7은 (묶음: AST파서묶음7)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류7이다.
+    내용이 ReferenceDefine(키순서, 값_name, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료ReferenceDefine(키순서, 값_name, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Return(키순서, 값_expr, 값_type_name, 값_compiler_generated, 값_opaque_trait_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Return(키순서, 값_expr, 값_type_name, 값_compiler_generated, 값_opaque_trait_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SortDefine(키순서, 값_mutable, 값_name, 값_array, 값_left_name, 값_right_name, 값_condition, 값_item_name, 값_key_expr, 값_descending, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SortDefine(키순서, 값_mutable, 값_name, 값_array, 값_left_name, 값_right_name, 값_condition, 값_item_name, 값_key_expr, 값_descending, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SourceLine(키순서, 값_line_no, 값_indent, 값_text, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SourceLine(키순서, 값_line_no, 값_indent, 값_text, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StorageModifierDef(키순서, 값_phrase, 값_params, 값_setup, 값_read, 값_write, 값_write_params, 값_finish, 값_type_params, 값_type_constraints, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StorageModifierDef(키순서, 값_phrase, 값_params, 값_setup, 값_read, 값_write, 값_write_params, 값_finish, 값_type_params, 값_type_constraints, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StoredBody(키순서, 값_table, 값_line, 값_unique_sets, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StoredBody(키순서, 값_table, 값_line, 값_unique_sets, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StoredField(키순서, 값_column, 값_primary_key, 값_unique, 값_auto, 값_db_default, 값_default_case, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StoredField(키순서, 값_column, 값_primary_key, 값_unique, 값_auto, 값_db_default, 값_default_case, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StringLiteral(키순서, 값_value, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StringLiteral(키순서, 값_value, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StructDef(키순서, 값_name, 값_fields, 값_packed, 값_endian, 값_type_params, 값_type_constraints, 값_visibility, 값_field_metadata, 값_initializers, 값_member_functions, 값_compiler_generated, 값_compiler_generated_fields, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StructDef(키순서, 값_name, 값_fields, 값_packed, 값_endian, 값_type_params, 값_type_constraints, 값_visibility, 값_field_metadata, 값_initializers, 값_member_functions, 값_compiler_generated, 값_compiler_generated_fields, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StructFieldMetadata(키순서, 값_name, 값_type_name, 값_visibility, 값_mutability, 값_line, 값_modifier_words, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StructFieldMetadata(키순서, 값_name, 값_type_name, 값_visibility, 값_mutability, 값_line, 값_modifier_words, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StructInitExpr(키순서, 값_name, 값_fields, 값_unsafe, 값_base, 값_compiler_generated, 값_module_qualifier, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StructInitExpr(키순서, 값_name, 값_fields, 값_unsafe, 값_base, 값_compiler_generated, 값_module_qualifier, 값_sentence_warnings)를 JSON값으로 반환한다.
+    StructInitializerAssignment(키순서, 값_field_name, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StructInitializerAssignment(키순서, 값_field_name, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료StructInitializerDef은 (키순서: 문자열의 배열, 값_params: AST파서노드의 배열, 값_assignments: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "assignments"이면
+            값들에 AST파서쓰기배열노드(값_assignments)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("StructInitializerDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceDatabaseBlock은 (키순서: 문자열의 배열, 값_header: 문자열, 값_lines: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "header"이면
+            값들에 AST파서쓰기문자열(값_header)를 추가한다.
+        만약 키 == "lines"이면
+            값들에 AST파서쓰기배열노드(값_lines)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceDatabaseBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceDatabaseStatement은 (키순서: 문자열의 배열, 값_header: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "header"이면
+            값들에 AST파서쓰기문자열(값_header)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceDatabaseStatement"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceDisplayFunctionDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_header: 문자열, 값_lines: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "header"이면
+            값들에 AST파서쓰기문자열(값_header)를 추가한다.
+        만약 키 == "lines"이면
+            값들에 AST파서쓰기배열노드(값_lines)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceDisplayFunctionDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceInheritDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_init: 문자열, 값_type_name: 문자열, 값_visibility: AST파서열거원문, 값_legacy: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "init"이면
+            값들에 AST파서쓰기문자열(값_init)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "legacy"이면
+            값들에 AST파서쓰기문자열(값_legacy)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceInheritDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfacePreviewDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_lines: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "lines"이면
+            값들에 AST파서쓰기배열노드(값_lines)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfacePreviewDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceRouteBlock은 (키순서: 문자열의 배열, 값_header: 문자열, 값_lines: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "header"이면
+            값들에 AST파서쓰기문자열(값_header)를 추가한다.
+        만약 키 == "lines"이면
+            값들에 AST파서쓰기배열노드(값_lines)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceRouteBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceRouteMount은 (키순서: 문자열의 배열, 값_header: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "header"이면
+            값들에 AST파서쓰기문자열(값_header)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceRouteMount"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceScreenDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_lines: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "lines"이면
+            값들에 AST파서쓰기배열노드(값_lines)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceScreenDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료SurfaceWindowFunctionDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_header: 문자열, 값_params: AST파서노드의 배열, 값_lines: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "header"이면
+            값들에 AST파서쓰기문자열(값_header)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "lines"이면
+            값들에 AST파서쓰기배열노드(값_lines)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("SurfaceWindowFunctionDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Switch은 (키순서: 문자열의 배열, 값_branches: AST파서분기의 배열, 값_else_body: AST파서문장줄의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "branches"이면
+            값들에 AST파서쓰기배열분기(값_branches)를 추가한다.
+        만약 키 == "else_body"이면
+            값들에 AST파서쓰기선택배열문장줄(값_else_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Switch"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료TakeDefine은 (키순서: 문자열의 배열, 값_name: 문자열, 값_address: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "address"이면
+            값들에 AST파서쓰기노드(값_address)를 추가한다.
+        만약 키 == "type_name"이면
+            값들에 AST파서쓰기문자열(값_type_name)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("TakeDefine"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음8은 (묶음: AST파서묶음8)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류8이다.
+    내용이 StructInitializerDef(키순서, 값_params, 값_assignments, 값_visibility, 값_sentence_warnings)인 경우
+        AST파서쓰기자료StructInitializerDef(키순서, 값_params, 값_assignments, 값_visibility, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceDatabaseBlock(키순서, 값_header, 값_lines, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceDatabaseBlock(키순서, 값_header, 값_lines, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceDatabaseStatement(키순서, 값_header, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceDatabaseStatement(키순서, 값_header, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceDisplayFunctionDef(키순서, 값_name, 값_header, 값_lines, 값_visibility, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceDisplayFunctionDef(키순서, 값_name, 값_header, 값_lines, 값_visibility, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceInheritDef(키순서, 값_name, 값_init, 값_type_name, 값_visibility, 값_legacy, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceInheritDef(키순서, 값_name, 값_init, 값_type_name, 값_visibility, 값_legacy, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfacePreviewDef(키순서, 값_name, 값_lines, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfacePreviewDef(키순서, 값_name, 값_lines, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceRouteBlock(키순서, 값_header, 값_lines, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceRouteBlock(키순서, 값_header, 값_lines, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceRouteMount(키순서, 값_header, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceRouteMount(키순서, 값_header, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceScreenDef(키순서, 값_name, 값_lines, 값_visibility, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceScreenDef(키순서, 값_name, 값_lines, 값_visibility, 값_sentence_warnings)를 JSON값으로 반환한다.
+    SurfaceWindowFunctionDef(키순서, 값_name, 값_header, 값_params, 값_lines, 값_visibility, 값_sentence_warnings)인 경우
+        AST파서쓰기자료SurfaceWindowFunctionDef(키순서, 값_name, 값_header, 값_params, 값_lines, 값_visibility, 값_sentence_warnings)를 JSON값으로 반환한다.
+    Switch(키순서, 값_branches, 값_else_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Switch(키순서, 값_branches, 값_else_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    TakeDefine(키순서, 값_name, 값_address, 값_type_name, 값_sentence_warnings)인 경우
+        AST파서쓰기자료TakeDefine(키순서, 값_name, 값_address, 값_type_name, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료Throw은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("Throw"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료TraitDef은 (키순서: 문자열의 배열, 값_name: 문자열, 값_self_type: 문자열, 값_supertraits: 문자열의 배열, 값_associated_types: 문자열의 배열, 값_associated_type_bounds: AST파서타입제약의 배열, 값_requirements: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "self_type"이면
+            값들에 AST파서쓰기문자열(값_self_type)를 추가한다.
+        만약 키 == "supertraits"이면
+            값들에 AST파서쓰기배열문자열(값_supertraits)를 추가한다.
+        만약 키 == "associated_types"이면
+            값들에 AST파서쓰기배열문자열(값_associated_types)를 추가한다.
+        만약 키 == "associated_type_bounds"이면
+            값들에 AST파서쓰기배열타입제약(값_associated_type_bounds)를 추가한다.
+        만약 키 == "requirements"이면
+            값들에 AST파서쓰기배열노드(값_requirements)를 추가한다.
+        만약 키 == "visibility"이면
+            값들에 AST파서쓰기열거원문(값_visibility)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("TraitDef"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료TraitRequirement은 (키순서: 문자열의 배열, 값_name: 문자열, 값_params: AST파서노드의 배열, 값_return_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "params"이면
+            값들에 AST파서쓰기배열노드(값_params)를 추가한다.
+        만약 키 == "return_type"이면
+            값들에 AST파서쓰기문자열(값_return_type)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("TraitRequirement"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료TransferOwnership은 (키순서: 문자열의 배열, 값_name: 문자열, 값_target: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "name"이면
+            값들에 AST파서쓰기문자열(값_name)를 추가한다.
+        만약 키 == "target"이면
+            값들에 AST파서쓰기문자열(값_target)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("TransferOwnership"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료TryBlock은 (키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_failure_body: AST파서문장줄의 배열?, 값_finally_body: AST파서문장줄의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "failure_body"이면
+            값들에 AST파서쓰기선택배열문장줄(값_failure_body)를 추가한다.
+        만약 키 == "finally_body"이면
+            값들에 AST파서쓰기선택배열문장줄(값_finally_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("TryBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료TryExpr은 (키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "expr"이면
+            값들에 AST파서쓰기노드(값_expr)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("TryExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료UnaryExpr은 (키순서: 문자열의 배열, 값_op: 문자열, 값_operand: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "op"이면
+            값들에 AST파서쓰기문자열(값_op)를 추가한다.
+        만약 키 == "operand"이면
+            값들에 AST파서쓰기노드(값_operand)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+        만약 키 == "source_expr_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_line"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_end_column"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+        만약 키 == "source_expr_tokens"이면
+            값들에 AST파서쓰기표현식위치(값_표현식위치, 키)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("UnaryExpr"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료UnsafeBlock은 (키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("UnsafeBlock"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료UnstructuredTaskStart은 (키순서: 문자열의 배열, 값_call: AST파서노드, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "call"이면
+            값들에 AST파서쓰기노드(값_call)를 추가한다.
+        만약 키 == "compiler_generated"이면
+            값들에 AST파서쓰기참거짓(값_compiler_generated)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("UnstructuredTaskStart"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기자료While은 (키순서: 문자열의 배열, 값_condition: AST파서노드, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)를 받아
+    변수 값들은 []이고, JSON값의 배열이다.
+    키순서에서 각 키마다
+        만약 키 == "condition"이면
+            값들에 AST파서쓰기노드(값_condition)를 추가한다.
+        만약 키 == "body"이면
+            값들에 AST파서쓰기배열문장줄(값_body)를 추가한다.
+        만약 키 == "sentence_warnings"이면
+            값들에 AST파서쓰기선택배열문장경고(값_sentence_warnings)를 추가한다.
+    JSON객체값(["kind", "fields"], [JSON문자열값("While"), JSON객체값(키순서, 값들)])을 JSON값으로 반환한다.
+
+함수 AST파서쓰기묶음9은 (묶음: AST파서묶음9)를 받아
+    상수 내용은 묶음.내용이고, AST파서묶음종류9이다.
+    내용이 Throw(키순서, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료Throw(키순서, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    TraitDef(키순서, 값_name, 값_self_type, 값_supertraits, 값_associated_types, 값_associated_type_bounds, 값_requirements, 값_visibility, 값_sentence_warnings)인 경우
+        AST파서쓰기자료TraitDef(키순서, 값_name, 값_self_type, 값_supertraits, 값_associated_types, 값_associated_type_bounds, 값_requirements, 값_visibility, 값_sentence_warnings)를 JSON값으로 반환한다.
+    TraitRequirement(키순서, 값_name, 값_params, 값_return_type, 값_sentence_warnings)인 경우
+        AST파서쓰기자료TraitRequirement(키순서, 값_name, 값_params, 값_return_type, 값_sentence_warnings)를 JSON값으로 반환한다.
+    TransferOwnership(키순서, 값_name, 값_target, 값_sentence_warnings)인 경우
+        AST파서쓰기자료TransferOwnership(키순서, 값_name, 값_target, 값_sentence_warnings)를 JSON값으로 반환한다.
+    TryBlock(키순서, 값_body, 값_failure_body, 값_finally_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료TryBlock(키순서, 값_body, 값_failure_body, 값_finally_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    TryExpr(키순서, 값_expr, 값_sentence_warnings)인 경우
+        AST파서쓰기자료TryExpr(키순서, 값_expr, 값_sentence_warnings)를 JSON값으로 반환한다.
+    UnaryExpr(키순서, 값_op, 값_operand, 값_sentence_warnings, 값_표현식위치)인 경우
+        AST파서쓰기자료UnaryExpr(키순서, 값_op, 값_operand, 값_sentence_warnings, 값_표현식위치)를 JSON값으로 반환한다.
+    UnsafeBlock(키순서, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료UnsafeBlock(키순서, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    UnstructuredTaskStart(키순서, 값_call, 값_compiler_generated, 값_sentence_warnings)인 경우
+        AST파서쓰기자료UnstructuredTaskStart(키순서, 값_call, 값_compiler_generated, 값_sentence_warnings)를 JSON값으로 반환한다.
+    While(키순서, 값_condition, 값_body, 값_sentence_warnings)인 경우
+        AST파서쓰기자료While(키순서, 값_condition, 값_body, 값_sentence_warnings)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+프로젝트 내부 함수 AST파서쓰기노드은 (노드: AST파서노드)를 받아
+    상수 내용은 노드.내용이고, AST파서내용이다.
+    내용이 그룹0(묶음)인 경우
+        AST파서쓰기묶음0(묶음)을 JSON값으로 반환한다.
+    그룹1(묶음)인 경우
+        AST파서쓰기묶음1(묶음)을 JSON값으로 반환한다.
+    그룹2(묶음)인 경우
+        AST파서쓰기묶음2(묶음)을 JSON값으로 반환한다.
+    그룹3(묶음)인 경우
+        AST파서쓰기묶음3(묶음)을 JSON값으로 반환한다.
+    그룹4(묶음)인 경우
+        AST파서쓰기묶음4(묶음)을 JSON값으로 반환한다.
+    그룹5(묶음)인 경우
+        AST파서쓰기묶음5(묶음)을 JSON값으로 반환한다.
+    그룹6(묶음)인 경우
+        AST파서쓰기묶음6(묶음)을 JSON값으로 반환한다.
+    그룹7(묶음)인 경우
+        AST파서쓰기묶음7(묶음)을 JSON값으로 반환한다.
+    그룹8(묶음)인 경우
+        AST파서쓰기묶음8(묶음)을 JSON값으로 반환한다.
+    그룹9(묶음)인 경우
+        AST파서쓰기묶음9(묶음)을 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.
+
+프로젝트 내부 함수 AST파서문장들JSON은 (문장들: AST파서문장줄의 배열)를 받아
+    AST파서쓰기배열문장줄(문장들).배열값을 JSON값의 배열로 반환한다.
+
+프로젝트 내부 함수 파서출력JSON은 (결과: AST소스파싱결과)를 받아
+    결과가 읽음(위치, 문장들)인 경우
+        문장파싱결과(성공: 참, 위치: 위치, 문장들: AST파서문장들JSON(문장들), 오류들: [], 오류: "")을 문장파싱결과로 반환한다.
+    문법오류(위치, 오류들, 오류)인 경우
+        문장파싱결과(성공: 거짓, 위치: 위치, 문장들: [], 오류들: 오류들, 오류: 오류)를 문장파싱결과로 반환한다.
+    모형오류(이유)인 경우
+        파서출력모형오류JSON(이유)를 문장파싱결과로 반환한다.
+    문장파싱결과(성공: 거짓, 위치: 0, 문장들: [], 오류들: [], 오류: "내부 오류: 파서 출력")를 문장파싱결과로 반환한다.
+
+함수 AST파서쓰기표현식위치는 (값: AST파서표현식위치?, 키: 문자열)를 받아
+    만약 값이 없으면
+        JSON널()을 JSON값으로 반환한다.
+    상수 위치는 값!이고, AST파서표현식위치이다.
+    만약 키 == "source_expr_line"이면
+        AST파서쓰기선택문자열(위치.값_source_expr_line)를 JSON값으로 반환한다.
+    만약 키 == "source_expr_column"이면
+        AST파서쓰기선택문자열(위치.값_source_expr_column)를 JSON값으로 반환한다.
+    만약 키 == "source_expr_end_line"이면
+        AST파서쓰기선택문자열(위치.값_source_expr_end_line)를 JSON값으로 반환한다.
+    만약 키 == "source_expr_end_column"이면
+        AST파서쓰기선택문자열(위치.값_source_expr_end_column)를 JSON값으로 반환한다.
+    만약 키 == "source_expr_tokens"이면
+        AST파서쓰기선택문자열(위치.값_source_expr_tokens)를 JSON값으로 반환한다.
+    JSON널()을 JSON값으로 반환한다.

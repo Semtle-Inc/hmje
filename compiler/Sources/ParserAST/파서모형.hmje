@@ -1,0 +1,376 @@
+기반을 가져온다.
+
+# 파서 문서의 닫힌 payload 모형. JSON은 codec 경계에만 둔다.
+# 현재 종류 저장소는 모든 사례 슬롯을 합산하므로 작은 그룹으로 나눈다.
+# 사례의 필드는 종류 payload에 직접 둔다. 재귀는 불변 노드·그룹 참조에서 끝난다.
+
+AST파서종류의 프로젝트 내부 종류는
+    AddressOfExpr과,
+    ArrayBufferViewExpr과,
+    ArrayLiteral과,
+    Assign과,
+    AsyncRootRun과,
+    AwaitExpr과,
+    BinaryExpr과,
+    BlockInheritedDecl과,
+    BlockModifierDef과,
+    BlockModifierParam과,
+    BoolExprCondition과,
+    BoolLiteral과,
+    BorrowDefine과,
+    Break과,
+    CallExpr과,
+    CastExpr과,
+    ChannelAsyncReceiveExpr과,
+    ChannelAsyncSendExpr과,
+    ChannelClose과,
+    ChannelCreate과,
+    ChannelReceiveExpr과,
+    ChannelSend과,
+    ChannelTrySendExpr과,
+    ClassDef과,
+    ClassField과,
+    CompareCondition과,
+    ConcurrentBlock과,
+    Continue과,
+    DeadlineBlock과,
+    DeferredDefaultExpr과,
+    Define과,
+    DynamicArrayAppend과,
+    DynamicArrayClear과,
+    DynamicArrayInsert과,
+    DynamicArrayPopExpr과,
+    DynamicArrayRemove과,
+    DynamicArrayReserve과,
+    EnumDef과,
+    Execute과,
+    ExprStmt과,
+    ExtensionDef과,
+    ExternalGlobal과,
+    FieldAccessExpr과,
+    FieldTarget과,
+    FileDataExpr과,
+    FilterDefine과,
+    FixedArrayFillExpr과,
+    FloatLiteral과,
+    ForEach과,
+    Forget과,
+    FunctionAddressExpr과,
+    FunctionDef과,
+    FunctionModifierDef과,
+    FunctionValueDefine과,
+    GlobalDefine과,
+    IdentityCompareExpr과,
+    If과,
+    Import과,
+    IndexAccessExpr과,
+    IndexTarget과,
+    IntLiteral과,
+    LogicalCondition과,
+    LoopModifierDef과,
+    ManualRelease과,
+    MapDefine과,
+    MemoryReadExpr과,
+    MemoryTarget과,
+    ModifierDef과,
+    ModuleImport과,
+    ModuleReexport과,
+    MoveDefine과,
+    NameExpr과,
+    NameTarget과,
+    NotCondition과,
+    OffsetMemoryReadExpr과,
+    OffsetMemoryTarget과,
+    OptionalBindCondition과,
+    OptionalHasValueCondition과,
+    OptionalNoneExpr과,
+    OptionalUnwrapExpr과,
+    OverlayBindExpr과,
+    Parameter과,
+    PinAddress과,
+    PreemptDisableBlock과,
+    ReferenceDefine과,
+    Return과,
+    SortDefine과,
+    SourceLine과,
+    StorageModifierDef과,
+    StoredBody과,
+    StoredField과,
+    StringLiteral과,
+    StructDef과,
+    StructFieldMetadata과,
+    StructInitExpr과,
+    StructInitializerAssignment과,
+    StructInitializerDef과,
+    SurfaceDatabaseBlock과,
+    SurfaceDatabaseStatement과,
+    SurfaceDisplayFunctionDef과,
+    SurfaceInheritDef과,
+    SurfacePreviewDef과,
+    SurfaceRouteBlock과,
+    SurfaceRouteMount과,
+    SurfaceScreenDef과,
+    SurfaceWindowFunctionDef과,
+    Switch과,
+    TakeDefine과,
+    Throw과,
+    TraitDef과,
+    TraitRequirement과,
+    TransferOwnership과,
+    TryBlock과,
+    TryExpr과,
+    UnaryExpr과,
+    UnsafeBlock과,
+    UnstructuredTaskStart과,
+    While과,
+    알수없음이다.
+
+AST파서내용의 프로젝트 내부 종류는
+    그룹0(값: AST파서묶음0)과,
+    그룹1(값: AST파서묶음1)과,
+    그룹2(값: AST파서묶음2)과,
+    그룹3(값: AST파서묶음3)과,
+    그룹4(값: AST파서묶음4)과,
+    그룹5(값: AST파서묶음5)과,
+    그룹6(값: AST파서묶음6)과,
+    그룹7(값: AST파서묶음7)과,
+    그룹8(값: AST파서묶음8)과,
+    그룹9(값: AST파서묶음9)이다.
+
+프로젝트 내부 클래스 AST파서노드의
+    프로젝트 내부 상수 내용은 AST파서내용이다.
+
+AST파서묶음종류0의 프로젝트 내부 종류는
+    AddressOfExpr(키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ArrayBufferViewExpr(키순서: 문자열의 배열, 값_array: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ArrayLiteral(키순서: 문자열의 배열, 값_elements: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Assign(키순서: 문자열의 배열, 값_target: AST파서노드, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    AsyncRootRun(키순서: 문자열의 배열, 값_call: AST파서노드, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    AwaitExpr(키순서: 문자열의 배열, 값_call: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    BinaryExpr(키순서: 문자열의 배열, 값_left: AST파서노드, 값_op: 문자열, 값_right: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    BlockInheritedDecl(키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    BlockModifierDef(키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    BlockModifierParam(키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_default: AST파서노드?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    BoolExprCondition(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    BoolLiteral(키순서: 문자열의 배열, 값_value: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음0의
+    프로젝트 내부 상수 내용은 AST파서묶음종류0이다.
+
+AST파서묶음종류1의 프로젝트 내부 종류는
+    BorrowDefine(키순서: 문자열의 배열, 값_name: 문자열, 값_address: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Break(키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    CallExpr(키순서: 문자열의 배열, 값_name: 문자열, 값_args: AST파서식인자의 배열, 값_compiler_generated: 참거짓?, 값_natural: 참거짓?, 값_subject_value: 참거짓?, 값_deprecated: 문자열?, 값_module_qualifier: 문자열?, 값_method_call: 참거짓?, 값_wait_statement: 참거짓?, 값_named_args: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    CastExpr(키순서: 문자열의 배열, 값_type_name: 문자열, 값_expr: AST파서노드, 값_compiler_generated: 참거짓, 값_source_cast_line: 문자열?, 값_source_cast_column: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    ChannelAsyncReceiveExpr(키순서: 문자열의 배열, 값_receiver: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ChannelAsyncSendExpr(키순서: 문자열의 배열, 값_value: AST파서노드, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ChannelClose(키순서: 문자열의 배열, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ChannelCreate(키순서: 문자열의 배열, 값_sender_name: 문자열, 값_receiver_name: 문자열, 값_capacity: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ChannelReceiveExpr(키순서: 문자열의 배열, 값_receiver: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ChannelSend(키순서: 문자열의 배열, 값_value: AST파서노드, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ChannelTrySendExpr(키순서: 문자열의 배열, 값_value: AST파서노드, 값_sender: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ClassDef(키순서: 문자열의 배열, 값_name: 문자열, 값_visibility: AST파서열거원문, 값_modifiers: 문자열의 배열, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_fields: AST파서노드의 배열, 값_methods: AST파서문장줄의 배열, 값_init_body: AST파서문장줄의 배열?, 값_deinit_body: AST파서문장줄의 배열?, 값_db_body: AST파서노드?, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음1의
+    프로젝트 내부 상수 내용은 AST파서묶음종류1이다.
+
+AST파서묶음종류2의 프로젝트 내부 종류는
+    ClassField(키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_default: AST파서노드?, 값_mutability: 문자열, 값_weak: 참거짓, 값_modifier_words: 문자열, 값_visibility: AST파서열거원문, 값_line: AST파서정수원문, 값_db_field: AST파서노드?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    CompareCondition(키순서: 문자열의 배열, 값_left: AST파서노드, 값_op: 문자열, 값_right: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ConcurrentBlock(키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Continue(키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DeadlineBlock(키순서: 문자열의 배열, 값_milliseconds: AST파서노드, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DeferredDefaultExpr(키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Define(키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_type_name: 문자열?, 값_expr: AST파서노드, 값_retain_borrowed_owner: 참거짓, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DynamicArrayAppend(키순서: 문자열의 배열, 값_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DynamicArrayClear(키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DynamicArrayInsert(키순서: 문자열의 배열, 값_target: AST파서노드, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DynamicArrayPopExpr(키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    DynamicArrayRemove(키순서: 문자열의 배열, 값_target: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음2의
+    프로젝트 내부 상수 내용은 AST파서묶음종류2이다.
+
+AST파서묶음종류3의 프로젝트 내부 종류는
+    DynamicArrayReserve(키순서: 문자열의 배열, 값_name: 문자열, 값_capacity: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    EnumDef(키순서: 문자열의 배열, 값_name: 문자열, 값_base_type: 문자열?, 값_cases: AST파서열거사례의 배열, 값_visibility: AST파서열거원문, 값_deprecated_block: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Execute(키순서: 문자열의 배열, 값_name: 문자열, 값_args: AST파서호출인자의 배열, 값_is_try: 참거짓, 값_module_qualifier: 문자열?, 값_method_call: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ExprStmt(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_deprecated_bare_call: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ExtensionDef(키순서: 문자열의 배열, 값_name: 문자열, 값_methods: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ExternalGlobal(키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FieldAccessExpr(키순서: 문자열의 배열, 값_base: AST파서노드, 값_field: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    FieldTarget(키순서: 문자열의 배열, 값_base: AST파서노드?, 값_field: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FileDataExpr(키순서: 문자열의 배열, 값_path: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FilterDefine(키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_array: AST파서노드, 값_item_name: 문자열, 값_condition: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FixedArrayFillExpr(키순서: 문자열의 배열, 값_value: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FloatLiteral(키순서: 문자열의 배열, 값_value: AST파서실수원문, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)이다.
+
+프로젝트 내부 클래스 AST파서묶음3의
+    프로젝트 내부 상수 내용은 AST파서묶음종류3이다.
+
+AST파서묶음종류4의 프로젝트 내부 종류는
+    ForEach(키순서: 문자열의 배열, 값_array: AST파서노드, 값_item_name: 문자열, 값_position_name: 문자열?, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Forget(키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FunctionAddressExpr(키순서: 문자열의 배열, 값_name: 문자열, 값_entry_param_types: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FunctionDef(키순서: 문자열의 배열, 값_name: 문자열, 값_params: AST파서노드의 배열, 값_body: AST파서문장줄의 배열, 값_return_type: 문자열?, 값_external_name: 문자열?, 값_unsafe: 참거짓, 값_can_fail: 참거짓, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_visibility: AST파서열거원문, 값_compiler_generated: 참거짓, 값_is_async: 참거짓, 값_opaque_trait_name: 문자열?, 값_error_type: 문자열?, 값_source_path: 문자열?, 값_nominal_owner: 문자열?, 값_nominal_key: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FunctionModifierDef(키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_setup: AST파서문장줄의 배열, 값_finish: AST파서문장줄의 배열, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    FunctionValueDefine(키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_function_name: 문자열, 값_params: AST파서노드의 배열, 값_return_type: 문자열?, 값_body: AST파서문장줄의 배열, 값_compiler_generated: 참거짓, 값_is_async: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    GlobalDefine(키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_type_name: 문자열, 값_expr: AST파서노드, 값_section: 문자열?, 값_alignment: AST파서정수원문?, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    IdentityCompareExpr(키순서: 문자열의 배열, 값_left: AST파서노드, 값_right: AST파서노드, 값_negate: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    If(키순서: 문자열의 배열, 값_branches: AST파서분기의 배열, 값_else_body: AST파서문장줄의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Import(키순서: 문자열의 배열, 값_path: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    IndexAccessExpr(키순서: 문자열의 배열, 값_base: AST파서노드, 값_index: AST파서노드, 값_natural: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    IndexTarget(키순서: 문자열의 배열, 값_base: AST파서노드?, 값_index: AST파서노드, 값_natural: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음4의
+    프로젝트 내부 상수 내용은 AST파서묶음종류4이다.
+
+AST파서묶음종류5의 프로젝트 내부 종류는
+    IntLiteral(키순서: 문자열의 배열, 값_value: AST파서정수원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    LogicalCondition(키순서: 문자열의 배열, 값_left: AST파서노드, 값_op: 문자열, 값_right: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    LoopModifierDef(키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_setup: AST파서문장줄의 배열, 값_step: AST파서문장줄의 배열, 값_finish: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ManualRelease(키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    MapDefine(키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_array: AST파서노드, 값_item_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    MemoryReadExpr(키순서: 문자열의 배열, 값_base: AST파서노드, 값_index: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    MemoryTarget(키순서: 문자열의 배열, 값_base: AST파서노드, 값_index: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ModifierDef(키순서: 문자열의 배열, 값_kind: 문자열, 값_phrase: 문자열, 값_conjugation: 문자열, 값_targets: 문자열, 값_field_type: 문자열, 값_count: 문자열, 값_thread: 문자열, 값_role: 문자열, 값_hooks: AST파서훅의 배열, 값_visibility: AST파서열거원문, 값_quoted_properties: AST파서문자경고의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ModuleImport(키순서: 문자열의 배열, 값_module_name: 문자열, 값_reexport: 참거짓?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    ModuleReexport(키순서: 문자열의 배열, 값_module_name: 문자열, 값_names: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    MoveDefine(키순서: 문자열의 배열, 값_source: 문자열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    NameExpr(키순서: 문자열의 배열, 값_name: 문자열, 값_compiler_generated: 참거짓?, 값_module_qualifier: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)이다.
+
+프로젝트 내부 클래스 AST파서묶음5의
+    프로젝트 내부 상수 내용은 AST파서묶음종류5이다.
+
+AST파서묶음종류6의 프로젝트 내부 종류는
+    NameTarget(키순서: 문자열의 배열, 값_name: 문자열, 값_module_qualifier: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    NotCondition(키순서: 문자열의 배열, 값_condition: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    OffsetMemoryReadExpr(키순서: 문자열의 배열, 값_address: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    OffsetMemoryTarget(키순서: 문자열의 배열, 값_address: AST파서노드, 값_value_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    OptionalBindCondition(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_name: 문자열, 값_narrowed: 참거짓?, 값_deprecated: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    OptionalHasValueCondition(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_has_value: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    OptionalNoneExpr(키순서: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    OptionalUnwrapExpr(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    OverlayBindExpr(키순서: 문자열의 배열, 값_buffer: AST파서노드, 값_struct_name: 문자열, 값_is_array: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Parameter(키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_consuming: 참거짓, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    PinAddress(키순서: 문자열의 배열, 값_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    PreemptDisableBlock(키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음6의
+    프로젝트 내부 상수 내용은 AST파서묶음종류6이다.
+
+AST파서묶음종류7의 프로젝트 내부 종류는
+    ReferenceDefine(키순서: 문자열의 배열, 값_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Return(키순서: 문자열의 배열, 값_expr: AST파서노드?, 값_type_name: 문자열?, 값_compiler_generated: 참거짓, 값_opaque_trait_name: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SortDefine(키순서: 문자열의 배열, 값_mutable: 참거짓, 값_name: 문자열, 값_array: AST파서노드, 값_left_name: 문자열?, 값_right_name: 문자열?, 값_condition: AST파서노드?, 값_item_name: 문자열?, 값_key_expr: AST파서노드?, 값_descending: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SourceLine(키순서: 문자열의 배열, 값_line_no: AST파서정수원문, 값_indent: AST파서정수원문, 값_text: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StorageModifierDef(키순서: 문자열의 배열, 값_phrase: 문자열, 값_params: AST파서노드의 배열, 값_setup: AST파서문장줄의 배열, 값_read: AST파서문장줄의 배열, 값_write: AST파서문장줄의 배열, 값_write_params: AST파서노드의 배열, 값_finish: AST파서문장줄의 배열, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StoredBody(키순서: 문자열의 배열, 값_table: AST파서노드?, 값_line: AST파서정수원문, 값_unique_sets: AST파서고유조합의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StoredField(키순서: 문자열의 배열, 값_column: 문자열?, 값_primary_key: 참거짓, 값_unique: 참거짓, 값_auto: 참거짓, 값_db_default: AST파서노드?, 값_default_case: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StringLiteral(키순서: 문자열의 배열, 값_value: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StructDef(키순서: 문자열의 배열, 값_name: 문자열, 값_fields: AST파서문자지도, 값_packed: 참거짓, 값_endian: 문자열?, 값_type_params: 문자열의 배열, 값_type_constraints: AST파서타입제약의 배열, 값_visibility: AST파서열거원문, 값_field_metadata: AST파서노드의 배열, 값_initializers: AST파서노드의 배열, 값_member_functions: AST파서문장줄의 배열, 값_compiler_generated: 참거짓, 값_compiler_generated_fields: 문자열의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StructFieldMetadata(키순서: 문자열의 배열, 값_name: 문자열, 값_type_name: 문자열, 값_visibility: AST파서열거원문, 값_mutability: 문자열, 값_line: AST파서정수원문, 값_modifier_words: 문자열의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StructInitExpr(키순서: 문자열의 배열, 값_name: 문자열, 값_fields: AST파서노드지도, 값_unsafe: 참거짓, 값_base: AST파서노드?, 값_compiler_generated: 참거짓, 값_module_qualifier: 문자열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    StructInitializerAssignment(키순서: 문자열의 배열, 값_field_name: 문자열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음7의
+    프로젝트 내부 상수 내용은 AST파서묶음종류7이다.
+
+AST파서묶음종류8의 프로젝트 내부 종류는
+    StructInitializerDef(키순서: 문자열의 배열, 값_params: AST파서노드의 배열, 값_assignments: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceDatabaseBlock(키순서: 문자열의 배열, 값_header: 문자열, 값_lines: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceDatabaseStatement(키순서: 문자열의 배열, 값_header: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceDisplayFunctionDef(키순서: 문자열의 배열, 값_name: 문자열, 값_header: 문자열, 값_lines: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceInheritDef(키순서: 문자열의 배열, 값_name: 문자열, 값_init: 문자열, 값_type_name: 문자열, 값_visibility: AST파서열거원문, 값_legacy: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfacePreviewDef(키순서: 문자열의 배열, 값_name: 문자열, 값_lines: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceRouteBlock(키순서: 문자열의 배열, 값_header: 문자열, 값_lines: AST파서노드의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceRouteMount(키순서: 문자열의 배열, 값_header: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceScreenDef(키순서: 문자열의 배열, 값_name: 문자열, 값_lines: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    SurfaceWindowFunctionDef(키순서: 문자열의 배열, 값_name: 문자열, 값_header: 문자열, 값_params: AST파서노드의 배열, 값_lines: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    Switch(키순서: 문자열의 배열, 값_branches: AST파서분기의 배열, 값_else_body: AST파서문장줄의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    TakeDefine(키순서: 문자열의 배열, 값_name: 문자열, 값_address: AST파서노드, 값_type_name: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음8의
+    프로젝트 내부 상수 내용은 AST파서묶음종류8이다.
+
+AST파서묶음종류9의 프로젝트 내부 종류는
+    Throw(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    TraitDef(키순서: 문자열의 배열, 값_name: 문자열, 값_self_type: 문자열, 값_supertraits: 문자열의 배열, 값_associated_types: 문자열의 배열, 값_associated_type_bounds: AST파서타입제약의 배열, 값_requirements: AST파서노드의 배열, 값_visibility: AST파서열거원문, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    TraitRequirement(키순서: 문자열의 배열, 값_name: 문자열, 값_params: AST파서노드의 배열, 값_return_type: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    TransferOwnership(키순서: 문자열의 배열, 값_name: 문자열, 값_target: 문자열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    TryBlock(키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_failure_body: AST파서문장줄의 배열?, 값_finally_body: AST파서문장줄의 배열?, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    TryExpr(키순서: 문자열의 배열, 값_expr: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    UnaryExpr(키순서: 문자열의 배열, 값_op: 문자열, 값_operand: AST파서노드, 값_sentence_warnings: AST파서문장경고의 배열?, 값_표현식위치: AST파서표현식위치?)과,
+    UnsafeBlock(키순서: 문자열의 배열, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    UnstructuredTaskStart(키순서: 문자열의 배열, 값_call: AST파서노드, 값_compiler_generated: 참거짓, 값_sentence_warnings: AST파서문장경고의 배열?)과,
+    While(키순서: 문자열의 배열, 값_condition: AST파서노드, 값_body: AST파서문장줄의 배열, 값_sentence_warnings: AST파서문장경고의 배열?)이다.
+
+프로젝트 내부 클래스 AST파서묶음9의
+    프로젝트 내부 상수 내용은 AST파서묶음종류9이다.
+
+AST파서식인자의 프로젝트 내부 종류는
+    위치(값: AST파서노드)과,
+    이름(값: AST파서호출인자)이다.
+
+프로젝트 내부 구조체 AST파서정수원문의
+    프로젝트 내부 값_raw는 문자열이다.
+
+프로젝트 내부 구조체 AST파서실수원문의
+    프로젝트 내부 값_raw는 문자열이다.
+
+프로젝트 내부 구조체 AST파서열거원문의
+    프로젝트 내부 값_enum는 문자열이고,
+    프로젝트 내부 값_value는 문자열이다.
+
+프로젝트 내부 구조체 AST파서문장줄의
+    프로젝트 내부 값_line는 AST파서정수원문이고,
+    프로젝트 내부 값_node는 AST파서노드이다.
+
+프로젝트 내부 구조체 AST파서분기의
+    프로젝트 내부 값_condition는 AST파서노드이고,
+    프로젝트 내부 값_body는 AST파서문장줄의 배열이다.
+
+프로젝트 내부 구조체 AST파서타입제약의
+    프로젝트 내부 값_name는 문자열이고,
+    프로젝트 내부 값_traits는 문자열의 배열이다.
+
+프로젝트 내부 구조체 AST파서호출인자의
+    프로젝트 내부 값_label는 문자열이고,
+    프로젝트 내부 값_value는 AST파서노드이다.
+
+프로젝트 내부 구조체 AST파서열거사례의
+    프로젝트 내부 값_name는 문자열이고,
+    프로젝트 내부 값_value는 AST파서노드?이고,
+    프로젝트 내부 값_params는 AST파서노드의 배열이다.
+
+프로젝트 내부 구조체 AST파서훅의
+    프로젝트 내부 값_name는 문자열이고,
+    프로젝트 내부 값_body는 AST파서문장줄의 배열이다.
+
+프로젝트 내부 구조체 AST파서문장경고의
+    프로젝트 내부 값_line는 AST파서정수원문이고,
+    프로젝트 내부 값_message는 문자열이다.
+
+프로젝트 내부 구조체 AST파서문자경고의
+    프로젝트 내부 값_line는 문자열이고,
+    프로젝트 내부 값_message는 문자열이다.
+
+프로젝트 내부 구조체 AST파서고유조합의
+    프로젝트 내부 값_line는 AST파서정수원문이고,
+    프로젝트 내부 값_names는 문자열의 배열이다.
+
+프로젝트 내부 구조체 AST파서문자지도의
+    프로젝트 내부 순서는 문자열의 배열이고,
+    프로젝트 내부 값들은 문자열로 문자열를 찾는 사전이다.
+
+프로젝트 내부 구조체 AST파서노드지도의
+    프로젝트 내부 순서는 문자열의 배열이고,
+    프로젝트 내부 값들은 문자열로 AST파서노드?를 찾는 사전이다.
+
+# 여러 식 사례가 공유하는 원문 위치. 종류의 반복 슬롯에는 참조만 둔다.
+프로젝트 내부 클래스 AST파서표현식위치의
+    프로젝트 내부 상수 값_source_expr_line는 문자열?이다.
+    프로젝트 내부 상수 값_source_expr_column는 문자열?이다.
+    프로젝트 내부 상수 값_source_expr_end_line는 문자열?이다.
+    프로젝트 내부 상수 값_source_expr_end_column는 문자열?이다.
+    프로젝트 내부 상수 값_source_expr_tokens는 문자열?이다.

@@ -1,0 +1,21 @@
+프로젝트 hmje-syntax의
+    버전은 "0.1.0"이다.
+
+# 표준·기반·HmjeUI는 설치된 툴체인의 플랫폼 라이브러리에서 찾는다(`의존 프로젝트` 불필요).
+
+# 훈민정음 원본을 조각(글, 종류)으로 가르는 구문 강조기. UI에 의존하지 않는다.
+모듈 HmjeSyntax의
+    원본 경로는 "Sources/HmjeSyntax"이다.
+
+라이브러리 HmjeSyntax의
+    내보내는 모듈은 HmjeSyntax이다.
+
+모듈 SyntaxSmoke의
+    원본 경로는 "Tests/SyntaxSmoke"이고,
+    의존 모듈은 HmjeSyntax이다.
+
+실행 파일 SyntaxSmoke의
+    시작 모듈은 SyntaxSmoke이고,
+    지원 플랫폼은
+        macOS 14 이상과,
+        Linux이다.

@@ -1,0 +1,76 @@
+HMJE 앱 포함 런타임·라이브러리 라이선스 — Beta 1
+라이선스 버전 1.0 · 2026-10-09
+Copyright (c) 2026 오현우. All rights reserved.
+
+한국어 (주 문서)
+
+1. 적용 범위
+library/, libraries/, platforms/의 HMJE 런타임·표준·플랫폼 라이브러리와
+얇은 운영체제 연결 코드에 적용합니다. compiler/runtime/ 중 최종 앱에
+링크되는 런타임 코드도 포함합니다. 컴파일러 전용 호스트 서비스와 컴파일러·
+IDE·빌드 도구 자체에는 LICENSE가 적용됩니다. 제삼자 코드는 원래 라이선스를
+따르며, 이 문서는 그 권리를 줄이거나 대체하지 않습니다. 개별 파일에 명시한
+다른 라이선스가 있으면 그 라이선스가 우선합니다. 소스 아카이브에도 압축 해제
+후 위 경로와 구성요소 기준을 적용합니다.
+
+2. 사용·수정·앱 내 재배포 허용
+개인·법인은 라이브러리를 무료로 사용·복제·수정·빌드하고, 자신의 앱에
+포함하여 소스 또는 바이너리 형태로 재배포할 수 있습니다. 상용 앱의 판매와
+배포도 허용합니다. 앱 수신자는 그 앱을 사용하고 배포하는 데 필요한 범위의
+권리를 받습니다. 자신의 앱 코드에 이 라이선스를 적용할 의무는 없습니다.
+라이브러리를 독립 개발 도구·SDK·대체 플랫폼 제품으로 판매·재라이선스·
+재배포하는 권리는 이 허가에 포함되지 않습니다.
+
+3. 기여 표시 조건
+HMJE 라이브러리를 포함한 앱의 정보 화면 또는 사용자 문서에 아래 두 문구
+중 하나를 읽을 수 있게 표시해야 합니다.
+
+훈민정음(HMJE)으로 만들었습니다
+Built with HMJE
+
+앱에 포함하여 재배포하는 소스에는 저작권 표시와 이 라이선스를 보존하고,
+제삼자 자료에는 해당 라이선스·고지 조건을 지켜야 합니다. 라이브러리 수정은
+공식 원본이 수정본을 보증하는 것처럼 표시하지 않아야 합니다.
+
+4. 권리·상표·종료
+명시한 앱 내 재배포 외의 권리는 부여하지 않습니다. “HMJE”와 “훈민정음 IDE”는
+저작권자 오현우의 이름·상표이며 상표 권리를 부여하지 않습니다. 위의 사실에 맞는
+기여 표시는 허용됩니다. 조건 위반 시 허가는 종료됩니다. 이 라이선스는
+OSI 오픈 소스 라이선스가 아닌 소스 공개 라이선스입니다.
+
+5. 보증과 책임
+법률이 허용하는 범위에서 코드는 보증 없이 현 상태로 제공되며 저작권자, 배포자 Semtle Inc., 기여자는 사용으로 발생한 손해에 책임을 지지 않습니다. 이 라이선스는 적용
+법률에 따라 배제하거나 제한할 수 없는 권리와 책임을 배제하거나 제한하지
+않습니다. 해석 차이가 있으면
+한국어 문서를 우선합니다.
+
+English (reference translation)
+
+This license covers HMJE runtime, standard and platform library code and thin OS
+interfaces in library/, libraries/ and platforms/, including application runtime
+code linked from compiler/runtime/. Compiler-only host services and the tools
+and IDE themselves are governed by LICENSE. Third-party code keeps its original
+license; this license does not restrict or replace those rights. A different
+license expressly stated for an individual file takes precedence. For archived
+sources, the same paths and component scope apply after extraction.
+
+Individuals and organizations may use, copy, modify and build the libraries free
+of charge and redistribute them as source or binaries embedded in their own
+applications, including commercially sold applications. Recipients receive the
+rights needed to use and distribute those applications. Your own application
+code need not adopt this license. This permission does not include selling,
+sublicensing or redistributing the libraries as standalone development tools,
+SDKs or substitute platform products.
+
+An application's about screen or user documentation must display either:
+“훈민정음(HMJE)으로 만들었습니다” or “Built with HMJE”. Preserve copyright and this
+license in redistributed source, and comply with third-party notices and
+licenses. Do not imply that official upstream authors endorse modifications.
+
+No unexpressed rights or trademark rights are granted. “HMJE” and “훈민정음 IDE”
+are names/trademarks of the Licensor (오현우); truthful acknowledgement is permitted.
+Permission terminates upon breach. This is a source-available license, not an
+OSI open-source license. To the extent permitted by law, the code is supplied AS
+IS without warranties or liability. This license does not exclude or limit
+rights or liabilities that cannot be excluded or limited under applicable law.
+The Korean text controls.

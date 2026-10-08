@@ -1,0 +1,2094 @@
+# HmjeGPU: SemtleOS GPU device ABI v2 위의 userspace virgl 렌더러.
+#
+# 이 파일은 UI display list를 소유하지 않는다. gpu_command_renderer.hmje가 이미
+# 정규화한 GPU_COMMAND_*만 받아 저수준 virgl 명령으로 바꾼다. 한 프레임은 항상
+# persistent offscreen target에 먼저 그린다. 화면 target의 END에서만 offscreen을
+# scanout으로 복사하고 PRESENT하므로, 중간 명령 실패/ABORT가 부분 화면을 노출하지
+# 않는다. 지원하지 않는 명령은 -ENOSYS로 거절해 기존 CPU 전체 재생으로 넘긴다.
+운영체제를 가져온다.
+
+"../device/gpu_device.hmje"를 가져온다.
+
+전역 상수 HMJEGPU_오류_지원안함은 정수(0 - 38)이고, 정수이다.
+전역 상수 HMJEGPU_오류_잘못됨은 정수(0 - 22)이고, 정수이다.
+전역 상수 HMJEGPU_명령용량은 자연수(65504)이고, 자연수이다.
+전역 상수 HMJEGPU_정점용량은 자연수(1048576)이고, 자연수이다.
+전역 상수 HMJEGPU_정점바이트는 자연수(48)이고, 자연수이다.
+전역 상수 HMJEGPU_최대참조수는 자연수(64)이고, 자연수이다.
+전역 상수 HMJEGPU_최대임시수는 자연수(60)이고, 자연수이다.
+전역 상수 HMJEGPU_임시레코드바이트는 자연수(32)이고, 자연수이다.
+전역 상수 HMJEGPU_최대레이어깊이는 자연수(8)이고, 자연수이다.
+전역 상수 HMJEGPU_업로드한계는 자연수(1048576)이고, 자연수이다.
+전역 상수 HMJEGPU_글리프아틀라스크기는 자연수(1024)이고, 자연수이다.
+
+# virgl_protocol.h의 stable wire 값. 헤더는 cmd | object<<8 | payload_dwords<<16.
+전역 상수 HMJEGPU_VIRGL_CREATE_OBJECT는 자연수32(1)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_BIND_OBJECT는 자연수32(2)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_DESTROY_OBJECT는 자연수32(3)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_SET_VIEWPORT는 자연수32(4)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_SET_FRAMEBUFFER는 자연수32(5)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_SET_VERTEX_BUFFERS는 자연수32(6)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_DRAW_VBO는 자연수32(8)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_SET_SAMPLER_VIEWS는 자연수32(10)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_SET_CONSTANT_BUFFER는 자연수32(12)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_SET_SCISSOR는 자연수32(15)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_RESOURCE_COPY_REGION는 자연수32(17)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_BIND_SAMPLER_STATES는 자연수32(18)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_BIND_SHADER는 자연수32(31)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_LINK_SHADER는 자연수32(51)이고, 자연수32이다.
+
+전역 상수 HMJEGPU_VIRGL_OBJECT_BLEND는 자연수32(1)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_RASTERIZER는 자연수32(2)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_DSA는 자연수32(3)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_SHADER는 자연수32(4)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_VERTEX_ELEMENTS는 자연수32(5)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_SAMPLER_VIEW는 자연수32(6)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_SAMPLER_STATE는 자연수32(7)이고, 자연수32이다.
+전역 상수 HMJEGPU_VIRGL_OBJECT_SURFACE는 자연수32(8)이고, 자연수32이다.
+
+전역 상수 HMJEGPU_FORMAT_BGRX8는 자연수32(2)이고, 자연수32이다.
+전역 상수 HMJEGPU_FORMAT_RGBA32F는 자연수32(31)이고, 자연수32이다.
+전역 상수 HMJEGPU_FORMAT_R8는 자연수32(64)이고, 자연수32이다.
+전역 상수 HMJEGPU_PRIM_TRIANGLES는 자연수32(4)이고, 자연수32이다.
+전역 상수 HMJEGPU_SHADER_VERTEX는 자연수32(0)이고, 자연수32이다.
+전역 상수 HMJEGPU_SHADER_FRAGMENT는 자연수32(1)이고, 자연수32이다.
+
+전역 상수 HMJEGPU_OBJECT_BLEND는 자연수32(1)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_RASTERIZER는 자연수32(2)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_DSA는 자연수32(3)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_VERTEX_ELEMENTS는 자연수32(4)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_VERTEX_SHADER는 자연수32(5)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_SOLID_SHADER는 자연수32(6)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_IMAGE_SHADER는 자연수32(7)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_GLYPH_SHADER는 자연수32(8)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_SAMPLER는 자연수32(9)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_GLYPH_VIEW는 자연수32(10)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_ROUNDED_SHADER는 자연수32(11)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_BORDER_SHADER는 자연수32(12)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_SHADOW_SHADER는 자연수32(13)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_SHADOW_HARD_SHADER는 자연수32(14)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_CAPSULE_SHADER는 자연수32(15)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_GRADIENT_SHADER는 자연수32(16)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_BLUR_DOWN_SHADER는 자연수32(17)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_BLUR_BOX_SHADER는 자연수32(18)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_BLUR_COMPOSITE_SHADER는 자연수32(19)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_SCREEN_SURFACE는 자연수32(100)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_BACKGROUND_SURFACE는 자연수32(101)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_TRANSIENT_VIEW_BASE는 자연수32(1000)이고, 자연수32이다.
+전역 상수 HMJEGPU_OBJECT_TRANSIENT_SURFACE_BASE는 자연수32(2000)이고, 자연수32이다.
+
+프로젝트 내부 구조체 HmjeGPU임시텍스처의
+    변수 결과는 정수이고,
+    변수 핸들은 자연수이고,
+    상수 wire는 자연수이고,
+    변수 view는 자연수32이고,
+    변수 surface는 자연수32이다.
+
+# 0=아직 질의 안 함, 1=v2 없음, 2=v2 virgl 사용 가능.
+전역 변수 HmjeGPU탐지상태는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU준비상태는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU화면너비는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU화면높이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU최대명령바이트는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU최대제출리소스는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU최대리소스바이트는 자연수(0)이고, 자연수이다.
+
+전역 변수 HmjeGPU문맥핸들은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU스캔아웃핸들은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU스캔아웃wire는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU정점핸들은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU정점wire는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU글리프핸들은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU글리프wire는 자연수(0)이고, 자연수이다.
+
+전역 변수 HmjeGPU화면대상핸들은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU화면대상wire는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU화면대상너비는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU화면대상높이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU배경대상핸들은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU배경대상wire는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU배경대상너비는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU배경대상높이는 자연수(0)이고, 자연수이다.
+
+전역 변수 HmjeGPU명령주소는 주소(0)이고, 주소이다.
+전역 변수 HmjeGPU명령길이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU정점주소는 주소(0)이고, 주소이다.
+전역 변수 HmjeGPU정점길이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU참조주소는 주소(0)이고, 주소이다.
+전역 변수 HmjeGPU참조수는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU임시주소는 주소(0)이고, 주소이다.
+전역 변수 HmjeGPU임시수는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU다음임시view는 자연수32(1000)이고, 자연수32이다.
+전역 변수 HmjeGPU다음임시surface는 자연수32(2000)이고, 자연수32이다.
+전역 변수 HmjeGPU인코딩실패는 거짓이고, 참거짓이다.
+
+전역 변수 HmjeGPU프레임활성은 거짓이고, 참거짓이다.
+전역 변수 HmjeGPU현재대상은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU현재너비는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU현재높이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU클립왼쪽은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU클립위는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU클립오른쪽은 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU클립아래는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU활성wire는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU활성surface는 자연수32(0)이고, 자연수32이다.
+전역 변수 HmjeGPU활성view는 자연수32(0)이고, 자연수32이다.
+전역 변수 HmjeGPU레이어깊이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU레이어부모wire들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어부모surface들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수32 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어부모view들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수32 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어부모너비들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어부모높이들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어클립왼쪽들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어클립위들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어클립오른쪽들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어클립아래들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어X들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어Y들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어너비들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어높이들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+전역 변수 HmjeGPU레이어알파들은 [0, 0, 0, 0, 0, 0, 0, 0]이고, 자연수 8개의 고정배열이다.
+
+전역 변수 HmjeGPU글리프다음X는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU글리프다음Y는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU글리프행높이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU마지막글리프X는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU마지막글리프Y는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU마지막글리프너비는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU마지막글리프높이는 자연수(0)이고, 자연수이다.
+전역 변수 HmjeGPU마지막글리프유효는 거짓이고, 참거짓이다.
+
+함수 HmjeGPUvirgl헤더는 (명령: 자연수32, 객체: 자연수32, 길이: 자연수32)를 받아
+    자연수32(명령 | (객체 << 8) | (길이 << 16))을 자연수32로 반환한다.
+
+함수 HmjeGPU명령초기화는
+    HmjeGPU명령길이는 0이다.
+    HmjeGPU인코딩실패는 거짓이다.
+
+함수 HmjeGPU명령u8추가는 (값: 자연수8)를 받아
+    만약 HmjeGPU명령주소 == 주소(0) 또는 HmjeGPU명령길이 >= HMJEGPU_명령용량이면
+        HmjeGPU인코딩실패는 참이다.
+        반환한다.
+    위험 작업은
+        HmjeGPU명령주소 + HmjeGPU명령길이에서 자연수8 값은 값이다.
+    HmjeGPU명령길이는 HmjeGPU명령길이 + 1이다.
+
+함수 HmjeGPU명령u32추가는 (값: 자연수32)를 받아
+    만약 HmjeGPU명령주소 == 주소(0) 또는 HmjeGPU명령길이 + 4 > HMJEGPU_명령용량이면
+        HmjeGPU인코딩실패는 참이다.
+        반환한다.
+    위험 작업은
+        HmjeGPU명령주소 + HmjeGPU명령길이에서 자연수32 값은 값이다.
+    HmjeGPU명령길이는 HmjeGPU명령길이 + 4이다.
+
+함수 HmjeGPU실수32비트는 (값: 실수32)를 받아
+    변수 셀은 [0.0]이고, 실수32 1개의 고정배열이다.
+    셀[0]은 값이다.
+    변수 결과는 자연수32(0)이고, 자연수32이다.
+    위험 작업은
+        결과는 셀의 주소에서 자연수32 값이다.
+    결과를 자연수32로 반환한다.
+
+함수 HmjeGPU명령실수32추가는 (값: 실수32)를 받아
+    HmjeGPU명령u32추가를 (값: HmjeGPU실수32비트(값))로 실행한다.
+
+# Fragment constant buffer 0은 리소스를 추가하지 않는 virgl inline
+# constant다. rounded는 vec4 하나, border/shadow는 vec4 두 개를 쓴다.
+함수 HmjeGPU상수4인코딩은 (a: 실수32, b: 실수32, c: 실수32, d: 실수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_CONSTANT_BUFFER, 객체: 0, 길이: 자연수32(6))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: a)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: b)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: c)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: d)로 실행한다.
+
+함수 HmjeGPU상수8인코딩은 (a: 실수32, b: 실수32, c: 실수32, d: 실수32, e: 실수32, f: 실수32, g: 실수32, h: 실수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_CONSTANT_BUFFER, 객체: 0, 길이: 자연수32(10))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: a)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: b)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: c)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: d)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: e)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: f)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: g)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: h)로 실행한다.
+
+함수 HmjeGPU상수12인코딩은 (a: 실수32, b: 실수32, c: 실수32, d: 실수32, e: 실수32, f: 실수32, g: 실수32, h: 실수32, i: 실수32, j: 실수32, k: 실수32, l: 실수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_CONSTANT_BUFFER, 객체: 0, 길이: 자연수32(14))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: a)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: b)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: c)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: d)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: e)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: f)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: g)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: h)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: i)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: j)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: k)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: l)로 실행한다.
+
+함수 HmjeGPU상수16인코딩은 (a: 실수32, b: 실수32, c: 실수32, d: 실수32, e: 실수32, f: 실수32, g: 실수32, h: 실수32, i: 실수32, j: 실수32, k: 실수32, l: 실수32, m: 실수32, n: 실수32, o: 실수32, p: 실수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_CONSTANT_BUFFER, 객체: 0, 길이: 자연수32(18))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: a)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: b)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: c)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: d)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: e)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: f)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: g)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: h)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: i)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: j)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: k)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: l)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: m)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: n)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: o)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: p)로 실행한다.
+
+# Gradient constant는 CPU 기준의 마지막 반올림을 shader에서
+# 정확히 하기 위해 0..255 straight RGBA를 유지한다.
+함수 HmjeGPU그라데이션색상추가는 (색워드: 자연수32)를 받아
+    HmjeGPU명령실수32추가를 (값: 실수32(자연수((색워드 >> 16) & 자연수32(255))))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(자연수((색워드 >> 8) & 자연수32(255))))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(자연수(색워드 & 자연수32(255))))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(자연수((색워드 >> 24) & 자연수32(255))))로 실행한다.
+
+함수 HmjeGPU명령문자열추가는 (문구: 문자열)를 받아
+    상수 길이는 문자열바이트길이(문구)이고, 자연수이다.
+    상수 원본은 문자열주소(문구)이고, 주소이다.
+    변수 위치는 자연수(0)이고, 자연수이다.
+    위치 < 길이일 동안
+        변수 바이트값은 자연수8(0)이고, 자연수8이다.
+        위험 작업은
+            바이트값은 원본 + 위치에서 자연수8 값이다.
+        HmjeGPU명령u8추가를 (값: 바이트값)로 실행한다.
+        위치는 위치 + 1이다.
+    # TGSI text는 NUL을 포함한 길이로 보내고 dword 경계까지 0으로 패딩한다.
+    HmjeGPU명령u8추가를 (값: 자연수8(0))로 실행한다.
+    (HmjeGPU명령길이 & 자연수(3)) != 0일 동안
+        HmjeGPU명령u8추가를 (값: 자연수8(0))로 실행한다.
+
+함수 HmjeGPU정점실수32추가는 (값: 실수32)를 받아
+    만약 HmjeGPU정점주소 == 주소(0) 또는 HmjeGPU정점길이 + 4 > HMJEGPU_정점용량이면
+        HmjeGPU인코딩실패는 참이다.
+        반환한다.
+    위험 작업은
+        HmjeGPU정점주소 + HmjeGPU정점길이에서 실수32 값은 값이다.
+    HmjeGPU정점길이는 HmjeGPU정점길이 + 4이다.
+
+함수 HmjeGPU패킷시작은 (명령: 자연수32, 객체: 자연수32, 길이: 자연수32)를 받아
+    HmjeGPU명령u32추가를 (값: HmjeGPUvirgl헤더(명령, 객체, 길이))로 실행한다.
+
+함수 HmjeGPUVirGL장치탐지는
+    만약 HmjeGPU탐지상태 != 0이면
+        HmjeGPU탐지상태 == 2를 참거짓로 반환한다.
+    상수 정보는 GPU장치정보읽기()이고, GPU장치정보이다.
+    상수 필수기능은 GPU_DEVICE_FEATURE_RESOURCE_WRITE | GPU_DEVICE_FEATURE_TIMELINE | GPU_DEVICE_FEATURE_PRESENT_LEASE | GPU_DEVICE_FEATURE_RAW_VIRGL_SUBMIT이고, 자연수이다.
+    만약 정보.결과 != 0 또는 정보.백엔드 != GPU_DEVICE_BACKEND_VIRGL 또는 (정보.기능들 & 필수기능) != 필수기능 또는 정보.화면너비 == 0 또는 정보.화면높이 == 0 또는 정보.화면형식 != GPU_DEVICE_FORMAT_BGRX8_UNORM이면
+        HmjeGPU탐지상태는 1이다.
+        거짓을 참거짓로 반환한다.
+    만약 정보.최대명령바이트 < 자연수(1024) 또는 정보.최대제출리소스 < 자연수(3) 또는 정보.최대리소스바이트 < 자연수(1048576)이면
+        HmjeGPU탐지상태는 1이다.
+        거짓을 참거짓로 반환한다.
+    HmjeGPU화면너비는 정보.화면너비이다.
+    HmjeGPU화면높이는 정보.화면높이이다.
+    HmjeGPU최대명령바이트는 정보.최대명령바이트이다.
+    HmjeGPU최대제출리소스는 정보.최대제출리소스이다.
+    HmjeGPU최대리소스바이트는 정보.최대리소스바이트이다.
+    HmjeGPU탐지상태는 2이다.
+    참을 참거짓로 반환한다.
+
+함수 HmjeGPUshader생성은 (핸들: 자연수32, 종류: 자연수32, 문구: 문자열)를 받아
+    상수 shader바이트길이는 문자열바이트길이(문구) + 1이고, 자연수이다.
+    상수 dword수는 (shader바이트길이 + 3) / 4이고, 자연수이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SHADER, 길이: 자연수32(5 + dword수))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 핸들)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 종류)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(shader바이트길이))로 실행한다.
+    # virglrenderer가 text TGSI를 번역할 token scratch 상한. 초기 도형
+    # shader의 300-token 관행으로는 unrolled filter shader가 잘린다.
+    HmjeGPU명령u32추가를 (값: 자연수32(4096))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(0))로 실행한다.
+    HmjeGPU명령문자열추가를 (문구: 문구)로 실행한다.
+
+함수 HmjeGPUshader연결은 (픽셀핸들: 자연수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_LINK_SHADER, 객체: 0, 길이: 자연수32(6))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_VERTEX_SHADER)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 픽셀핸들)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+
+함수 HmjeGPU고정상태인코딩은
+    # Premultiplied source-over: ONE, INV_SRC_ALPHA, ADD, RGBA mask.
+    상수 혼합RT는 자연수32(1 | (1 << 4) | (0x13 << 9) | (1 << 17) | (0x13 << 22) | (15 << 27))이고, 자연수32이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_BLEND, 길이: 자연수32(11))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_BLEND)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 혼합RT)로 실행한다.
+    변수 RT번호는 자연수(1)이고, 자연수이다.
+    RT번호 < 자연수(8)일 동안
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        RT번호는 RT번호 + 1이다.
+
+    # depth clip + scissor, fill/no-cull. 나머지 float state는 0 또는 1이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_RASTERIZER, 길이: 자연수32(9))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_RASTERIZER)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32((1 << 1) | (1 << 14)))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(1.0))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(1.0))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_DSA, 길이: 자연수32(5))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_DSA)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+
+    # position(float4), premultiplied color(float4), uv(float4), 한 VBO/stride 48.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_VERTEX_ELEMENTS, 길이: 자연수32(13))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_VERTEX_ELEMENTS)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_FORMAT_RGBA32F)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 16)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_FORMAT_RGBA32F)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 32)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_FORMAT_RGBA32F)로 실행한다.
+
+    # clamp-to-edge + nearest + no mipmap. 이미지는 CPU 기준과 같은
+    # nearest를 쓰고, glyph atlas는 texel 가장자를 넘지 않는다.
+    상수 samplerS0는 자연수32(2 | (2 << 3) | (2 << 6) | (2 << 11))이고, 자연수32이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SAMPLER_STATE, 길이: 자연수32(9))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_SAMPLER)로 실행한다.
+    HmjeGPU명령u32추가를 (값: samplerS0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    변수 샘플러번호는 자연수(0)이고, 자연수이다.
+    샘플러번호 < 4일 동안
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        샘플러번호는 샘플러번호 + 1이다.
+
+    # R8 atlas sampler view는 context 수명 동안 유지된다.
+    상수 정체swizzle은 자연수32(0 | (1 << 3) | (2 << 6) | (3 << 9))이고, 자연수32이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SAMPLER_VIEW, 길이: 자연수32(6))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_GLYPH_VIEW)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU글리프wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_FORMAT_R8)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 정체swizzle)로 실행한다.
+
+    상수 정점shader는 "VERT\nDCL IN[0]\nDCL IN[1]\nDCL IN[2]\nDCL OUT[0], POSITION\nDCL OUT[1], COLOR\nDCL OUT[2], GENERIC[0]\n  0: MOV OUT[2], IN[2]\n  1: MOV OUT[1], IN[1]\n  2: MOV OUT[0], IN[0]\n  3: END\n"이고, 문자열이다.
+    상수 solidShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL OUT[0], COLOR\n  0: MOV OUT[0], IN[0]\n  1: END\n"이고, 문자열이다.
+    상수 imageShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL SAMP[0]\nDCL SVIEW[0], 2D, FLOAT\nDCL TEMP[0]\n  0: TEX TEMP[0], IN[1], SAMP[0], 2D\n  1: MUL OUT[0], TEMP[0], IN[0]\n  2: END\n"이고, 문자열이다.
+    상수 glyphShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL SAMP[0]\nDCL SVIEW[0], 2D, FLOAT\nDCL TEMP[0]\n  0: TEX TEMP[0], IN[1], SAMP[0], 2D\n  1: MUL OUT[0], IN[0], TEMP[0].xxxx\n  2: END\n"이고, 문자열이다.
+    # DRAW kind 3 round-cap line. CONST[0]은 local a.xy/b.xy,
+    # CONST[1].xy는 radius와 1/dot(b-a,b-a)다. 퇴화 선분은 역수를 0으로
+    # 보내 시작점 중심의 원으로 처리한다.
+    상수 capsuleShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..1]\nDCL TEMP[0..2]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 0.0 }\n  0: ADD TEMP[0].xy, IN[1].xyyy, -CONST[0].xyyy\n  1: ADD TEMP[1].xy, CONST[0].zwww, -CONST[0].xyyy\n  2: DP2 TEMP[2].x, TEMP[0].xyyy, TEMP[1].xyyy\n  3: MUL TEMP[2].x, TEMP[2].xxxx, CONST[1].yyyy\n  4: MAX TEMP[2].x, TEMP[2].xxxx, IMM[0].xxxx\n  5: MIN TEMP[2].x, TEMP[2].xxxx, IMM[0].zzzz\n  6: MUL TEMP[1].xy, TEMP[1].xyyy, TEMP[2].xxxx\n  7: ADD TEMP[0].xy, TEMP[0].xyyy, -TEMP[1].xyyy\n  8: DP2 TEMP[2].x, TEMP[0].xyyy, TEMP[0].xyyy\n  9: SQRT TEMP[2].x, TEMP[2].xxxx\n 10: ADD TEMP[2].x, TEMP[2].xxxx, -CONST[1].xxxx\n 11: ADD TEMP[2].x, IMM[0].yyyy, -TEMP[2].xxxx\n 12: MAX TEMP[2].x, TEMP[2].xxxx, IMM[0].xxxx\n 13: MIN TEMP[2].x, TEMP[2].xxxx, IMM[0].zzzz\n 14: MUL OUT[0], IN[0], TEMP[2].xxxx\n 15: END\n"이고, 문자열이다.
+    # GRADIENT_FILL. CONST[0]=size.xy/radius/direction,
+    # CONST[1]=(count-1,count-2,1/denom,0), CONST[2..9]=RGBA 0..255.
+    # 색과 coverage를 바이트로 양자화한 뒤 premultiplied source-over로 내린다.
+    상수 gradientShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..9]\nDCL TEMP[0..9]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 2.0 }\nIMM[1] FLT32 { 255.0, 0.003921568627451, 3.0, 0.0 }\nIMM[2] FLT32 { 4.0, 5.0, 6.0, 0.0 }\n  0: FLR TEMP[0].xy, IN[1].xyyy\n  1: ADD TEMP[0].z, TEMP[0].xxxx, TEMP[0].yyyy\n  2: MOV TEMP[1].x, TEMP[0].xxxx\n  3: SEQ TEMP[1].y, CONST[0].wwww, IMM[0].zzzz\n  4: LRP TEMP[1].x, TEMP[1].yyyy, TEMP[0].yyyy, TEMP[1].xxxx\n  5: SEQ TEMP[1].y, CONST[0].wwww, IMM[1].zzzz\n  6: LRP TEMP[1].x, TEMP[1].yyyy, TEMP[0].zzzz, TEMP[1].xxxx\n  7: MUL TEMP[1].x, TEMP[1].xxxx, CONST[1].zzzz\n  8: ADD TEMP[6].xy, CONST[0].xyyy, -IMM[0].zzzz\n  9: MUL TEMP[6].xy, TEMP[6].xyyy, IMM[0].yyyy\n 10: ADD TEMP[7].xy, TEMP[0].xyyy, -TEMP[6].xyyy\n 11: MAX TEMP[6].xy, TEMP[6].xyyy, IMM[0].yyyy\n 12: MIN TEMP[8].x, TEMP[6].xxxx, TEMP[6].yyyy\n 13: SEQ TEMP[8].y, CONST[0].wwww, IMM[2].xxxx\n 14: LRP TEMP[6].x, TEMP[8].yyyy, TEMP[8].xxxx, TEMP[6].xxxx\n 15: LRP TEMP[6].y, TEMP[8].yyyy, TEMP[8].xxxx, TEMP[6].yyyy\n 16: RCP TEMP[8].x, TEMP[6].xxxx\n 17: MUL TEMP[7].x, TEMP[7].xxxx, TEMP[8].xxxx\n 18: RCP TEMP[8].x, TEMP[6].yyyy\n 19: MUL TEMP[7].y, TEMP[7].yyyy, TEMP[8].xxxx\n 20: DP2 TEMP[7].x, TEMP[7].xyyy, TEMP[7].xyyy\n 21: SQRT TEMP[7].x, TEMP[7].xxxx\n 22: SEQ TEMP[8].y, CONST[0].wwww, IMM[2].xxxx\n 23: SEQ TEMP[8].z, CONST[0].wwww, IMM[2].yyyy\n 24: ADD TEMP[8].y, TEMP[8].yyyy, TEMP[8].zzzz\n 25: LRP TEMP[1].x, TEMP[8].yyyy, TEMP[7].xxxx, TEMP[1].xxxx\n 26: MAX TEMP[1].x, TEMP[1].xxxx, IMM[0].xxxx\n 27: MIN TEMP[1].x, TEMP[1].xxxx, IMM[0].zzzz\n 28: MUL TEMP[1].x, TEMP[1].xxxx, CONST[1].xxxx\n 29: FLR TEMP[1].y, TEMP[1].xxxx\n 30: MIN TEMP[1].y, TEMP[1].yyyy, CONST[1].yyyy\n 31: ADD TEMP[1].z, TEMP[1].xxxx, -TEMP[1].yyyy\n 32: MOV TEMP[2], CONST[2]\n 33: MOV TEMP[3], CONST[3]\n 34: SGE TEMP[4].x, TEMP[1].yyyy, IMM[0].zzzz\n 35: LRP TEMP[2], TEMP[4].xxxx, CONST[3], TEMP[2]\n 36: LRP TEMP[3], TEMP[4].xxxx, CONST[4], TEMP[3]\n 37: SGE TEMP[4].x, TEMP[1].yyyy, IMM[0].wwww\n 38: LRP TEMP[2], TEMP[4].xxxx, CONST[4], TEMP[2]\n 39: LRP TEMP[3], TEMP[4].xxxx, CONST[5], TEMP[3]\n 40: SGE TEMP[4].x, TEMP[1].yyyy, IMM[1].zzzz\n 41: LRP TEMP[2], TEMP[4].xxxx, CONST[5], TEMP[2]\n 42: LRP TEMP[3], TEMP[4].xxxx, CONST[6], TEMP[3]\n 43: SGE TEMP[4].x, TEMP[1].yyyy, IMM[2].xxxx\n 44: LRP TEMP[2], TEMP[4].xxxx, CONST[6], TEMP[2]\n 45: LRP TEMP[3], TEMP[4].xxxx, CONST[7], TEMP[3]\n 46: SGE TEMP[4].x, TEMP[1].yyyy, IMM[2].yyyy\n 47: LRP TEMP[2], TEMP[4].xxxx, CONST[7], TEMP[2]\n 48: LRP TEMP[3], TEMP[4].xxxx, CONST[8], TEMP[3]\n 49: SGE TEMP[4].x, TEMP[1].yyyy, IMM[2].zzzz\n 50: LRP TEMP[2], TEMP[4].xxxx, CONST[8], TEMP[2]\n 51: LRP TEMP[3], TEMP[4].xxxx, CONST[9], TEMP[3]\n 52: LRP TEMP[2], TEMP[1].zzzz, TEMP[3], TEMP[2]\n 53: ADD TEMP[2], TEMP[2], IMM[0].yyyy\n 54: FLR TEMP[2], TEMP[2]\n 55: MUL TEMP[5].xy, CONST[0].xyyy, IMM[0].yyyy\n 56: ADD TEMP[6].xy, IN[1].xyyy, -TEMP[5].xyyy\n 57: ABS TEMP[6].xy, TEMP[6].xyyy\n 58: ADD TEMP[6].xy, TEMP[6].xyyy, -TEMP[5].xyyy\n 59: ADD TEMP[6].xy, TEMP[6].xyyy, CONST[0].zzzz\n 60: MAX TEMP[7].xy, TEMP[6].xyyy, IMM[0].xxxx\n 61: DP2 TEMP[7].x, TEMP[7].xyyy, TEMP[7].xyyy\n 62: SQRT TEMP[7].x, TEMP[7].xxxx\n 63: MAX TEMP[8].x, TEMP[6].xxxx, TEMP[6].yyyy\n 64: MIN TEMP[8].x, TEMP[8].xxxx, IMM[0].xxxx\n 65: ADD TEMP[7].x, TEMP[7].xxxx, TEMP[8].xxxx\n 66: ADD TEMP[7].x, TEMP[7].xxxx, -CONST[0].zzzz\n 67: ADD TEMP[9].x, IMM[0].yyyy, -TEMP[7].xxxx\n 68: MAX TEMP[9].x, TEMP[9].xxxx, IMM[0].xxxx\n 69: MIN TEMP[9].x, TEMP[9].xxxx, IMM[0].zzzz\n 70: MUL TEMP[9].x, TEMP[9].xxxx, IMM[1].xxxx\n 71: FLR TEMP[9].x, TEMP[9].xxxx\n 72: MUL TEMP[9].x, TEMP[9].xxxx, TEMP[2].wwww\n 73: MUL TEMP[9].x, TEMP[9].xxxx, IMM[1].yyyy\n 74: FLR TEMP[9].x, TEMP[9].xxxx\n 75: MUL TEMP[9].x, TEMP[9].xxxx, IMM[1].yyyy\n 76: MUL TEMP[2].xyz, TEMP[2], IMM[1].yyyy\n 77: MUL OUT[0].xyz, TEMP[2], TEMP[9].xxxx\n 78: MOV OUT[0].w, TEMP[9].xxxx\n 79: END\n"이고, 문자열이다.
+    # BACKDROP_BLUR downsample: CONST[0]=clip origin/scale, CONST[1]=clip/grid,
+    # CONST[2].xy=active target texel size. 4x4를 unroll하고 scale 밖 및 마지막
+    # partial block 표본을 mask해 CPU의 실제 표본수 평균을 재현한다.
+    상수 blurDownShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..2]\nDCL SAMP[0]\nDCL SVIEW[0], 2D, FLOAT\nDCL TEMP[0..6]\nIMM[0] FLT32 { 0.0, 1.0, 2.0, 3.0 }\nIMM[1] FLT32 { 0.5, 1.0, 0.0, 0.0 }\n  0: FLR TEMP[0].xy, IN[1].xyyy\n  1: MUL TEMP[0].xy, TEMP[0].xyyy, CONST[0].zzzz\n  2: MOV TEMP[2], IMM[0].xxxx\n  3: MOV TEMP[3].x, IMM[0].xxxx\n  4: MOV TEMP[1].xy, TEMP[0].xyyy\n  5: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n  6: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n  7: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n  8: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n  9: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 10: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n 11: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 12: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n 13: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n 14: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n 15: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n 16: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n 17: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n 18: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n 19: MOV TEMP[1].xy, TEMP[0].xyyy\n 20: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].yyyy\n 21: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n 22: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n 23: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 24: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n 25: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 26: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n 27: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 28: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n 29: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n 30: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n 31: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n 32: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n 33: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n 34: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n 35: MOV TEMP[1].xy, TEMP[0].xyyy\n 36: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].zzzz\n 37: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n 38: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n 39: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 40: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n 41: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 42: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n 43: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 44: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n 45: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n 46: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n 47: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n 48: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n 49: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n 50: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n 51: MOV TEMP[1].xy, TEMP[0].xyyy\n 52: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].wwww\n 53: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n 54: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n 55: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 56: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n 57: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 58: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n 59: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 60: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n 61: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n 62: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n 63: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n 64: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n 65: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n 66: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n 67: MOV TEMP[1].xy, TEMP[0].xyyy\n 68: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].yyyy\n 69: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n 70: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n 71: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 72: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n 73: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 74: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n 75: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 76: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n 77: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n 78: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n 79: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n 80: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n 81: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n 82: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n 83: MOV TEMP[1].xy, TEMP[0].xyyy\n 84: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].yyyy\n 85: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].yyyy\n 86: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n 87: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n 88: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 89: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n 90: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 91: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n 92: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n 93: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n 94: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n 95: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n 96: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n 97: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n 98: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n 99: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n100: MOV TEMP[1].xy, TEMP[0].xyyy\n101: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].zzzz\n102: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].yyyy\n103: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n104: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n105: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n106: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n107: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n108: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n109: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n110: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n111: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n112: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n113: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n114: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n115: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n116: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n117: MOV TEMP[1].xy, TEMP[0].xyyy\n118: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].wwww\n119: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].yyyy\n120: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n121: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n122: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n123: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n124: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n125: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n126: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n127: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n128: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n129: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n130: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n131: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n132: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n133: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n134: MOV TEMP[1].xy, TEMP[0].xyyy\n135: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].zzzz\n136: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n137: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n138: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n139: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n140: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n141: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n142: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n143: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n144: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n145: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n146: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n147: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n148: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n149: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n150: MOV TEMP[1].xy, TEMP[0].xyyy\n151: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].yyyy\n152: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].zzzz\n153: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n154: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n155: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n156: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n157: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n158: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n159: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n160: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n161: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n162: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n163: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n164: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n165: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n166: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n167: MOV TEMP[1].xy, TEMP[0].xyyy\n168: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].zzzz\n169: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].zzzz\n170: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n171: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n172: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n173: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n174: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n175: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n176: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n177: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n178: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n179: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n180: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n181: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n182: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n183: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n184: MOV TEMP[1].xy, TEMP[0].xyyy\n185: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].wwww\n186: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].zzzz\n187: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n188: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n189: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n190: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n191: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n192: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n193: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n194: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n195: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n196: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n197: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n198: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n199: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n200: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n201: MOV TEMP[1].xy, TEMP[0].xyyy\n202: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].wwww\n203: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n204: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n205: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n206: SLT TEMP[5].y, IMM[0].xxxx, CONST[0].zzzz\n207: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n208: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n209: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n210: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n211: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n212: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n213: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n214: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n215: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n216: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n217: MOV TEMP[1].xy, TEMP[0].xyyy\n218: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].yyyy\n219: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].wwww\n220: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n221: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n222: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n223: SLT TEMP[5].y, IMM[0].yyyy, CONST[0].zzzz\n224: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n225: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n226: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n227: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n228: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n229: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n230: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n231: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n232: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n233: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n234: MOV TEMP[1].xy, TEMP[0].xyyy\n235: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].zzzz\n236: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].wwww\n237: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n238: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n239: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n240: SLT TEMP[5].y, IMM[0].zzzz, CONST[0].zzzz\n241: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n242: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n243: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n244: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n245: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n246: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n247: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n248: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n249: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n250: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n251: MOV TEMP[1].xy, TEMP[0].xyyy\n252: ADD TEMP[1].x, TEMP[1].xxxx, IMM[0].wwww\n253: ADD TEMP[1].y, TEMP[1].yyyy, IMM[0].wwww\n254: SLT TEMP[5].x, TEMP[1].xxxx, CONST[1].xxxx\n255: SLT TEMP[5].y, TEMP[1].yyyy, CONST[1].yyyy\n256: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n257: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n258: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n259: SLT TEMP[5].y, IMM[0].wwww, CONST[0].zzzz\n260: MUL TEMP[5].x, TEMP[5].xxxx, TEMP[5].yyyy\n261: ADD TEMP[4].xy, TEMP[1].xyyy, CONST[0].xyyy\n262: ADD TEMP[4].xy, TEMP[4].xyyy, IMM[1].xxxx\n263: MUL TEMP[4].xy, TEMP[4].xyyy, CONST[2].xyyy\n264: TEX TEMP[6], TEMP[4], SAMP[0], 2D\n265: MUL TEMP[6].xyz, TEMP[6], TEMP[5].xxxx\n266: ADD TEMP[2].xyz, TEMP[2], TEMP[6]\n267: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[5].xxxx\n268: RCP TEMP[3].x, TEMP[3].xxxx\n269: MUL OUT[0].xyz, TEMP[2], TEMP[3].xxxx\n270: MOV OUT[0].w, IMM[1].yyyy\n271: END"이고, 문자열이다.
+    # float scratch에서 반경 0..8 box 한 패스. 같은 shader를 가로 3회,
+    # 세로 3회 실행해 CPU의 중간 단계별 clamp-to-edge까지 동일하게 만든다.
+    상수 blurBoxShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..1]\nDCL SAMP[0]\nDCL SVIEW[0], 2D, FLOAT\nDCL TEMP[0..4]\nIMM[0] FLT32 { -8.0, -7.0, -6.0, -5.0 }\nIMM[1] FLT32 { -4.0, -3.0, -2.0, -1.0 }\nIMM[2] FLT32 { 0.0, 1.0, 2.0, 3.0 }\nIMM[3] FLT32 { 4.0, 5.0, 6.0, 7.0 }\nIMM[4] FLT32 { 8.0, 1.0, 0.0, 0.0 }\n  0: MOV TEMP[3], IMM[2].xxxx\n  1: MAD TEMP[0].xy, CONST[1].xyyy, IMM[0].xxxx, IN[1].xyyy\n  2: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n  3: ABS TEMP[2].x, IMM[0].xxxx\n  4: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n  5: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n  6: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n  7: MAD TEMP[0].xy, CONST[1].xyyy, IMM[0].yyyy, IN[1].xyyy\n  8: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n  9: ABS TEMP[2].x, IMM[0].yyyy\n 10: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 11: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 12: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 13: MAD TEMP[0].xy, CONST[1].xyyy, IMM[0].zzzz, IN[1].xyyy\n 14: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 15: ABS TEMP[2].x, IMM[0].zzzz\n 16: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 17: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 18: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 19: MAD TEMP[0].xy, CONST[1].xyyy, IMM[0].wwww, IN[1].xyyy\n 20: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 21: ABS TEMP[2].x, IMM[0].wwww\n 22: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 23: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 24: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 25: MAD TEMP[0].xy, CONST[1].xyyy, IMM[1].xxxx, IN[1].xyyy\n 26: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 27: ABS TEMP[2].x, IMM[1].xxxx\n 28: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 29: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 30: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 31: MAD TEMP[0].xy, CONST[1].xyyy, IMM[1].yyyy, IN[1].xyyy\n 32: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 33: ABS TEMP[2].x, IMM[1].yyyy\n 34: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 35: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 36: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 37: MAD TEMP[0].xy, CONST[1].xyyy, IMM[1].zzzz, IN[1].xyyy\n 38: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 39: ABS TEMP[2].x, IMM[1].zzzz\n 40: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 41: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 42: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 43: MAD TEMP[0].xy, CONST[1].xyyy, IMM[1].wwww, IN[1].xyyy\n 44: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 45: ABS TEMP[2].x, IMM[1].wwww\n 46: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 47: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 48: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 49: MAD TEMP[0].xy, CONST[1].xyyy, IMM[2].xxxx, IN[1].xyyy\n 50: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 51: ABS TEMP[2].x, IMM[2].xxxx\n 52: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 53: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 54: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 55: MAD TEMP[0].xy, CONST[1].xyyy, IMM[2].yyyy, IN[1].xyyy\n 56: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 57: ABS TEMP[2].x, IMM[2].yyyy\n 58: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 59: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 60: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 61: MAD TEMP[0].xy, CONST[1].xyyy, IMM[2].zzzz, IN[1].xyyy\n 62: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 63: ABS TEMP[2].x, IMM[2].zzzz\n 64: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 65: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 66: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 67: MAD TEMP[0].xy, CONST[1].xyyy, IMM[2].wwww, IN[1].xyyy\n 68: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 69: ABS TEMP[2].x, IMM[2].wwww\n 70: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 71: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 72: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 73: MAD TEMP[0].xy, CONST[1].xyyy, IMM[3].xxxx, IN[1].xyyy\n 74: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 75: ABS TEMP[2].x, IMM[3].xxxx\n 76: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 77: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 78: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 79: MAD TEMP[0].xy, CONST[1].xyyy, IMM[3].yyyy, IN[1].xyyy\n 80: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 81: ABS TEMP[2].x, IMM[3].yyyy\n 82: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 83: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 84: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 85: MAD TEMP[0].xy, CONST[1].xyyy, IMM[3].zzzz, IN[1].xyyy\n 86: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 87: ABS TEMP[2].x, IMM[3].zzzz\n 88: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 89: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 90: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 91: MAD TEMP[0].xy, CONST[1].xyyy, IMM[3].wwww, IN[1].xyyy\n 92: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 93: ABS TEMP[2].x, IMM[3].wwww\n 94: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n 95: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n 96: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n 97: MAD TEMP[0].xy, CONST[1].xyyy, IMM[4].xxxx, IN[1].xyyy\n 98: TEX TEMP[1], TEMP[0], SAMP[0], 2D\n 99: ABS TEMP[2].x, IMM[4].xxxx\n100: SGE TEMP[2].x, CONST[0].zzzz, TEMP[2].xxxx\n101: MUL TEMP[1].xyz, TEMP[1], TEMP[2].xxxx\n102: ADD TEMP[3].xyz, TEMP[3], TEMP[1]\n103: MUL OUT[0].xyz, TEMP[3], CONST[0].wwww\n104: MOV OUT[0].w, IMM[4].yyyy\n105: END"이고, 문자열이다.
+    # float 결과를 픽셀 중심 bilinear로 올리고 tint 1회 양자화 후 rounded
+    # coverage를 premultiplied source-over 입력으로 만든다.
+    상수 blurCompositeShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..3]\nDCL SAMP[0]\nDCL SVIEW[0], 2D, FLOAT\nDCL TEMP[0..11]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 255.0 }\nIMM[1] FLT32 { 0.003921568627451, 0.0, 0.0, 0.0 }\n  0: ADD TEMP[0].xy, IN[1].xyyy, -CONST[0].xyyy\n  1: MUL TEMP[0].xy, TEMP[0].xyyy, CONST[0].zzzz\n  2: ADD TEMP[0].xy, TEMP[0].xyyy, -IMM[0].yyyy\n  3: FLR TEMP[1].xy, TEMP[0].xyyy\n  4: ADD TEMP[2].xy, TEMP[0].xyyy, -TEMP[1].xyyy\n  5: MAX TEMP[1].xy, TEMP[1].xyyy, IMM[0].xxxx\n  6: ADD TEMP[3].xy, CONST[1].zwww, -IMM[0].zzzz\n  7: MIN TEMP[1].xy, TEMP[1].xyyy, TEMP[3].xyyy\n  8: ADD TEMP[4].xy, TEMP[1].xyyy, IMM[0].zzzz\n  9: MIN TEMP[4].xy, TEMP[4].xyyy, TEMP[3].xyyy\n 10: ADD TEMP[5].xy, TEMP[1].xyyy, IMM[0].yyyy\n 11: MUL TEMP[5].xy, TEMP[5].xyyy, CONST[2].xyyy\n 12: MOV TEMP[6].x, TEMP[4].xxxx\n 13: MOV TEMP[6].y, TEMP[1].yyyy\n 14: ADD TEMP[6].xy, TEMP[6].xyyy, IMM[0].yyyy\n 15: MUL TEMP[6].xy, TEMP[6].xyyy, CONST[2].xyyy\n 16: MOV TEMP[7].x, TEMP[1].xxxx\n 17: MOV TEMP[7].y, TEMP[4].yyyy\n 18: ADD TEMP[7].xy, TEMP[7].xyyy, IMM[0].yyyy\n 19: MUL TEMP[7].xy, TEMP[7].xyyy, CONST[2].xyyy\n 20: ADD TEMP[8].xy, TEMP[4].xyyy, IMM[0].yyyy\n 21: MUL TEMP[8].xy, TEMP[8].xyyy, CONST[2].xyyy\n 22: TEX TEMP[9], TEMP[5], SAMP[0], 2D\n 23: TEX TEMP[10], TEMP[6], SAMP[0], 2D\n 24: TEX TEMP[11], TEMP[7], SAMP[0], 2D\n 25: TEX TEMP[8], TEMP[8], SAMP[0], 2D\n 26: LRP TEMP[9].xyz, TEMP[2].xxxx, TEMP[10], TEMP[9]\n 27: LRP TEMP[11].xyz, TEMP[2].xxxx, TEMP[8], TEMP[11]\n 28: LRP TEMP[9].xyz, TEMP[2].yyyy, TEMP[11], TEMP[9]\n 29: MUL TEMP[9].xyz, TEMP[9], IMM[0].wwww\n 30: MUL TEMP[9].xyz, TEMP[9], CONST[2].wwww\n 31: MAD TEMP[9].xyz, CONST[3], CONST[2].zzzz, TEMP[9]\n 32: ADD TEMP[9].xyz, TEMP[9], IMM[0].yyyy\n 33: FLR TEMP[9].xyz, TEMP[9]\n 34: MUL TEMP[9].xyz, TEMP[9], IMM[1].xxxx\n 35: MUL TEMP[5].xy, CONST[1].xyyy, IMM[0].yyyy\n 36: ADD TEMP[6].xy, IN[1].xyyy, -TEMP[5].xyyy\n 37: ABS TEMP[6].xy, TEMP[6].xyyy\n 38: ADD TEMP[6].xy, TEMP[6].xyyy, -TEMP[5].xyyy\n 39: ADD TEMP[6].xy, TEMP[6].xyyy, CONST[0].wwww\n 40: MAX TEMP[7].xy, TEMP[6].xyyy, IMM[0].xxxx\n 41: DP2 TEMP[7].x, TEMP[7].xyyy, TEMP[7].xyyy\n 42: SQRT TEMP[7].x, TEMP[7].xxxx\n 43: MAX TEMP[8].x, TEMP[6].xxxx, TEMP[6].yyyy\n 44: MIN TEMP[8].x, TEMP[8].xxxx, IMM[0].xxxx\n 45: ADD TEMP[7].x, TEMP[7].xxxx, TEMP[8].xxxx\n 46: ADD TEMP[7].x, TEMP[7].xxxx, -CONST[0].wwww\n 47: ADD TEMP[8].x, IMM[0].yyyy, -TEMP[7].xxxx\n 48: MAX TEMP[8].x, TEMP[8].xxxx, IMM[0].xxxx\n 49: MIN TEMP[8].x, TEMP[8].xxxx, IMM[0].zzzz\n 50: MUL TEMP[8].x, TEMP[8].xxxx, IMM[0].wwww\n 51: FLR TEMP[8].x, TEMP[8].xxxx\n 52: MUL TEMP[8].x, TEMP[8].xxxx, IMM[1].xxxx\n 53: MUL OUT[0].xyz, TEMP[9], TEMP[8].xxxx\n 54: MOV OUT[0].w, TEMP[8].xxxx\n 55: END"이고, 문자열이다.
+    # CONST[0] = width, height, radius, reserved. IN[1].xy는 원본 도형
+    # 원점 기준 pixel-local 좌표다. scissor로 자르더라도 모서리가
+    # 클립 경계에서 새로 생기지 않는다.
+    상수 roundedShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0]\nDCL TEMP[0..4]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 2.0 }\n  0: MUL TEMP[0].xy, CONST[0].xyyy, IMM[0].yyyy\n  1: ADD TEMP[1].xy, IN[1].xyyy, -TEMP[0].xyyy\n  2: ABS TEMP[1].xy, TEMP[1].xyyy\n  3: ADD TEMP[1].xy, TEMP[1].xyyy, -TEMP[0].xyyy\n  4: ADD TEMP[1].xy, TEMP[1].xyyy, CONST[0].zzzz\n  5: MAX TEMP[2].xy, TEMP[1].xyyy, IMM[0].xxxx\n  6: DP2 TEMP[2].x, TEMP[2].xyyy, TEMP[2].xyyy\n  7: SQRT TEMP[2].x, TEMP[2].xxxx\n  8: MAX TEMP[3].x, TEMP[1].xxxx, TEMP[1].yyyy\n  9: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 10: ADD TEMP[2].x, TEMP[2].xxxx, TEMP[3].xxxx\n 11: ADD TEMP[2].x, TEMP[2].xxxx, -CONST[0].zzzz\n 12: ADD TEMP[4].x, IMM[0].yyyy, -TEMP[2].xxxx\n 13: MAX TEMP[4].x, TEMP[4].xxxx, IMM[0].xxxx\n 14: MIN TEMP[4].x, TEMP[4].xxxx, IMM[0].zzzz\n 15: MUL OUT[0], IN[0], TEMP[4].xxxx\n 16: END\n"이고, 문자열이다.
+    # CONST[0] = outer width, height, radius, thickness.
+    # CONST[1] = inner width, height, inner radius, reserved.
+    상수 borderShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..1]\nDCL TEMP[0..4]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 2.0 }\n  0: MUL TEMP[0].xy, CONST[0].xyyy, IMM[0].yyyy\n  1: ADD TEMP[1].xy, IN[1].xyyy, -TEMP[0].xyyy\n  2: ABS TEMP[1].xy, TEMP[1].xyyy\n  3: ADD TEMP[1].xy, TEMP[1].xyyy, -TEMP[0].xyyy\n  4: ADD TEMP[1].xy, TEMP[1].xyyy, CONST[0].zzzz\n  5: MAX TEMP[2].xy, TEMP[1].xyyy, IMM[0].xxxx\n  6: DP2 TEMP[2].x, TEMP[2].xyyy, TEMP[2].xyyy\n  7: SQRT TEMP[2].x, TEMP[2].xxxx\n  8: MAX TEMP[3].x, TEMP[1].xxxx, TEMP[1].yyyy\n  9: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 10: ADD TEMP[2].x, TEMP[2].xxxx, TEMP[3].xxxx\n 11: ADD TEMP[2].x, TEMP[2].xxxx, -CONST[0].zzzz\n 12: ADD TEMP[4].x, IMM[0].yyyy, -TEMP[2].xxxx\n 13: MAX TEMP[4].x, TEMP[4].xxxx, IMM[0].xxxx\n 14: MIN TEMP[4].x, TEMP[4].xxxx, IMM[0].zzzz\n 15: MUL TEMP[0].xy, CONST[1].xyyy, IMM[0].yyyy\n 16: ADD TEMP[1].xy, IN[1].xyyy, -CONST[0].wwww\n 17: ADD TEMP[1].xy, TEMP[1].xyyy, -TEMP[0].xyyy\n 18: ABS TEMP[1].xy, TEMP[1].xyyy\n 19: ADD TEMP[1].xy, TEMP[1].xyyy, -TEMP[0].xyyy\n 20: ADD TEMP[1].xy, TEMP[1].xyyy, CONST[1].zzzz\n 21: MAX TEMP[2].xy, TEMP[1].xyyy, IMM[0].xxxx\n 22: DP2 TEMP[2].x, TEMP[2].xyyy, TEMP[2].xyyy\n 23: SQRT TEMP[2].x, TEMP[2].xxxx\n 24: MAX TEMP[3].x, TEMP[1].xxxx, TEMP[1].yyyy\n 25: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 26: ADD TEMP[2].x, TEMP[2].xxxx, TEMP[3].xxxx\n 27: ADD TEMP[2].x, TEMP[2].xxxx, -CONST[1].zzzz\n 28: ADD TEMP[3].x, IMM[0].yyyy, -TEMP[2].xxxx\n 29: MAX TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 30: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].zzzz\n 31: ADD TEMP[4].x, TEMP[4].xxxx, -TEMP[3].xxxx\n 32: MAX TEMP[4].x, TEMP[4].xxxx, IMM[0].xxxx\n 33: MUL OUT[0], IN[0], TEMP[4].xxxx\n 34: END\n"이고, 문자열이다.
+    # DRAW ABI v2 shadow constants:
+    # CONST[0] = outer width, outer height, silhouette radius, blur.
+    # CONST[1] = original border-box local x, y, width, height.
+    # CONST[2] = original radius, 1/(2*blur), reserved, reserved.
+    # 두 shader 모두 원래 상자 커버리지를 빼 CSS non-inset 의미를 보존한다.
+    상수 shadowShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..2]\nDCL TEMP[0..6]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 2.0 }\nIMM[1] FLT32 { 3.0, 0.0, 0.0, 0.0 }\n  0: MUL TEMP[0].xy, CONST[0].wwww, IMM[0].wwww\n  1: ADD TEMP[0].xy, CONST[0].xyyy, -TEMP[0].xyyy\n  2: MUL TEMP[1].xy, TEMP[0].xyyy, IMM[0].yyyy\n  3: ADD TEMP[2].xy, IN[1].xyyy, -CONST[0].wwww\n  4: ADD TEMP[2].xy, TEMP[2].xyyy, -TEMP[1].xyyy\n  5: ABS TEMP[2].xy, TEMP[2].xyyy\n  6: ADD TEMP[2].xy, TEMP[2].xyyy, -TEMP[1].xyyy\n  7: ADD TEMP[2].xy, TEMP[2].xyyy, CONST[0].zzzz\n  8: MAX TEMP[3].xy, TEMP[2].xyyy, IMM[0].xxxx\n  9: DP2 TEMP[3].x, TEMP[3].xyyy, TEMP[3].xyyy\n 10: SQRT TEMP[3].x, TEMP[3].xxxx\n 11: MAX TEMP[4].x, TEMP[2].xxxx, TEMP[2].yyyy\n 12: MIN TEMP[4].x, TEMP[4].xxxx, IMM[0].xxxx\n 13: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[4].xxxx\n 14: ADD TEMP[3].x, TEMP[3].xxxx, -CONST[0].zzzz\n 15: ADD TEMP[4].x, TEMP[3].xxxx, CONST[0].wwww\n 16: MUL TEMP[4].x, TEMP[4].xxxx, CONST[2].yyyy\n 17: MAX TEMP[4].x, TEMP[4].xxxx, IMM[0].xxxx\n 18: MIN TEMP[4].x, TEMP[4].xxxx, IMM[0].zzzz\n 19: MUL TEMP[3].x, TEMP[4].xxxx, TEMP[4].xxxx\n 20: MUL TEMP[2].x, TEMP[4].xxxx, IMM[0].wwww\n 21: ADD TEMP[2].x, IMM[1].xxxx, -TEMP[2].xxxx\n 22: MUL TEMP[3].x, TEMP[3].xxxx, TEMP[2].xxxx\n 23: ADD TEMP[4].x, IMM[0].zzzz, -TEMP[3].xxxx\n 24: ADD TEMP[5].xy, IN[1].xyyy, -CONST[1].xyyy\n 25: MUL TEMP[0].xy, CONST[1].zwww, IMM[0].yyyy\n 26: ADD TEMP[5].xy, TEMP[5].xyyy, -TEMP[0].xyyy\n 27: ABS TEMP[5].xy, TEMP[5].xyyy\n 28: ADD TEMP[5].xy, TEMP[5].xyyy, -TEMP[0].xyyy\n 29: ADD TEMP[5].xy, TEMP[5].xyyy, CONST[2].xxxx\n 30: MAX TEMP[3].xy, TEMP[5].xyyy, IMM[0].xxxx\n 31: DP2 TEMP[3].x, TEMP[3].xyyy, TEMP[3].xyyy\n 32: SQRT TEMP[3].x, TEMP[3].xxxx\n 33: MAX TEMP[2].x, TEMP[5].xxxx, TEMP[5].yyyy\n 34: MIN TEMP[2].x, TEMP[2].xxxx, IMM[0].xxxx\n 35: ADD TEMP[3].x, TEMP[3].xxxx, TEMP[2].xxxx\n 36: ADD TEMP[3].x, TEMP[3].xxxx, -CONST[2].xxxx\n 37: ADD TEMP[3].x, IMM[0].yyyy, -TEMP[3].xxxx\n 38: MAX TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 39: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].zzzz\n 40: ADD TEMP[3].x, IMM[0].zzzz, -TEMP[3].xxxx\n 41: MUL TEMP[4].x, TEMP[4].xxxx, TEMP[3].xxxx\n 42: MUL OUT[0], IN[0], TEMP[4].xxxx\n 43: END\n"이고, 문자열이다.
+    상수 shadowHardShader는 "FRAG\nDCL IN[0], COLOR, LINEAR\nDCL IN[1], GENERIC[0], LINEAR\nDCL OUT[0], COLOR\nDCL CONST[0..2]\nDCL TEMP[0..5]\nIMM[0] FLT32 { 0.0, 0.5, 1.0, 2.0 }\n  0: MUL TEMP[0].xy, CONST[0].xyyy, IMM[0].yyyy\n  1: ADD TEMP[1].xy, IN[1].xyyy, -TEMP[0].xyyy\n  2: ABS TEMP[1].xy, TEMP[1].xyyy\n  3: ADD TEMP[1].xy, TEMP[1].xyyy, -TEMP[0].xyyy\n  4: ADD TEMP[1].xy, TEMP[1].xyyy, CONST[0].zzzz\n  5: MAX TEMP[2].xy, TEMP[1].xyyy, IMM[0].xxxx\n  6: DP2 TEMP[2].x, TEMP[2].xyyy, TEMP[2].xyyy\n  7: SQRT TEMP[2].x, TEMP[2].xxxx\n  8: MAX TEMP[3].x, TEMP[1].xxxx, TEMP[1].yyyy\n  9: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 10: ADD TEMP[2].x, TEMP[2].xxxx, TEMP[3].xxxx\n 11: ADD TEMP[2].x, TEMP[2].xxxx, -CONST[0].zzzz\n 12: ADD TEMP[4].x, IMM[0].yyyy, -TEMP[2].xxxx\n 13: MAX TEMP[4].x, TEMP[4].xxxx, IMM[0].xxxx\n 14: MIN TEMP[4].x, TEMP[4].xxxx, IMM[0].zzzz\n 15: ADD TEMP[5].xy, IN[1].xyyy, -CONST[1].xyyy\n 16: MUL TEMP[0].xy, CONST[1].zwww, IMM[0].yyyy\n 17: ADD TEMP[5].xy, TEMP[5].xyyy, -TEMP[0].xyyy\n 18: ABS TEMP[5].xy, TEMP[5].xyyy\n 19: ADD TEMP[5].xy, TEMP[5].xyyy, -TEMP[0].xyyy\n 20: ADD TEMP[5].xy, TEMP[5].xyyy, CONST[2].xxxx\n 21: MAX TEMP[2].xy, TEMP[5].xyyy, IMM[0].xxxx\n 22: DP2 TEMP[2].x, TEMP[2].xyyy, TEMP[2].xyyy\n 23: SQRT TEMP[2].x, TEMP[2].xxxx\n 24: MAX TEMP[3].x, TEMP[5].xxxx, TEMP[5].yyyy\n 25: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 26: ADD TEMP[2].x, TEMP[2].xxxx, TEMP[3].xxxx\n 27: ADD TEMP[2].x, TEMP[2].xxxx, -CONST[2].xxxx\n 28: ADD TEMP[3].x, IMM[0].yyyy, -TEMP[2].xxxx\n 29: MAX TEMP[3].x, TEMP[3].xxxx, IMM[0].xxxx\n 30: MIN TEMP[3].x, TEMP[3].xxxx, IMM[0].zzzz\n 31: ADD TEMP[3].x, IMM[0].zzzz, -TEMP[3].xxxx\n 32: MUL TEMP[4].x, TEMP[4].xxxx, TEMP[3].xxxx\n 33: MUL OUT[0], IN[0], TEMP[4].xxxx\n 34: END\n"이고, 문자열이다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_VERTEX_SHADER, 종류: HMJEGPU_SHADER_VERTEX, 문구: 정점shader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_SOLID_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: solidShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_IMAGE_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: imageShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_GLYPH_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: glyphShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_ROUNDED_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: roundedShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_BORDER_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: borderShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_SHADOW_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: shadowShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_SHADOW_HARD_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: shadowHardShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_CAPSULE_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: capsuleShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_GRADIENT_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: gradientShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_BLUR_DOWN_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: blurDownShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_BLUR_BOX_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: blurBoxShader)로 실행한다.
+    HmjeGPUshader생성를 (핸들: HMJEGPU_OBJECT_BLUR_COMPOSITE_SHADER, 종류: HMJEGPU_SHADER_FRAGMENT, 문구: blurCompositeShader)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_SOLID_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_IMAGE_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_GLYPH_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_ROUNDED_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_BORDER_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_SHADOW_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_SHADOW_HARD_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_CAPSULE_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_GRADIENT_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_BLUR_DOWN_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_BLUR_BOX_SHADER)로 실행한다.
+    HmjeGPUshader연결를 (픽셀핸들: HMJEGPU_OBJECT_BLUR_COMPOSITE_SHADER)로 실행한다.
+
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_BLEND, 길이: 자연수32(1))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_BLEND)로 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_RASTERIZER, 길이: 자연수32(1))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_RASTERIZER)로 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_DSA, 길이: 자연수32(1))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_DSA)로 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_VERTEX_ELEMENTS, 길이: 자연수32(1))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_VERTEX_ELEMENTS)로 실행한다.
+
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_SHADER, 객체: 0, 길이: 자연수32(2))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_VERTEX_SHADER)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_VERTEX)로 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_SHADER, 객체: 0, 길이: 자연수32(2))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_SOLID_SHADER)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_SAMPLER_STATES, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_OBJECT_SAMPLER)로 실행한다.
+
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_VERTEX_BUFFERS, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(HMJEGPU_정점바이트))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU정점wire))로 실행한다.
+
+함수 HmjeGPU참조초기화는
+    HmjeGPU참조수는 0이다.
+
+함수 HmjeGPU참조추가는 (핸들: 자연수)를 받아
+    만약 핸들 == 0이면
+        참을 참거짓로 반환한다.
+    변수 번호는 자연수(0)이고, 자연수이다.
+    번호 < HmjeGPU참조수일 동안
+        변수 기존은 자연수(0)이고, 자연수이다.
+        위험 작업은
+            기존은 HmjeGPU참조주소 + (번호 * 8)에서 자연수 값이다.
+        만약 기존 == 핸들이면
+            참을 참거짓로 반환한다.
+        번호는 번호 + 1이다.
+    만약 HmjeGPU참조주소 == 주소(0) 또는 HmjeGPU참조수 >= HMJEGPU_최대참조수 또는 HmjeGPU참조수 >= HmjeGPU최대제출리소스이면
+        HmjeGPU인코딩실패는 참이다.
+        거짓을 참거짓로 반환한다.
+    위험 작업은
+        HmjeGPU참조주소 + (HmjeGPU참조수 * 8)에서 자연수 값은 핸들이다.
+    HmjeGPU참조수는 HmjeGPU참조수 + 1이다.
+    참을 참거짓로 반환한다.
+
+함수 HmjeGPU제출은
+    만약 HmjeGPU인코딩실패 또는 HmjeGPU명령길이 == 0 또는 HmjeGPU명령길이 > HmjeGPU최대명령바이트이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    상수 제출은 GPU장치명령제출(HmjeGPU문맥핸들, HmjeGPU명령주소, HmjeGPU명령길이, HmjeGPU참조주소, HmjeGPU참조수, 0)이고, GPU장치제출결과이다.
+    만약 제출.결과 != 0이면
+        제출.결과를 정수로 반환한다.
+    정수(제출.신호값)을 정수로 반환한다.
+
+함수 HmjeGPU임시view파기인코딩은
+    만약 HmjeGPU임시수 > 0이면
+        # 마지막 draw 뒤에도 context가 transient view를 붙잡지 않게 먼저
+        # slot 0을 비운다. 이어지는 destroy와 resource close의 수명을 명확히 한다.
+        HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_SAMPLER_VIEWS, 객체: 0, 길이: 자연수32(3))로 실행한다.
+        HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    변수 번호는 자연수(0)이고, 자연수이다.
+    번호 < HmjeGPU임시수일 동안
+        변수 view는 자연수(0)이고, 자연수이다.
+        변수 surface는 자연수(0)이고, 자연수이다.
+        위험 작업은
+            view는 HmjeGPU임시주소 + (번호 * HMJEGPU_임시레코드바이트) + 16에서 자연수 값이다.
+            surface는 HmjeGPU임시주소 + (번호 * HMJEGPU_임시레코드바이트) + 24에서 자연수 값이다.
+        HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_DESTROY_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SAMPLER_VIEW, 길이: 자연수32(1))로 실행한다.
+        HmjeGPU명령u32추가를 (값: 자연수32(view))로 실행한다.
+        만약 surface != 0이면
+            HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_DESTROY_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SURFACE, 길이: 자연수32(1))로 실행한다.
+            HmjeGPU명령u32추가를 (값: 자연수32(surface))로 실행한다.
+        번호는 번호 + 1이다.
+
+함수 HmjeGPU임시리소스정리는
+    변수 번호는 자연수(0)이고, 자연수이다.
+    번호 < HmjeGPU임시수일 동안
+        변수 핸들은 자연수(0)이고, 자연수이다.
+        위험 작업은
+            핸들은 HmjeGPU임시주소 + (번호 * HMJEGPU_임시레코드바이트)에서 자연수 값이다.
+        만약 핸들 != 0이면
+            상수 닫기결과는 GPU장치리소스닫기(HmjeGPU문맥핸들, 핸들)이고, 정수이다.
+        번호는 번호 + 1이다.
+    HmjeGPU임시수는 0이다.
+
+함수 HmjeGPU초기화는
+    만약 HmjeGPU준비상태 == 2이면
+        참을 참거짓로 반환한다.
+    만약 HmjeGPU준비상태 == 1 또는 HmjeGPUVirGL장치탐지() == 거짓이면
+        거짓을 참거짓로 반환한다.
+    HmjeGPU준비상태는 1이다.
+    HmjeGPU명령주소는 메모리요청(HMJEGPU_명령용량)이다.
+    HmjeGPU정점주소는 메모리요청(HMJEGPU_정점용량)이다.
+    HmjeGPU참조주소는 메모리요청(HMJEGPU_최대참조수 * 8)이다.
+    HmjeGPU임시주소는 메모리요청(HMJEGPU_최대임시수 * HMJEGPU_임시레코드바이트)이다.
+    만약 HmjeGPU명령주소 == 주소(0) 또는 HmjeGPU정점주소 == 주소(0) 또는 HmjeGPU참조주소 == 주소(0) 또는 HmjeGPU임시주소 == 주소(0)이면
+        거짓을 참거짓로 반환한다.
+    상수 문맥은 GPU장치문맥열기(참)이고, GPU장치문맥이다.
+    만약 문맥.결과 != 0이면
+        거짓을 참거짓로 반환한다.
+    HmjeGPU문맥핸들은 문맥.핸들이다.
+    HmjeGPU스캔아웃핸들은 문맥.화면핸들이다.
+    HmjeGPU스캔아웃wire는 문맥.화면wireID이다.
+    상수 정점버퍼는 GPU장치버퍼만들기(HmjeGPU문맥핸들, HMJEGPU_정점용량, GPU_DEVICE_USAGE_VERTEX | GPU_DEVICE_USAGE_TRANSFER_DST)이고, GPU장치리소스이다.
+    만약 정점버퍼.결과 != 0이면
+        상수 닫기결과는 GPU장치문맥닫기(HmjeGPU문맥핸들)이고, 정수이다.
+        HmjeGPU문맥핸들은 0이다.
+        거짓을 참거짓로 반환한다.
+    HmjeGPU정점핸들은 정점버퍼.핸들이다.
+    HmjeGPU정점wire는 정점버퍼.wireID이다.
+    상수 글리프사용법은 GPU_DEVICE_USAGE_SAMPLED | GPU_DEVICE_USAGE_TRANSFER_DST이고, 자연수이다.
+    상수 글리프이미지는 GPU장치이미지만들기(HmjeGPU문맥핸들, HMJEGPU_글리프아틀라스크기, HMJEGPU_글리프아틀라스크기, GPU_DEVICE_FORMAT_R8_UNORM, 글리프사용법)이고, GPU장치리소스이다.
+    만약 글리프이미지.결과 != 0이면
+        상수 닫기결과2는 GPU장치문맥닫기(HmjeGPU문맥핸들)이고, 정수이다.
+        HmjeGPU문맥핸들은 0이다.
+        거짓을 참거짓로 반환한다.
+    HmjeGPU글리프핸들은 글리프이미지.핸들이다.
+    HmjeGPU글리프wire는 글리프이미지.wireID이다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU참조초기화를 실행한다.
+    HmjeGPU참조추가를 (핸들: HmjeGPU정점핸들)로 실행한다.
+    HmjeGPU참조추가를 (핸들: HmjeGPU글리프핸들)로 실행한다.
+    HmjeGPU고정상태인코딩을 실행한다.
+    상수 설정제출은 HmjeGPU제출()이고, 정수이다.
+    만약 설정제출 <= 0이면
+        상수 닫기결과2는 GPU장치문맥닫기(HmjeGPU문맥핸들)이고, 정수이다.
+        HmjeGPU문맥핸들은 0이다.
+        거짓을 참거짓로 반환한다.
+    HmjeGPU준비상태는 2이다.
+    참을 참거짓로 반환한다.
+
+함수 HmjeGPU대상핸들은 (대상: 자연수)를 받아
+    만약 대상 == GPU_TARGET_BACKGROUND이면
+        HmjeGPU배경대상핸들을 자연수로 반환한다.
+    HmjeGPU화면대상핸들을 자연수로 반환한다.
+
+함수 HmjeGPU대상wire는 (대상: 자연수)를 받아
+    만약 대상 == GPU_TARGET_BACKGROUND이면
+        HmjeGPU배경대상wire를 자연수로 반환한다.
+    HmjeGPU화면대상wire를 자연수로 반환한다.
+
+함수 HmjeGPU대상표면은 (대상: 자연수)를 받아
+    만약 대상 == GPU_TARGET_BACKGROUND이면
+        HMJEGPU_OBJECT_BACKGROUND_SURFACE를 자연수32로 반환한다.
+    HMJEGPU_OBJECT_SCREEN_SURFACE를 자연수32로 반환한다.
+
+함수 HmjeGPU대상파기는 (대상: 자연수)를 받아
+    상수 핸들은 HmjeGPU대상핸들(대상)이고, 자연수이다.
+    만약 핸들 == 0이면
+        정수(1)을 정수로 반환한다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_DESTROY_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SURFACE, 길이: 자연수32(1))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HmjeGPU대상표면(대상))로 실행한다.
+    HmjeGPU참조초기화를 실행한다.
+    HmjeGPU참조추가를 (핸들: 핸들)로 실행한다.
+    상수 제출결과는 HmjeGPU제출()이고, 정수이다.
+    만약 제출결과 <= 0이면
+        제출결과를 정수로 반환한다.
+    상수 파기결과는 GPU장치리소스닫기(HmjeGPU문맥핸들, 핸들)이고, 정수이다.
+    만약 파기결과 != 0이면
+        파기결과를 정수로 반환한다.
+    만약 대상 == GPU_TARGET_BACKGROUND이면
+        HmjeGPU배경대상핸들은 0이다.
+        HmjeGPU배경대상wire는 0이다.
+        HmjeGPU배경대상너비는 0이다.
+        HmjeGPU배경대상높이는 0이다.
+    아니면
+        HmjeGPU화면대상핸들은 0이다.
+        HmjeGPU화면대상wire는 0이다.
+        HmjeGPU화면대상너비는 0이다.
+        HmjeGPU화면대상높이는 0이다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU대상보장은 (대상: 자연수, 너비: 자연수, 높이: 자연수)를 받아
+    변수 기존너비는 HmjeGPU화면대상너비이고, 자연수이다.
+    변수 기존높이는 HmjeGPU화면대상높이이고, 자연수이다.
+    만약 대상 == GPU_TARGET_BACKGROUND이면
+        기존너비는 HmjeGPU배경대상너비이다.
+        기존높이는 HmjeGPU배경대상높이이다.
+    만약 HmjeGPU대상핸들(대상) != 0 그리고 기존너비 == 너비 그리고 기존높이 == 높이이면
+        정수(1)을 정수로 반환한다.
+    상수 이전파기는 HmjeGPU대상파기(대상)이고, 정수이다.
+    만약 이전파기 <= 0이면
+        이전파기를 정수로 반환한다.
+    상수 사용법은 GPU_DEVICE_USAGE_SAMPLED | GPU_DEVICE_USAGE_RENDER_TARGET | GPU_DEVICE_USAGE_TRANSFER_SRC | GPU_DEVICE_USAGE_TRANSFER_DST이고, 자연수이다.
+    상수 이미지값은 GPU장치이미지만들기(HmjeGPU문맥핸들, 너비, 높이, GPU_DEVICE_FORMAT_BGRX8_UNORM, 사용법)이고, GPU장치리소스이다.
+    만약 이미지값.결과 != 0이면
+        이미지값.결과를 정수로 반환한다.
+    만약 대상 == GPU_TARGET_BACKGROUND이면
+        HmjeGPU배경대상핸들은 이미지값.핸들이다.
+        HmjeGPU배경대상wire는 이미지값.wireID이다.
+        HmjeGPU배경대상너비는 너비이다.
+        HmjeGPU배경대상높이는 높이이다.
+    아니면
+        HmjeGPU화면대상핸들은 이미지값.핸들이다.
+        HmjeGPU화면대상wire는 이미지값.wireID이다.
+        HmjeGPU화면대상너비는 너비이다.
+        HmjeGPU화면대상높이는 높이이다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SURFACE, 길이: 자연수32(5))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HmjeGPU대상표면(대상))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(이미지값.wireID))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_FORMAT_BGRX8)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU참조초기화를 실행한다.
+    HmjeGPU참조추가를 (핸들: 이미지값.핸들)로 실행한다.
+    HmjeGPU제출()을 정수로 반환한다.
+
+함수 HmjeGPUviewport인코딩은 (너비: 자연수, 높이: 자연수)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_VIEWPORT, 객체: 0, 길이: 자연수32(7))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(너비) / 실수32(2.0))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(0.0) - (실수32(높이) / 실수32(2.0)))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(1.0))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(너비) / 실수32(2.0))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(높이) / 실수32(2.0))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(0.0))로 실행한다.
+
+함수 HmjeGPU클립인코딩은 (왼쪽: 자연수, 위: 자연수, 오른쪽: 자연수, 아래: 자연수)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_SCISSOR, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32((왼쪽 & 0xffff) | ((위 & 0xffff) << 16)))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32((오른쪽 & 0xffff) | ((아래 & 0xffff) << 16)))로 실행한다.
+
+함수 HmjeGPU시작은 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 길이 != 24 또는 요청주소 == 주소(0) 또는 HmjeGPU프레임활성이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 대상은 자연수(0)이고, 자연수이다.
+    위험 작업은
+        너비는 요청주소에서 자연수 값이다.
+        높이는 요청주소 + 8에서 자연수 값이다.
+        대상은 요청주소 + 16에서 자연수 값이다.
+    만약 너비 == 0 또는 높이 == 0 또는 너비 > 65535 또는 높이 > 65535이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 대상 != GPU_TARGET_SCREEN 그리고 대상 != GPU_TARGET_BACKGROUND이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 대상 == GPU_TARGET_SCREEN이면
+        만약 너비 != HmjeGPU화면너비 또는 높이 != HmjeGPU화면높이이면
+            HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 HmjeGPU초기화() == 거짓이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    상수 대상결과는 HmjeGPU대상보장(대상, 너비, 높이)이고, 정수이다.
+    만약 대상결과 <= 0이면
+        대상결과를 정수로 반환한다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU참조초기화를 실행한다.
+    HmjeGPU참조추가를 (핸들: HmjeGPU대상핸들(대상))로 실행한다.
+    HmjeGPU참조추가를 (핸들: HmjeGPU정점핸들)로 실행한다.
+    HmjeGPU정점길이는 0이다.
+    HmjeGPU임시수는 0이다.
+    HmjeGPU글리프다음X는 0이다.
+    HmjeGPU글리프다음Y는 0이다.
+    HmjeGPU글리프행높이는 0이다.
+    HmjeGPU마지막글리프유효는 거짓이다.
+    HmjeGPU현재대상은 대상이다.
+    HmjeGPU현재너비는 너비이다.
+    HmjeGPU현재높이는 높이이다.
+    HmjeGPU활성wire는 HmjeGPU대상wire(대상)이다.
+    HmjeGPU활성surface는 HmjeGPU대상표면(대상)이다.
+    HmjeGPU활성view는 0이다.
+    HmjeGPU레이어깊이는 0이다.
+    HmjeGPU클립왼쪽은 0이다.
+    HmjeGPU클립위는 0이다.
+    HmjeGPU클립오른쪽은 너비이다.
+    HmjeGPU클립아래는 높이이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_FRAMEBUFFER, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HmjeGPU활성surface)로 실행한다.
+    HmjeGPUviewport인코딩를 (너비: 너비, 높이: 높이)로 실행한다.
+    HmjeGPU클립인코딩를 (왼쪽: 0, 위: 0, 오른쪽: 너비, 아래: 높이)로 실행한다.
+    HmjeGPU프레임활성은 참이다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU클립은 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 길이 != 32 또는 요청주소 == 주소(0)이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 왼쪽은 자연수(0)이고, 자연수이다.
+    변수 위는 자연수(0)이고, 자연수이다.
+    변수 오른쪽은 자연수(0)이고, 자연수이다.
+    변수 아래는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        왼쪽은 요청주소에서 자연수 값이다.
+        위는 요청주소 + 8에서 자연수 값이다.
+        오른쪽은 요청주소 + 16에서 자연수 값이다.
+        아래는 요청주소 + 24에서 자연수 값이다.
+    만약 왼쪽 > HmjeGPU현재너비이면
+        왼쪽은 HmjeGPU현재너비이다.
+    만약 위 > HmjeGPU현재높이이면
+        위는 HmjeGPU현재높이이다.
+    만약 오른쪽 > HmjeGPU현재너비이면
+        오른쪽은 HmjeGPU현재너비이다.
+    만약 아래 > HmjeGPU현재높이이면
+        아래는 HmjeGPU현재높이이다.
+    만약 오른쪽 < 왼쪽이면
+        오른쪽은 왼쪽이다.
+    만약 아래 < 위이면
+        아래는 위이다.
+    HmjeGPU클립왼쪽은 왼쪽이다.
+    HmjeGPU클립위는 위이다.
+    HmjeGPU클립오른쪽은 오른쪽이다.
+    HmjeGPU클립아래는 아래이다.
+    HmjeGPU클립인코딩를 (왼쪽: 왼쪽, 위: 위, 오른쪽: 오른쪽, 아래: 아래)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+# persistent background target은 CPU shadow와 동기화되어 있음을
+# high-level renderer가 보장한 뒤에만 이 명령으로 들어온다. 두 target은
+# 같은 virgl context에 붙은 persistent resource이므로 핀 복사만으로 충분하다.
+함수 HmjeGPU대상합성은 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 길이 != 56 또는 요청주소 == 주소(0)이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 원본대상은 자연수(0)이고, 자연수이다.
+    변수 원본X는 자연수(0)이고, 자연수이다.
+    변수 원본Y는 자연수(0)이고, 자연수이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 대상X는 정수(0)이고, 정수이다.
+    변수 대상Y는 정수(0)이고, 정수이다.
+    위험 작업은
+        원본대상은 요청주소에서 자연수 값이다.
+        원본X는 요청주소 + 8에서 자연수 값이다.
+        원본Y는 요청주소 + 16에서 자연수 값이다.
+        너비는 요청주소 + 24에서 자연수 값이다.
+        높이는 요청주소 + 32에서 자연수 값이다.
+        대상X는 요청주소 + 40에서 정수 값이다.
+        대상Y는 요청주소 + 48에서 정수 값이다.
+    만약 원본대상 != GPU_TARGET_BACKGROUND 또는 HmjeGPU현재대상 != GPU_TARGET_SCREEN 또는 HmjeGPU배경대상핸들 == 0 또는 HmjeGPU활성wire == HmjeGPU배경대상wire이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    만약 너비 == 0 또는 높이 == 0이면
+        정수(1)을 정수로 반환한다.
+    만약 원본X >= HmjeGPU배경대상너비 또는 원본Y >= HmjeGPU배경대상높이이면
+        정수(1)을 정수로 반환한다.
+    만약 너비 > HmjeGPU배경대상너비 - 원본X이면
+        너비는 HmjeGPU배경대상너비 - 원본X이다.
+    만약 높이 > HmjeGPU배경대상높이 - 원본Y이면
+        높이는 HmjeGPU배경대상높이 - 원본Y이다.
+
+    # destination 경계나 현재 scissor에 잘리는 만큼 source 원점도
+    # 같이 이동시켜 1:1 사상을 보존한다.
+    만약 대상X < 0이면
+        상수 잘림X는 자연수(정수(0) - (대상X + 1)) + 1이고, 자연수이다.
+        만약 잘림X >= 너비이면
+            정수(1)을 정수로 반환한다.
+        원본X는 원본X + 잘림X이다.
+        너비는 너비 - 잘림X이다.
+        대상X는 0이다.
+    만약 대상Y < 0이면
+        상수 잘림Y는 자연수(정수(0) - (대상Y + 1)) + 1이고, 자연수이다.
+        만약 잘림Y >= 높이이면
+            정수(1)을 정수로 반환한다.
+        원본Y는 원본Y + 잘림Y이다.
+        높이는 높이 - 잘림Y이다.
+        대상Y는 0이다.
+    만약 대상X >= 정수(HmjeGPU현재너비) 또는 대상Y >= 정수(HmjeGPU현재높이)이면
+        정수(1)을 정수로 반환한다.
+    변수 대상왼쪽은 자연수(대상X)이고, 자연수이다.
+    변수 대상위는 자연수(대상Y)이고, 자연수이다.
+    만약 대상왼쪽 < HmjeGPU클립왼쪽이면
+        상수 잘림왼쪽은 HmjeGPU클립왼쪽 - 대상왼쪽이고, 자연수이다.
+        만약 잘림왼쪽 >= 너비이면
+            정수(1)을 정수로 반환한다.
+        원본X는 원본X + 잘림왼쪽이다.
+        너비는 너비 - 잘림왼쪽이다.
+        대상왼쪽은 HmjeGPU클립왼쪽이다.
+    만약 대상위 < HmjeGPU클립위이면
+        상수 잘림위는 HmjeGPU클립위 - 대상위이고, 자연수이다.
+        만약 잘림위 >= 높이이면
+            정수(1)을 정수로 반환한다.
+        원본Y는 원본Y + 잘림위이다.
+        높이는 높이 - 잘림위이다.
+        대상위는 HmjeGPU클립위이다.
+    변수 최대오른쪽은 HmjeGPU클립오른쪽이고, 자연수이다.
+    변수 최대아래는 HmjeGPU클립아래이고, 자연수이다.
+    만약 최대오른쪽 > HmjeGPU현재너비이면
+        최대오른쪽은 HmjeGPU현재너비이다.
+    만약 최대아래 > HmjeGPU현재높이이면
+        최대아래는 HmjeGPU현재높이이다.
+    만약 대상왼쪽 >= 최대오른쪽 또는 대상위 >= 최대아래이면
+        정수(1)을 정수로 반환한다.
+    만약 너비 > 최대오른쪽 - 대상왼쪽이면
+        너비는 최대오른쪽 - 대상왼쪽이다.
+    만약 높이 > 최대아래 - 대상위이면
+        높이는 최대아래 - 대상위이다.
+    만약 너비 == 0 또는 높이 == 0이면
+        정수(1)을 정수로 반환한다.
+
+    HmjeGPU참조추가를 (핸들: HmjeGPU배경대상핸들)로 실행한다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_RESOURCE_COPY_REGION, 객체: 0, 길이: 자연수32(13))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU활성wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(대상왼쪽))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(대상위))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU배경대상wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(원본X))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(원본Y))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(너비))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(높이))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPUshader선택은 (핸들: 자연수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_BIND_SHADER, 객체: 0, 길이: 자연수32(2))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 핸들)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+
+함수 HmjeGPUview선택은 (view: 자연수32)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_SAMPLER_VIEWS, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: view)로 실행한다.
+
+함수 HmjeGPUdraw인코딩은 (시작정점: 자연수)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_DRAW_VBO, 객체: 0, 길이: 자연수32(12))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(시작정점))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 6)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_PRIM_TRIANGLES)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0xffffffff)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+
+함수 HmjeGPU정점은 (x: 실수32, y: 실수32, r: 실수32, g: 실수32, b: 실수32, a: 실수32, u: 실수32, v: 실수32)를 받아
+    상수 nx는 (실수32(2.0) * x / 실수32(HmjeGPU현재너비)) - 실수32(1.0)이고, 실수32이다.
+    상수 ny는 실수32(1.0) - (실수32(2.0) * y / 실수32(HmjeGPU현재높이))이고, 실수32이다.
+    HmjeGPU정점실수32추가를 (값: nx)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: ny)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: 실수32(0.0))로 실행한다.
+    HmjeGPU정점실수32추가를 (값: 실수32(1.0))로 실행한다.
+    HmjeGPU정점실수32추가를 (값: r)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: g)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: b)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: a)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: u)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: v)로 실행한다.
+    HmjeGPU정점실수32추가를 (값: 실수32(0.0))로 실행한다.
+    HmjeGPU정점실수32추가를 (값: 실수32(1.0))로 실행한다.
+
+함수 HmjeGPU사각형정점은 (왼쪽: 자연수, 위: 자연수, 오른쪽: 자연수, 아래: 자연수, 색워드: 자연수32)를 받아
+    상수 알파8은 자연수((색워드 >> 24) & 자연수32(255))이고, 자연수이다.
+    상수 알파는 실수32(알파8) / 실수32(255.0)이고, 실수32이다.
+    상수 빨강은 (실수32(자연수((색워드 >> 16) & 자연수32(255))) / 실수32(255.0)) * 알파이고, 실수32이다.
+    상수 초록은 (실수32(자연수((색워드 >> 8) & 자연수32(255))) / 실수32(255.0)) * 알파이고, 실수32이다.
+    상수 파랑은 (실수32(자연수(색워드 & 자연수32(255))) / 실수32(255.0)) * 알파이고, 실수32이다.
+    상수 l은 실수32(왼쪽)이고, 실수32이다.
+    상수 t는 실수32(위)이고, 실수32이다.
+    상수 r은 실수32(오른쪽)이고, 실수32이다.
+    상수 b는 실수32(아래)이고, 실수32이다.
+    HmjeGPU정점를 (x: l, y: t, r: 빨강, g: 초록, b: 파랑, a: 알파, u: 실수32(0.0), v: 실수32(0.0))로 실행한다.
+    HmjeGPU정점를 (x: r, y: t, r: 빨강, g: 초록, b: 파랑, a: 알파, u: 실수32(0.0), v: 실수32(0.0))로 실행한다.
+    HmjeGPU정점를 (x: r, y: b, r: 빨강, g: 초록, b: 파랑, a: 알파, u: 실수32(0.0), v: 실수32(0.0))로 실행한다.
+    HmjeGPU정점를 (x: l, y: t, r: 빨강, g: 초록, b: 파랑, a: 알파, u: 실수32(0.0), v: 실수32(0.0))로 실행한다.
+    HmjeGPU정점를 (x: r, y: b, r: 빨강, g: 초록, b: 파랑, a: 알파, u: 실수32(0.0), v: 실수32(0.0))로 실행한다.
+    HmjeGPU정점를 (x: l, y: b, r: 빨강, g: 초록, b: 파랑, a: 알파, u: 실수32(0.0), v: 실수32(0.0))로 실행한다.
+
+함수 HmjeGPU텍스처사각형정점은 (왼쪽: 실수32, 위: 실수32, 오른쪽: 실수32, 아래: 실수32, u0: 실수32, v0: 실수32, u1: 실수32, v1: 실수32, 색워드: 자연수32)를 받아
+    상수 알파는 실수32(자연수((색워드 >> 24) & 자연수32(255))) / 실수32(255.0)이고, 실수32이다.
+    상수 빨강은 (실수32(자연수((색워드 >> 16) & 자연수32(255))) / 실수32(255.0)) * 알파이고, 실수32이다.
+    상수 초록은 (실수32(자연수((색워드 >> 8) & 자연수32(255))) / 실수32(255.0)) * 알파이고, 실수32이다.
+    상수 파랑은 (실수32(자연수(색워드 & 자연수32(255))) / 실수32(255.0)) * 알파이고, 실수32이다.
+    HmjeGPU정점를 (x: 왼쪽, y: 위, r: 빨강, g: 초록, b: 파랑, a: 알파, u: u0, v: v0)로 실행한다.
+    HmjeGPU정점를 (x: 오른쪽, y: 위, r: 빨강, g: 초록, b: 파랑, a: 알파, u: u1, v: v0)로 실행한다.
+    HmjeGPU정점를 (x: 오른쪽, y: 아래, r: 빨강, g: 초록, b: 파랑, a: 알파, u: u1, v: v1)로 실행한다.
+    HmjeGPU정점를 (x: 왼쪽, y: 위, r: 빨강, g: 초록, b: 파랑, a: 알파, u: u0, v: v0)로 실행한다.
+    HmjeGPU정점를 (x: 오른쪽, y: 아래, r: 빨강, g: 초록, b: 파랑, a: 알파, u: u1, v: v1)로 실행한다.
+    HmjeGPU정점를 (x: 왼쪽, y: 아래, r: 빨강, g: 초록, b: 파랑, a: 알파, u: u0, v: v1)로 실행한다.
+
+함수 HmjeGPU임시텍스처형식만들기는 (너비: 자연수, 높이: 자연수, 장치형식: 자연수, virgl형식: 자연수32, 픽셀바이트: 자연수)를 받아
+    만약 너비 == 0 또는 높이 == 0 또는 HmjeGPU임시수 >= HMJEGPU_최대임시수이면
+        HmjeGPU임시텍스처(결과: HMJEGPU_오류_지원안함, 핸들: 0, wire: 0, view: 0, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+    만약 픽셀바이트 == 0 또는 너비 > HmjeGPU최대리소스바이트 / 픽셀바이트 또는 높이 > HmjeGPU최대리소스바이트 / (너비 * 픽셀바이트)이면
+        HmjeGPU임시텍스처(결과: HMJEGPU_오류_지원안함, 핸들: 0, wire: 0, view: 0, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+    # 이미지 upload에는 TRANSFER_DST, 겹침 shift scratch에는
+    # TRANSFER_SRC까지 필요하다. 한 transient 수명 모델로 공유한다.
+    상수 사용법은 GPU_DEVICE_USAGE_SAMPLED | GPU_DEVICE_USAGE_RENDER_TARGET | GPU_DEVICE_USAGE_TRANSFER_SRC | GPU_DEVICE_USAGE_TRANSFER_DST이고, 자연수이다.
+    상수 이미지값은 GPU장치이미지만들기(HmjeGPU문맥핸들, 너비, 높이, 장치형식, 사용법)이고, GPU장치리소스이다.
+    만약 이미지값.결과 != 0이면
+        HmjeGPU임시텍스처(결과: 이미지값.결과, 핸들: 0, wire: 0, view: 0, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+    상수 view는 HmjeGPU다음임시view이고, 자연수32이다.
+    HmjeGPU다음임시view는 HmjeGPU다음임시view + 1이다.
+    상수 레코드는 HmjeGPU임시주소 + (HmjeGPU임시수 * HMJEGPU_임시레코드바이트)이고, 주소이다.
+    위험 작업은
+        레코드에서 자연수 값은 이미지값.핸들이다.
+        레코드 + 8에서 자연수 값은 이미지값.wireID이다.
+        레코드 + 16에서 자연수 값은 자연수(view)이다.
+        레코드 + 24에서 자연수 값은 자연수(0)이다.
+    HmjeGPU임시수는 HmjeGPU임시수 + 1이다.
+    HmjeGPU참조추가를 (핸들: 이미지값.핸들)로 실행한다.
+
+    상수 정체swizzle은 자연수32(0 | (1 << 3) | (2 << 6) | (3 << 9))이고, 자연수32이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SAMPLER_VIEW, 길이: 자연수32(6))로 실행한다.
+    HmjeGPU명령u32추가를 (값: view)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(이미지값.wireID))로 실행한다.
+    HmjeGPU명령u32추가를 (값: virgl형식)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 정체swizzle)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HmjeGPU임시텍스처(결과: HMJEGPU_오류_잘못됨, 핸들: 이미지값.핸들, wire: 이미지값.wireID, view: view, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+    HmjeGPU임시텍스처(결과: 정수(0), 핸들: 이미지값.핸들, wire: 이미지값.wireID, view: view, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+
+함수 HmjeGPU임시텍스처만들기는 (너비: 자연수, 높이: 자연수)를 받아
+    HmjeGPU임시텍스처형식만들기(너비, 높이, GPU_DEVICE_FORMAT_BGRX8_UNORM, HMJEGPU_FORMAT_BGRX8, 자연수(4))를 HmjeGPU임시텍스처로 반환한다.
+
+# persistent/층 target을 같은 제출 안에서 읽기 위한 view-only record다. 핸들이
+# 0이므로 프레임 정리에서 원본 리소스는 닫지 않고 sampler view만 파기한다.
+함수 HmjeGPU임시view만들기는 (wire: 자연수, virgl형식: 자연수32)를 받아
+    만약 wire == 0 또는 HmjeGPU임시수 >= HMJEGPU_최대임시수이면
+        HmjeGPU임시텍스처(결과: HMJEGPU_오류_지원안함, 핸들: 0, wire: 0, view: 0, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+    상수 view는 HmjeGPU다음임시view이고, 자연수32이다.
+    HmjeGPU다음임시view는 HmjeGPU다음임시view + 1이다.
+    상수 레코드는 HmjeGPU임시주소 + (HmjeGPU임시수 * HMJEGPU_임시레코드바이트)이고, 주소이다.
+    위험 작업은
+        레코드에서 자연수 값은 0이다.
+        레코드 + 8에서 자연수 값은 wire이다.
+        레코드 + 16에서 자연수 값은 자연수(view)이다.
+        레코드 + 24에서 자연수 값은 0이다.
+    HmjeGPU임시수는 HmjeGPU임시수 + 1이다.
+    상수 정체swizzle은 자연수32(0 | (1 << 3) | (2 << 6) | (3 << 9))이고, 자연수32이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SAMPLER_VIEW, 길이: 자연수32(6))로 실행한다.
+    HmjeGPU명령u32추가를 (값: view)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: virgl형식)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 정체swizzle)로 실행한다.
+    HmjeGPU임시텍스처(결과: 정수(0), 핸들: 0, wire: wire, view: view, surface: 0)를 HmjeGPU임시텍스처로 반환한다.
+
+# 바로 앞에서 만든 transient texture에 render-target surface를 붙인다.
+함수 HmjeGPU임시표면만들기는 (텍스처: HmjeGPU임시텍스처, virgl형식: 자연수32)를 받아
+    만약 텍스처.결과 != 0 또는 텍스처.핸들 == 0 또는 HmjeGPU임시수 == 0이면
+        자연수32(0)을 자연수32로 반환한다.
+    상수 surface는 HmjeGPU다음임시surface이고, 자연수32이다.
+    HmjeGPU다음임시surface는 HmjeGPU다음임시surface + 1이다.
+    상수 레코드는 HmjeGPU임시주소 + ((HmjeGPU임시수 - 1) * HMJEGPU_임시레코드바이트)이고, 주소이다.
+    위험 작업은
+        레코드 + 24에서 자연수 값은 자연수(surface)이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SURFACE, 길이: 자연수32(5))로 실행한다.
+    HmjeGPU명령u32추가를 (값: surface)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(텍스처.wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: virgl형식)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    surface를 자연수32로 반환한다.
+
+함수 HmjeGPU복사영역인코딩은 (대상wire: 자연수, 대상X: 자연수, 대상Y: 자연수, 원본wire: 자연수, 원본X: 자연수, 원본Y: 자연수, 너비: 자연수, 높이: 자연수)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_RESOURCE_COPY_REGION, 객체: 0, 길이: 자연수32(13))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(대상wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(대상X))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(대상Y))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(원본wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(원본X))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(원본Y))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(너비))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(높이))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+
+# 같은 render target의 겹치는 copy를 직접 보내지 않고 프레임 수명
+# scratch를 경유한다. 드러난 strip을 건드리지 않는 CPU/Metal 의미와 같다.
+함수 HmjeGPU시프트복사는 (요청주소: 주소, 길이: 자연수, 두축: 참거짓)를 받아
+    변수 기대길이는 자연수(48)이고, 자연수이다.
+    만약 두축이면
+        기대길이는 64이다.
+    만약 HmjeGPU프레임활성 == 거짓 또는 요청주소 == 주소(0) 또는 길이 != 기대길이이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 sx는 정수(0)이고, 정수이다.
+    변수 sy는 정수(0)이고, 정수이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 이동X는 자연수(0)이고, 자연수이다.
+    변수 이동Y는 자연수(0)이고, 자연수이다.
+    변수 오른쪽은 거짓이고, 참거짓이다.
+    변수 아래로는 거짓이고, 참거짓이다.
+    변수 오른쪽워드는 자연수(0)이고, 자연수이다.
+    변수 아래로워드는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        sx는 요청주소에서 정수 값이다.
+        sy는 요청주소 + 8에서 정수 값이다.
+        너비는 요청주소 + 16에서 자연수 값이다.
+        높이는 요청주소 + 24에서 자연수 값이다.
+        만약 두축이면
+            이동X는 요청주소 + 32에서 자연수 값이다.
+            이동Y는 요청주소 + 40에서 자연수 값이다.
+            오른쪽워드는 요청주소 + 48에서 자연수 값이다.
+            아래로워드는 요청주소 + 56에서 자연수 값이다.
+        아니면
+            이동Y는 요청주소 + 32에서 자연수 값이다.
+            아래로워드는 요청주소 + 40에서 자연수 값이다.
+    오른쪽은 오른쪽워드 != 0이다.
+    아래로는 아래로워드 != 0이다.
+    만약 sx < 0이면
+        상수 잘림X는 자연수(정수(0) - (sx + 1)) + 1이고, 자연수이다.
+        만약 잘림X >= 너비이면
+            정수(1)을 정수로 반환한다.
+        너비는 너비 - 잘림X이다.
+        sx는 0이다.
+    만약 sy < 0이면
+        상수 잘림Y는 자연수(정수(0) - (sy + 1)) + 1이고, 자연수이다.
+        만약 잘림Y >= 높이이면
+            정수(1)을 정수로 반환한다.
+        높이는 높이 - 잘림Y이다.
+        sy는 0이다.
+    상수 x는 자연수(sx)이고, 자연수이다.
+    상수 y는 자연수(sy)이고, 자연수이다.
+    만약 x >= HmjeGPU현재너비 또는 y >= HmjeGPU현재높이 또는 너비 == 0 또는 높이 == 0이면
+        정수(1)을 정수로 반환한다.
+    만약 너비 > HmjeGPU현재너비 - x이면
+        너비는 HmjeGPU현재너비 - x이다.
+    만약 높이 > HmjeGPU현재높이 - y이면
+        높이는 HmjeGPU현재높이 - y이다.
+    만약 두축이면
+        만약 이동X == 0 그리고 이동Y == 0이면
+            정수(1)을 정수로 반환한다.
+    아니면
+        만약 이동Y == 0이면
+            정수(1)을 정수로 반환한다.
+    만약 이동X >= 너비 또는 이동Y >= 높이이면
+        정수(1)을 정수로 반환한다.
+    상수 복사너비는 너비 - 이동X이고, 자연수이다.
+    상수 복사높이는 높이 - 이동Y이고, 자연수이다.
+    변수 원본X는 x + 이동X이고, 자연수이다.
+    변수 대상X는 x이고, 자연수이다.
+    변수 원본Y는 y + 이동Y이고, 자연수이다.
+    변수 대상Y는 y이고, 자연수이다.
+    만약 오른쪽이면
+        원본X는 x이다.
+        대상X는 x + 이동X이다.
+    만약 아래로이면
+        원본Y는 y이다.
+        대상Y는 y + 이동Y이다.
+    상수 scratch는 HmjeGPU임시텍스처만들기(복사너비, 복사높이)이고, HmjeGPU임시텍스처이다.
+    만약 scratch.결과 != 0이면
+        scratch.결과를 정수로 반환한다.
+    상수 현재wire는 HmjeGPU활성wire이고, 자연수이다.
+    HmjeGPU복사영역인코딩을 (대상wire: scratch.wire, 대상X: 0, 대상Y: 0, 원본wire: 현재wire, 원본X: 원본X, 원본Y: 원본Y, 너비: 복사너비, 높이: 복사높이)로 실행한다.
+    HmjeGPU복사영역인코딩을 (대상wire: 현재wire, 대상X: 대상X, 대상Y: 대상Y, 원본wire: scratch.wire, 원본X: 0, 원본Y: 0, 너비: 복사너비, 높이: 복사높이)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+# Group opacity는 부모 영역을 그대로 떠서 자식을 정상 alpha로 그린 뒤,
+# LAYER_END에서 전체를 한 번만 혼합한다. BGRX만으로도 CPU/Metal과 같다.
+함수 HmjeGPU레이어시작은 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 요청주소 == 주소(0) 또는 길이 != 40 또는 HmjeGPU레이어깊이 >= HMJEGPU_최대레이어깊이이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    변수 x는 자연수(0)이고, 자연수이다.
+    변수 y는 자연수(0)이고, 자연수이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 알파는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        x는 요청주소에서 자연수 값이다.
+        y는 요청주소 + 8에서 자연수 값이다.
+        너비는 요청주소 + 16에서 자연수 값이다.
+        높이는 요청주소 + 24에서 자연수 값이다.
+        알파는 요청주소 + 32에서 자연수 값이다.
+    만약 x >= HmjeGPU현재너비 또는 y >= HmjeGPU현재높이이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    만약 너비 > HmjeGPU현재너비 - x이면
+        너비는 HmjeGPU현재너비 - x이다.
+    만약 높이 > HmjeGPU현재높이 - y이면
+        높이는 HmjeGPU현재높이 - y이다.
+    만약 너비 == 0 또는 높이 == 0이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    만약 알파 > 255이면
+        알파는 255이다.
+    상수 레이어는 HmjeGPU임시텍스처만들기(너비, 높이)이고, HmjeGPU임시텍스처이다.
+    만약 레이어.결과 != 0이면
+        레이어.결과를 정수로 반환한다.
+    상수 surface는 HmjeGPU다음임시surface이고, 자연수32이다.
+    HmjeGPU다음임시surface는 HmjeGPU다음임시surface + 1이다.
+    상수 레코드는 HmjeGPU임시주소 + ((HmjeGPU임시수 - 1) * HMJEGPU_임시레코드바이트)이고, 주소이다.
+    위험 작업은
+        레코드 + 24에서 자연수 값은 자연수(surface)이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_CREATE_OBJECT, 객체: HMJEGPU_VIRGL_OBJECT_SURFACE, 길이: 자연수32(5))로 실행한다.
+    HmjeGPU명령u32추가를 (값: surface)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 자연수32(레이어.wire))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_FORMAT_BGRX8)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU복사영역인코딩을 (대상wire: 레이어.wire, 대상X: 0, 대상Y: 0, 원본wire: HmjeGPU활성wire, 원본X: x, 원본Y: y, 너비: 너비, 높이: 높이)로 실행한다.
+
+    상수 번호는 HmjeGPU레이어깊이이고, 자연수이다.
+    HmjeGPU레이어부모wire들[번호]은 HmjeGPU활성wire이다.
+    HmjeGPU레이어부모surface들[번호]은 HmjeGPU활성surface이다.
+    HmjeGPU레이어부모view들[번호]은 HmjeGPU활성view이다.
+    HmjeGPU레이어부모너비들[번호]은 HmjeGPU현재너비이다.
+    HmjeGPU레이어부모높이들[번호]은 HmjeGPU현재높이이다.
+    HmjeGPU레이어클립왼쪽들[번호]은 HmjeGPU클립왼쪽이다.
+    HmjeGPU레이어클립위들[번호]은 HmjeGPU클립위이다.
+    HmjeGPU레이어클립오른쪽들[번호]은 HmjeGPU클립오른쪽이다.
+    HmjeGPU레이어클립아래들[번호]은 HmjeGPU클립아래이다.
+    HmjeGPU레이어X들[번호]은 x이다.
+    HmjeGPU레이어Y들[번호]은 y이다.
+    HmjeGPU레이어너비들[번호]은 너비이다.
+    HmjeGPU레이어높이들[번호]은 높이이다.
+    HmjeGPU레이어알파들[번호]은 알파이다.
+    HmjeGPU레이어깊이는 번호 + 1이다.
+    HmjeGPU활성wire는 레이어.wire이다.
+    HmjeGPU활성surface는 surface이다.
+    HmjeGPU활성view는 레이어.view이다.
+    HmjeGPU현재너비는 너비이다.
+    HmjeGPU현재높이는 높이이다.
+    HmjeGPU클립왼쪽은 0이다.
+    HmjeGPU클립위는 0이다.
+    HmjeGPU클립오른쪽은 너비이다.
+    HmjeGPU클립아래는 높이이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_FRAMEBUFFER, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: surface)로 실행한다.
+    HmjeGPUviewport인코딩를 (너비: 너비, 높이: 높이)로 실행한다.
+    HmjeGPU클립인코딩를 (왼쪽: 0, 위: 0, 오른쪽: 너비, 아래: 높이)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU레이어끝은 (길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 길이 != 0이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 HmjeGPU레이어깊이 == 0이면
+        정수(1)을 정수로 반환한다.
+    상수 번호는 HmjeGPU레이어깊이 - 1이고, 자연수이다.
+    상수 레이어view는 HmjeGPU활성view이고, 자연수32이다.
+    HmjeGPU레이어깊이는 번호이다.
+    HmjeGPU활성wire는 HmjeGPU레이어부모wire들[번호]이다.
+    HmjeGPU활성surface는 HmjeGPU레이어부모surface들[번호]이다.
+    HmjeGPU활성view는 HmjeGPU레이어부모view들[번호]이다.
+    HmjeGPU현재너비는 HmjeGPU레이어부모너비들[번호]이다.
+    HmjeGPU현재높이는 HmjeGPU레이어부모높이들[번호]이다.
+    HmjeGPU클립왼쪽은 HmjeGPU레이어클립왼쪽들[번호]이다.
+    HmjeGPU클립위는 HmjeGPU레이어클립위들[번호]이다.
+    HmjeGPU클립오른쪽은 HmjeGPU레이어클립오른쪽들[번호]이다.
+    HmjeGPU클립아래는 HmjeGPU레이어클립아래들[번호]이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_FRAMEBUFFER, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: HmjeGPU활성surface)로 실행한다.
+    HmjeGPUviewport인코딩를 (너비: HmjeGPU현재너비, 높이: HmjeGPU현재높이)로 실행한다.
+    HmjeGPU클립인코딩를 (왼쪽: HmjeGPU클립왼쪽, 위: HmjeGPU클립위, 오른쪽: HmjeGPU클립오른쪽, 아래: HmjeGPU클립아래)로 실행한다.
+    상수 x는 HmjeGPU레이어X들[번호]이고, 자연수이다.
+    상수 y는 HmjeGPU레이어Y들[번호]이고, 자연수이다.
+    상수 너비는 HmjeGPU레이어너비들[번호]이고, 자연수이다.
+    상수 높이는 HmjeGPU레이어높이들[번호]이고, 자연수이다.
+    상수 알파는 HmjeGPU레이어알파들[번호]이고, 자연수이다.
+    상수 시작정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    상수 색워드는 자연수32((알파 << 24) | 자연수(0x00ffffff))이고, 자연수32이다.
+    HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(x), 위: 실수32(y), 오른쪽: 실수32(x + 너비), 아래: 실수32(y + 높이), u0: 실수32(0.0), v0: 실수32(0.0), u1: 실수32(1.0), v1: 실수32(1.0), 색워드: 색워드)로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_IMAGE_SHADER)로 실행한다.
+    HmjeGPUview선택를 (view: 레이어view)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU이미지는 (요청주소: 주소, 길이: 자연수, 스케일: 참거짓)를 받아
+    변수 기대길이는 자연수(80)이고, 자연수이다.
+    만약 스케일이면
+        기대길이는 96이다.
+    만약 HmjeGPU프레임활성 == 거짓 또는 요청주소 == 주소(0) 또는 길이 != 기대길이이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 이미지주소는 주소(0)이고, 주소이다.
+    변수 이미지너비는 자연수(0)이고, 자연수이다.
+    변수 이미지높이는 자연수(0)이고, 자연수이다.
+    변수 피치는 자연수(0)이고, 자연수이다.
+    변수 원본X는 자연수(0)이고, 자연수이다.
+    변수 원본Y는 자연수(0)이고, 자연수이다.
+    변수 복사너비는 자연수(0)이고, 자연수이다.
+    변수 복사높이는 자연수(0)이고, 자연수이다.
+    변수 대상X는 정수(0)이고, 정수이다.
+    변수 대상Y는 정수(0)이고, 정수이다.
+    변수 대상너비는 자연수(0)이고, 자연수이다.
+    변수 대상높이는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        이미지주소는 주소(요청주소에서 자연수 값)이다.
+        이미지너비는 요청주소 + 8에서 자연수 값이다.
+        이미지높이는 요청주소 + 16에서 자연수 값이다.
+        피치는 요청주소 + 24에서 자연수 값이다.
+        원본X는 요청주소 + 32에서 자연수 값이다.
+        원본Y는 요청주소 + 40에서 자연수 값이다.
+        복사너비는 요청주소 + 48에서 자연수 값이다.
+        복사높이는 요청주소 + 56에서 자연수 값이다.
+        대상X는 요청주소 + 64에서 정수 값이다.
+        대상Y는 요청주소 + 72에서 정수 값이다.
+    대상너비는 복사너비이다.
+    대상높이는 복사높이이다.
+    만약 스케일이면
+        위험 작업은
+            대상너비는 요청주소 + 80에서 자연수 값이다.
+            대상높이는 요청주소 + 88에서 자연수 값이다.
+    만약 복사너비 == 0 또는 복사높이 == 0 또는 대상너비 == 0 또는 대상높이 == 0이면
+        정수(1)을 정수로 반환한다.
+    만약 이미지주소 == 주소(0) 또는 이미지너비 == 0 또는 이미지높이 == 0 또는 이미지너비 > 1073741824 또는 피치 < 이미지너비 * 4이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 원본X >= 이미지너비 또는 원본Y >= 이미지높이 또는 복사너비 > 이미지너비 - 원본X 또는 복사높이 > 이미지높이 - 원본Y이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    상수 행바이트는 복사너비 * 4이고, 자연수이다.
+    만약 행바이트 > HMJEGPU_업로드한계이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    상수 텍스처는 HmjeGPU임시텍스처만들기(복사너비, 복사높이)이고, HmjeGPU임시텍스처이다.
+    만약 텍스처.결과 != 0이면
+        텍스처.결과를 정수로 반환한다.
+    변수 한번행수는 자연수(1)이고, 자연수이다.
+    만약 피치 <= HMJEGPU_업로드한계이면
+        한번행수는 1 + ((HMJEGPU_업로드한계 - 행바이트) / 피치)이다.
+    변수 행은 자연수(0)이고, 자연수이다.
+    행 < 복사높이일 동안
+        변수 행수는 한번행수이고, 자연수이다.
+        만약 행수 > 복사높이 - 행이면
+            행수는 복사높이 - 행이다.
+        상수 원본밴드는 이미지주소 + ((원본Y + 행) * 피치) + (원본X * 4)이고, 주소이다.
+        상수 원본길이는 ((행수 - 1) * 피치) + 행바이트이고, 자연수이다.
+        상수 쓰기결과는 GPU장치이미지쓰기(HmjeGPU문맥핸들, 텍스처.핸들, 원본밴드, 원본길이, 피치, 0, 행, 복사너비, 행수)이고, 정수이다.
+        만약 쓰기결과 != 0이면
+            쓰기결과를 정수로 반환한다.
+        행은 행 + 행수이다.
+
+    만약 대상X >= 정수(HmjeGPU현재너비) 또는 대상Y >= 정수(HmjeGPU현재높이) 또는 대상X + 정수(대상너비) <= 0 또는 대상Y + 정수(대상높이) <= 0이면
+        정수(1)을 정수로 반환한다.
+    상수 시작정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점을 (왼쪽: 실수32(대상X), 위: 실수32(대상Y), 오른쪽: 실수32(대상X + 정수(대상너비)), 아래: 실수32(대상Y + 정수(대상높이)), u0: 실수32(0.0), v0: 실수32(0.0), u1: 실수32(1.0), v1: 실수32(1.0), 색워드: 자연수32(0xffffffff))로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_IMAGE_SHADER)로 실행한다.
+    HmjeGPUview선택를 (view: 텍스처.view)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU글리프업로드는 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 길이 != 32 또는 요청주소 == 주소(0)이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 데이터는 주소(0)이고, 주소이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 피치는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        데이터는 주소(요청주소에서 자연수 값)이다.
+        너비는 요청주소 + 8에서 자연수 값이다.
+        높이는 요청주소 + 16에서 자연수 값이다.
+        피치는 요청주소 + 24에서 자연수 값이다.
+    HmjeGPU마지막글리프유효는 거짓이다.
+    만약 데이터 == 주소(0) 또는 너비 == 0 또는 높이 == 0 또는 너비 > HMJEGPU_글리프아틀라스크기 또는 높이 > HMJEGPU_글리프아틀라스크기 또는 피치 < 너비이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 HmjeGPU글리프다음X + 너비 > HMJEGPU_글리프아틀라스크기이면
+        HmjeGPU글리프다음X는 0이다.
+        HmjeGPU글리프다음Y는 HmjeGPU글리프다음Y + HmjeGPU글리프행높이 + 1이다.
+        HmjeGPU글리프행높이는 0이다.
+    만약 HmjeGPU글리프다음Y + 높이 > HMJEGPU_글리프아틀라스크기이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    변수 원본길이는 너비이고, 자연수이다.
+    만약 높이 > 1이면
+        # 곱셈을 먼저 하면 악의적이거나 깨진 pitch에서 u64가 돌아갈 수 있다.
+        # syscall copy 상한 안에 들어오는지를 나눗셈으로 먼저 증명한다.
+        만약 피치 > HMJEGPU_업로드한계 또는 높이 - 1 > (HMJEGPU_업로드한계 - 너비) / 피치이면
+            HMJEGPU_오류_지원안함을 정수로 반환한다.
+        원본길이는 ((높이 - 1) * 피치) + 너비이다.
+    상수 쓰기결과는 GPU장치이미지쓰기(HmjeGPU문맥핸들, HmjeGPU글리프핸들, 데이터, 원본길이, 피치, HmjeGPU글리프다음X, HmjeGPU글리프다음Y, 너비, 높이)이고, 정수이다.
+    만약 쓰기결과 != 0이면
+        쓰기결과를 정수로 반환한다.
+    HmjeGPU마지막글리프X는 HmjeGPU글리프다음X이다.
+    HmjeGPU마지막글리프Y는 HmjeGPU글리프다음Y이다.
+    HmjeGPU마지막글리프너비는 너비이다.
+    HmjeGPU마지막글리프높이는 높이이다.
+    HmjeGPU마지막글리프유효는 참이다.
+    HmjeGPU글리프다음X는 HmjeGPU글리프다음X + 너비 + 1이다.
+    만약 높이 > HmjeGPU글리프행높이이면
+        HmjeGPU글리프행높이는 높이이다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU글리프그리기는 (x: 정수, y: 정수, 너비: 자연수, 높이: 자연수, 색워드: 자연수32)를 받아
+    만약 HmjeGPU마지막글리프유효 == 거짓이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    HmjeGPU마지막글리프유효는 거짓이다.
+    상수 알파값은 (색워드 >> 24) & 자연수32(255)이고, 자연수32이다.
+    만약 너비 == 0 또는 높이 == 0 또는 알파값 == 0이면
+        정수(1)을 정수로 반환한다.
+    만약 x >= 정수(HmjeGPU현재너비) 또는 y >= 정수(HmjeGPU현재높이) 또는 x + 정수(너비) <= 0 또는 y + 정수(높이) <= 0이면
+        정수(1)을 정수로 반환한다.
+    상수 atlas는 실수32(HMJEGPU_글리프아틀라스크기)이고, 실수32이다.
+    상수 u0는 실수32(HmjeGPU마지막글리프X) / atlas이고, 실수32이다.
+    상수 v0는 실수32(HmjeGPU마지막글리프Y) / atlas이고, 실수32이다.
+    상수 u1는 실수32(HmjeGPU마지막글리프X + HmjeGPU마지막글리프너비) / atlas이고, 실수32이다.
+    상수 v1는 실수32(HmjeGPU마지막글리프Y + HmjeGPU마지막글리프높이) / atlas이고, 실수32이다.
+    상수 시작정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점을 (왼쪽: 실수32(x), 위: 실수32(y), 오른쪽: 실수32(x + 정수(너비)), 아래: 실수32(y + 정수(높이)), u0: u0, v0: v0, u1: u1, v1: v1, 색워드: 색워드)로 실행한다.
+    HmjeGPU참조추가를 (핸들: HmjeGPU글리프핸들)로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_GLYPH_SHADER)로 실행한다.
+    HmjeGPUview선택를 (view: HMJEGPU_OBJECT_GLYPH_VIEW)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU캡슐그리기는 (시작X: 정수, 시작Y: 정수, 끝X: 정수, 끝Y: 정수, 두께: 자연수, 색워드: 자연수32)를 받아
+    상수 알파값은 자연수((색워드 >> 24) & 자연수32(255))이고, 자연수이다.
+    만약 두께 == 0 또는 알파값 == 0이면
+        정수(1)을 정수로 반환한다.
+
+    상수 여백은 정수(((두께 + 1) / 2) + 1)이고, 정수이다.
+    변수 원점왼쪽은 시작X이고, 정수이다.
+    변수 원점위는 시작Y이고, 정수이다.
+    변수 원점오른쪽은 끝X이고, 정수이다.
+    변수 원점아래는 끝Y이고, 정수이다.
+    만약 끝X < 원점왼쪽이면
+        원점왼쪽은 끝X이다.
+    만약 끝Y < 원점위이면
+        원점위는 끝Y이다.
+    만약 시작X > 원점오른쪽이면
+        원점오른쪽은 시작X이다.
+    만약 시작Y > 원점아래이면
+        원점아래는 시작Y이다.
+    원점왼쪽은 원점왼쪽 - 여백이다.
+    원점위는 원점위 - 여백이다.
+    원점오른쪽은 원점오른쪽 + 여백 + 1이다.
+    원점아래는 원점아래 + 여백 + 1이다.
+
+    만약 원점오른쪽 <= 0 또는 원점아래 <= 0 또는 원점왼쪽 >= 정수(HmjeGPU현재너비) 또는 원점위 >= 정수(HmjeGPU현재높이)이면
+        정수(1)을 정수로 반환한다.
+    변수 왼쪽정수는 원점왼쪽이고, 정수이다.
+    변수 위정수는 원점위이고, 정수이다.
+    변수 오른쪽정수는 원점오른쪽이고, 정수이다.
+    변수 아래정수는 원점아래이고, 정수이다.
+    만약 왼쪽정수 < 0이면
+        왼쪽정수는 0이다.
+    만약 위정수 < 0이면
+        위정수는 0이다.
+    만약 오른쪽정수 > 정수(HmjeGPU현재너비)이면
+        오른쪽정수는 정수(HmjeGPU현재너비)이다.
+    만약 아래정수 > 정수(HmjeGPU현재높이)이면
+        아래정수는 정수(HmjeGPU현재높이)이다.
+    변수 왼쪽은 자연수(왼쪽정수)이고, 자연수이다.
+    변수 위는 자연수(위정수)이고, 자연수이다.
+    변수 오른쪽은 자연수(오른쪽정수)이고, 자연수이다.
+    변수 아래는 자연수(아래정수)이고, 자연수이다.
+    만약 왼쪽 < HmjeGPU클립왼쪽이면
+        왼쪽은 HmjeGPU클립왼쪽이다.
+    만약 위 < HmjeGPU클립위이면
+        위는 HmjeGPU클립위이다.
+    만약 오른쪽 > HmjeGPU클립오른쪽이면
+        오른쪽은 HmjeGPU클립오른쪽이다.
+    만약 아래 > HmjeGPU클립아래이면
+        아래는 HmjeGPU클립아래이다.
+    만약 왼쪽 >= 오른쪽 또는 위 >= 아래이면
+        정수(1)을 정수로 반환한다.
+
+    상수 ax는 실수32(시작X - 원점왼쪽)이고, 실수32이다.
+    상수 ay는 실수32(시작Y - 원점위)이고, 실수32이다.
+    상수 bx는 실수32(끝X - 원점왼쪽)이고, 실수32이다.
+    상수 by는 실수32(끝Y - 원점위)이고, 실수32이다.
+    상수 dx는 bx - ax이고, 실수32이다.
+    상수 dy는 by - ay이고, 실수32이다.
+    상수 거리제곱은 (dx * dx) + (dy * dy)이고, 실수32이다.
+    변수 거리제곱역수는 실수32(0.0)이고, 실수32이다.
+    만약 거리제곱 > 실수32(0.0)이면
+        거리제곱역수는 실수32(1.0) / 거리제곱이다.
+
+    상수 u0는 실수32(정수(왼쪽) - 원점왼쪽)이고, 실수32이다.
+    상수 v0는 실수32(정수(위) - 원점위)이고, 실수32이다.
+    상수 u1는 실수32(정수(오른쪽) - 원점왼쪽)이고, 실수32이다.
+    상수 v1는 실수32(정수(아래) - 원점위)이고, 실수32이다.
+    상수 시작정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(왼쪽), 위: 실수32(위), 오른쪽: 실수32(오른쪽), 아래: 실수32(아래), u0: u0, v0: v0, u1: u1, v1: v1, 색워드: 색워드)로 실행한다.
+    HmjeGPU상수8인코딩을 (a: ax, b: ay, c: bx, d: by, e: 실수32(두께) * 실수32(0.5), f: 거리제곱역수, g: 실수32(0.0), h: 실수32(0.0))로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_CAPSULE_SHADER)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPUframebuffer선택은 (surface: 자연수32, 너비: 자연수, 높이: 자연수, 왼쪽: 자연수, 위: 자연수, 오른쪽: 자연수, 아래: 자연수)를 받아
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_FRAMEBUFFER, 객체: 0, 길이: 자연수32(3))로 실행한다.
+    HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령u32추가를 (값: surface)로 실행한다.
+    HmjeGPUviewport인코딩를 (너비: 너비, 높이: 높이)로 실행한다.
+    HmjeGPU클립인코딩를 (왼쪽: 왼쪽, 위: 위, 오른쪽: 오른쪽, 아래: 아래)로 실행한다.
+
+함수 HmjeGPU블러박스패스는 (대상surface: 자연수32, 원본view: 자연수32, 그리드너비: 자연수, 그리드높이: 자연수, 박스반경: 자연수, 가로: 참거짓, 시작정점: 자연수)를 받아
+    HmjeGPUframebuffer선택을 (surface: 대상surface, 너비: 그리드너비, 높이: 그리드높이, 왼쪽: 0, 위: 0, 오른쪽: 그리드너비, 아래: 그리드높이)로 실행한다.
+    상수 역너비는 실수32(1.0) / 실수32(그리드너비)이고, 실수32이다.
+    상수 역높이는 실수32(1.0) / 실수32(그리드높이)이고, 실수32이다.
+    상수 나눔은 실수32(1.0) / 실수32((박스반경 * 2) + 1)이고, 실수32이다.
+    변수 이동X는 실수32(0.0)이고, 실수32이다.
+    변수 이동Y는 역높이이고, 실수32이다.
+    만약 가로이면
+        이동X는 역너비이다.
+        이동Y는 실수32(0.0)이다.
+    HmjeGPU상수8인코딩을 (a: 역너비, b: 역높이, c: 실수32(박스반경), d: 나눔, e: 이동X, f: 이동Y, g: 실수32(0.0), h: 실수32(0.0))로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_BLUR_BOX_SHADER)로 실행한다.
+    HmjeGPUview선택를 (view: 원본view)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+
+# CPU/Metal과 같은 float 파이프라인. UI 토큰의 최대 β=34는 s=4,
+# r'=8이며, 그보다 큰 arbitrary radius는 정확성을 지키기 위해 CPU fallback한다.
+함수 HmjeGPU배경블러는 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 요청주소 == 주소(0) 또는 길이 != 56이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 x는 정수(0)이고, 정수이다.
+    변수 y는 정수(0)이고, 정수이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 모서리반경은 자연수(0)이고, 자연수이다.
+    변수 블러반경은 자연수(0)이고, 자연수이다.
+    변수 틴트는 자연수32(0)이고, 자연수32이다.
+    위험 작업은
+        x는 요청주소에서 정수 값이다.
+        y는 요청주소 + 8에서 정수 값이다.
+        너비는 요청주소 + 16에서 자연수 값이다.
+        높이는 요청주소 + 24에서 자연수 값이다.
+        모서리반경은 요청주소 + 32에서 자연수 값이다.
+        블러반경은 요청주소 + 40에서 자연수 값이다.
+        틴트는 자연수32(요청주소 + 48에서 자연수 값)이다.
+    만약 너비 == 0 또는 높이 == 0이면
+        정수(1)을 정수로 반환한다.
+    만약 모서리반경 > 너비 / 2이면
+        모서리반경은 너비 / 2이다.
+    만약 모서리반경 > 높이 / 2이면
+        모서리반경은 높이 / 2이다.
+
+    변수 왼쪽정수는 x이고, 정수이다.
+    변수 위정수는 y이고, 정수이다.
+    변수 오른쪽정수는 x + 정수(너비)이고, 정수이다.
+    변수 아래정수는 y + 정수(높이)이고, 정수이다.
+    만약 오른쪽정수 <= 0 또는 아래정수 <= 0 또는 왼쪽정수 >= 정수(HmjeGPU현재너비) 또는 위정수 >= 정수(HmjeGPU현재높이)이면
+        정수(1)을 정수로 반환한다.
+    만약 왼쪽정수 < 0이면
+        왼쪽정수는 0이다.
+    만약 위정수 < 0이면
+        위정수는 0이다.
+    만약 오른쪽정수 > 정수(HmjeGPU현재너비)이면
+        오른쪽정수는 정수(HmjeGPU현재너비)이다.
+    만약 아래정수 > 정수(HmjeGPU현재높이)이면
+        아래정수는 정수(HmjeGPU현재높이)이다.
+    변수 왼쪽은 자연수(왼쪽정수)이고, 자연수이다.
+    변수 위는 자연수(위정수)이고, 자연수이다.
+    변수 오른쪽은 자연수(오른쪽정수)이고, 자연수이다.
+    변수 아래는 자연수(아래정수)이고, 자연수이다.
+    만약 왼쪽 < HmjeGPU클립왼쪽이면
+        왼쪽은 HmjeGPU클립왼쪽이다.
+    만약 위 < HmjeGPU클립위이면
+        위는 HmjeGPU클립위이다.
+    만약 오른쪽 > HmjeGPU클립오른쪽이면
+        오른쪽은 HmjeGPU클립오른쪽이다.
+    만약 아래 > HmjeGPU클립아래이면
+        아래는 HmjeGPU클립아래이다.
+    만약 왼쪽 >= 오른쪽 또는 위 >= 아래이면
+        정수(1)을 정수로 반환한다.
+
+    변수 배율은 자연수(1)이고, 자연수이다.
+    만약 블러반경 > 8 그리고 블러반경 <= 16이면
+        배율은 2이다.
+    만약 블러반경 > 16이면
+        배율은 4이다.
+    상수 박스반경은 블러반경 / 배율이고, 자연수이다.
+    만약 박스반경 > 8이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    상수 잘린너비는 오른쪽 - 왼쪽이고, 자연수이다.
+    상수 잘린높이는 아래 - 위이고, 자연수이다.
+    상수 그리드너비는 (잘린너비 + 배율 - 1) / 배율이고, 자연수이다.
+    상수 그리드높이는 (잘린높이 + 배율 - 1) / 배율이고, 자연수이다.
+
+    상수 원본view는 HmjeGPU임시view만들기(HmjeGPU활성wire, HMJEGPU_FORMAT_BGRX8)이고, HmjeGPU임시텍스처이다.
+    만약 원본view.결과 != 0이면
+        원본view.결과를 정수로 반환한다.
+    상수 scratchA는 HmjeGPU임시텍스처형식만들기(그리드너비, 그리드높이, GPU_DEVICE_FORMAT_RGBA32_FLOAT, HMJEGPU_FORMAT_RGBA32F, 자연수(16))이고, HmjeGPU임시텍스처이다.
+    만약 scratchA.결과 != 0이면
+        scratchA.결과를 정수로 반환한다.
+    상수 surfaceA는 HmjeGPU임시표면만들기(scratchA, HMJEGPU_FORMAT_RGBA32F)이고, 자연수32이다.
+    만약 surfaceA == 0이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    변수 scratchB는 HmjeGPU임시텍스처(결과: 정수(0), 핸들: 0, wire: 0, view: 0, surface: 0)이고, HmjeGPU임시텍스처이다.
+    변수 surfaceB는 자연수32(0)이고, 자연수32이다.
+    만약 블러반경 > 0이면
+        scratchB는 HmjeGPU임시텍스처형식만들기(그리드너비, 그리드높이, GPU_DEVICE_FORMAT_RGBA32_FLOAT, HMJEGPU_FORMAT_RGBA32F, 자연수(16))이다.
+        만약 scratchB.결과 != 0이면
+            scratchB.결과를 정수로 반환한다.
+        surfaceB는 HmjeGPU임시표면만들기(scratchB, HMJEGPU_FORMAT_RGBA32F)이다.
+        만약 surfaceB == 0이면
+            HMJEGPU_오류_지원안함을 정수로 반환한다.
+
+    # scratch용 정점은 scratch viewport 기준으로 한 번 만들고 모든 pass가 공유한다.
+    상수 부모너비는 HmjeGPU현재너비이고, 자연수이다.
+    상수 부모높이는 HmjeGPU현재높이이고, 자연수이다.
+    HmjeGPU현재너비는 그리드너비이다.
+    HmjeGPU현재높이는 그리드높이이다.
+    상수 다운정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(0.0), 위: 실수32(0.0), 오른쪽: 실수32(그리드너비), 아래: 실수32(그리드높이), u0: 실수32(0.0), v0: 실수32(0.0), u1: 실수32(그리드너비), v1: 실수32(그리드높이), 색워드: 자연수32(0xffffffff))로 실행한다.
+    상수 박스정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(0.0), 위: 실수32(0.0), 오른쪽: 실수32(그리드너비), 아래: 실수32(그리드높이), u0: 실수32(0.0), v0: 실수32(0.0), u1: 실수32(1.0), v1: 실수32(1.0), 색워드: 자연수32(0xffffffff))로 실행한다.
+    HmjeGPU현재너비는 부모너비이다.
+    HmjeGPU현재높이는 부모높이이다.
+
+    # 1) active target → float scratch A 블록 평균.
+    HmjeGPUframebuffer선택을 (surface: surfaceA, 너비: 그리드너비, 높이: 그리드높이, 왼쪽: 0, 위: 0, 오른쪽: 그리드너비, 아래: 그리드높이)로 실행한다.
+    HmjeGPU상수12인코딩을 (a: 실수32(왼쪽), b: 실수32(위), c: 실수32(배율), d: 실수32(0.0), e: 실수32(잘린너비), f: 실수32(잘린높이), g: 실수32(그리드너비), h: 실수32(그리드높이), i: 실수32(1.0) / 실수32(부모너비), j: 실수32(1.0) / 실수32(부모높이), k: 실수32(0.0), l: 실수32(0.0))로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_BLUR_DOWN_SHADER)로 실행한다.
+    HmjeGPUview선택를 (view: 원본view.view)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 다운정점)로 실행한다.
+
+    # 2) float box 3회씩. 짝수 총 pass라 최종은 다시 A에 놓인다.
+    만약 블러반경 > 0이면
+        HmjeGPU블러박스패스를 (대상surface: surfaceB, 원본view: scratchA.view, 그리드너비: 그리드너비, 그리드높이: 그리드높이, 박스반경: 박스반경, 가로: 참, 시작정점: 박스정점)로 실행한다.
+        HmjeGPU블러박스패스를 (대상surface: surfaceA, 원본view: scratchB.view, 그리드너비: 그리드너비, 그리드높이: 그리드높이, 박스반경: 박스반경, 가로: 참, 시작정점: 박스정점)로 실행한다.
+        HmjeGPU블러박스패스를 (대상surface: surfaceB, 원본view: scratchA.view, 그리드너비: 그리드너비, 그리드높이: 그리드높이, 박스반경: 박스반경, 가로: 참, 시작정점: 박스정점)로 실행한다.
+        HmjeGPU블러박스패스를 (대상surface: surfaceA, 원본view: scratchB.view, 그리드너비: 그리드너비, 그리드높이: 그리드높이, 박스반경: 박스반경, 가로: 거짓, 시작정점: 박스정점)로 실행한다.
+        HmjeGPU블러박스패스를 (대상surface: surfaceB, 원본view: scratchA.view, 그리드너비: 그리드너비, 그리드높이: 그리드높이, 박스반경: 박스반경, 가로: 거짓, 시작정점: 박스정점)로 실행한다.
+        HmjeGPU블러박스패스를 (대상surface: surfaceA, 원본view: scratchB.view, 그리드너비: 그리드너비, 그리드높이: 그리드높이, 박스반경: 박스반경, 가로: 거짓, 시작정점: 박스정점)로 실행한다.
+
+    # 3) 원래 target/clip 복구 후 bilinear upsample + tint + rounded composite.
+    HmjeGPUframebuffer선택을 (surface: HmjeGPU활성surface, 너비: 부모너비, 높이: 부모높이, 왼쪽: HmjeGPU클립왼쪽, 위: HmjeGPU클립위, 오른쪽: HmjeGPU클립오른쪽, 아래: HmjeGPU클립아래)로 실행한다.
+    상수 합성정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(왼쪽), 위: 실수32(위), 오른쪽: 실수32(오른쪽), 아래: 실수32(아래), u0: 실수32(정수(왼쪽) - x), v0: 실수32(정수(위) - y), u1: 실수32(정수(오른쪽) - x), v1: 실수32(정수(아래) - y), 색워드: 자연수32(0xffffffff))로 실행한다.
+    상수 틴트알파는 실수32(자연수((틴트 >> 24) & 자연수32(255))) / 실수32(255.0)이고, 실수32이다.
+    상수 무틴트는 실수32(1.0) - 틴트알파이고, 실수32이다.
+    HmjeGPU상수16인코딩을 (a: 실수32(정수(왼쪽) - x), b: 실수32(정수(위) - y), c: 실수32(1.0) / 실수32(배율), d: 실수32(모서리반경), e: 실수32(너비), f: 실수32(높이), g: 실수32(그리드너비), h: 실수32(그리드높이), i: 실수32(1.0) / 실수32(그리드너비), j: 실수32(1.0) / 실수32(그리드높이), k: 틴트알파, l: 무틴트, m: 실수32(자연수((틴트 >> 16) & 자연수32(255))), n: 실수32(자연수((틴트 >> 8) & 자연수32(255))), o: 실수32(자연수(틴트 & 자연수32(255))), p: 실수32(0.0))로 실행한다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_BLUR_COMPOSITE_SHADER)로 실행한다.
+    HmjeGPUview선택를 (view: scratchA.view)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 합성정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU그라데이션채우기는 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 길이 != 120 또는 요청주소 == 주소(0)이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 x는 정수(0)이고, 정수이다.
+    변수 y는 정수(0)이고, 정수이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 반경은 자연수(0)이고, 자연수이다.
+    변수 방향은 자연수(0)이고, 자연수이다.
+    변수 색상수는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        x는 요청주소에서 정수 값이다.
+        y는 요청주소 + 8에서 정수 값이다.
+        너비는 요청주소 + 16에서 자연수 값이다.
+        높이는 요청주소 + 24에서 자연수 값이다.
+        반경은 요청주소 + 32에서 자연수 값이다.
+        방향은 요청주소 + 40에서 자연수 값이다.
+        색상수는 요청주소 + 48에서 자연수 값이다.
+    만약 너비 == 0 또는 높이 == 0 또는 색상수 < 2이면
+        정수(1)을 정수로 반환한다.
+    만약 색상수 > 8이면
+        색상수는 8이다.
+    만약 반경 > 너비 / 2이면
+        반경은 너비 / 2이다.
+    만약 반경 > 높이 / 2이면
+        반경은 높이 / 2이다.
+
+    변수 왼쪽정수는 x이고, 정수이다.
+    변수 위정수는 y이고, 정수이다.
+    변수 오른쪽정수는 x + 정수(너비)이고, 정수이다.
+    변수 아래정수는 y + 정수(높이)이고, 정수이다.
+    만약 오른쪽정수 <= 0 또는 아래정수 <= 0 또는 왼쪽정수 >= 정수(HmjeGPU현재너비) 또는 위정수 >= 정수(HmjeGPU현재높이)이면
+        정수(1)을 정수로 반환한다.
+    만약 왼쪽정수 < 0이면
+        왼쪽정수는 0이다.
+    만약 위정수 < 0이면
+        위정수는 0이다.
+    만약 오른쪽정수 > 정수(HmjeGPU현재너비)이면
+        오른쪽정수는 정수(HmjeGPU현재너비)이다.
+    만약 아래정수 > 정수(HmjeGPU현재높이)이면
+        아래정수는 정수(HmjeGPU현재높이)이다.
+    변수 왼쪽은 자연수(왼쪽정수)이고, 자연수이다.
+    변수 위는 자연수(위정수)이고, 자연수이다.
+    변수 오른쪽은 자연수(오른쪽정수)이고, 자연수이다.
+    변수 아래는 자연수(아래정수)이고, 자연수이다.
+    만약 왼쪽 < HmjeGPU클립왼쪽이면
+        왼쪽은 HmjeGPU클립왼쪽이다.
+    만약 위 < HmjeGPU클립위이면
+        위는 HmjeGPU클립위이다.
+    만약 오른쪽 > HmjeGPU클립오른쪽이면
+        오른쪽은 HmjeGPU클립오른쪽이다.
+    만약 아래 > HmjeGPU클립아래이면
+        아래는 HmjeGPU클립아래이다.
+    만약 왼쪽 >= 오른쪽 또는 위 >= 아래이면
+        정수(1)을 정수로 반환한다.
+
+    상수 u0는 실수32(정수(왼쪽) - x)이고, 실수32이다.
+    상수 v0는 실수32(정수(위) - y)이고, 실수32이다.
+    상수 u1는 실수32(정수(오른쪽) - x)이고, 실수32이다.
+    상수 v1는 실수32(정수(아래) - y)이고, 실수32이다.
+    상수 시작정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(왼쪽), 위: 실수32(위), 오른쪽: 실수32(오른쪽), 아래: 실수32(아래), u0: u0, v0: v0, u1: u1, v1: v1, 색워드: 자연수32(0xffffffff))로 실행한다.
+
+    변수 분모는 너비 - 1이고, 자연수이다.
+    만약 방향 == 1이면
+        분모는 높이 - 1이다.
+    만약 방향 == 3이면
+        분모는 (너비 - 1) + (높이 - 1)이다.
+    변수 분모역수는 실수32(0.0)이고, 실수32이다.
+    만약 분모 > 0이면
+        분모역수는 실수32(1.0) / 실수32(분모)이다.
+    HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_SET_CONSTANT_BUFFER, 객체: 0, 길이: 자연수32(42))로 실행한다.
+    HmjeGPU명령u32추가를 (값: HMJEGPU_SHADER_FRAGMENT)로 실행한다.
+    HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(너비))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(높이))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(반경))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(방향))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(색상수 - 1))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(색상수 - 2))로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 분모역수)로 실행한다.
+    HmjeGPU명령실수32추가를 (값: 실수32(0.0))로 실행한다.
+    변수 색번호는 자연수(0)이고, 자연수이다.
+    색번호 < 8일 동안
+        변수 읽을번호는 색번호이고, 자연수이다.
+        만약 읽을번호 >= 색상수이면
+            읽을번호는 색상수 - 1이다.
+        변수 색워드는 자연수32(0)이고, 자연수32이다.
+        위험 작업은
+            색워드는 자연수32(요청주소 + 56 + (읽을번호 * 8)에서 자연수 값)이다.
+        HmjeGPU그라데이션색상추가를 (색워드: 색워드)로 실행한다.
+        색번호는 색번호 + 1이다.
+    HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_GRADIENT_SHADER)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU그리기는 (요청주소: 주소, 길이: 자연수)를 받아
+    만약 HmjeGPU프레임활성 == 거짓 또는 길이 != 104 또는 요청주소 == 주소(0)이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    변수 종류는 자연수(0)이고, 자연수이다.
+    변수 x는 정수(0)이고, 정수이다.
+    변수 y는 정수(0)이고, 정수이다.
+    변수 너비는 자연수(0)이고, 자연수이다.
+    변수 높이는 자연수(0)이고, 자연수이다.
+    변수 반경은 자연수(0)이고, 자연수이다.
+    변수 보조값은 자연수(0)이고, 자연수이다.
+    변수 두께는 자연수(0)이고, 자연수이다.
+    변수 색워드은 자연수32(0)이고, 자연수32이다.
+    변수 원본상자X는 정수(0)이고, 정수이다.
+    변수 원본상자Y는 정수(0)이고, 정수이다.
+    변수 원본상자너비는 자연수(0)이고, 자연수이다.
+    변수 원본상자높이는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        종류는 요청주소에서 자연수 값이다.
+        x는 요청주소 + 8에서 정수 값이다.
+        y는 요청주소 + 16에서 정수 값이다.
+        너비는 요청주소 + 24에서 자연수 값이다.
+        높이는 요청주소 + 32에서 자연수 값이다.
+        반경은 요청주소 + 40에서 자연수 값이다.
+        보조값은 요청주소 + 48에서 자연수 값이다.
+        두께는 요청주소 + 56에서 자연수 값이다.
+        색워드은 자연수32(요청주소 + 64에서 자연수 값)이다.
+        원본상자X는 요청주소 + 72에서 정수 값이다.
+        원본상자Y는 요청주소 + 80에서 정수 값이다.
+        원본상자너비는 요청주소 + 88에서 자연수 값이다.
+        원본상자높이는 요청주소 + 96에서 자연수 값이다.
+    만약 종류 == 4이면
+        HmjeGPU글리프그리기(x, y, 너비, 높이, 색워드)를 정수로 반환한다.
+    만약 종류 == 3이면
+        HmjeGPU캡슐그리기(x, y, 정수(너비), 정수(높이), 두께, 색워드)를 정수로 반환한다.
+    만약 종류 != 0 그리고 종류 != 1 그리고 종류 != 2 그리고 종류 != 5이면
+        HMJEGPU_오류_지원안함을 정수로 반환한다.
+    상수 알파값은 자연수((색워드 >> 24) & 자연수32(255))이고, 자연수이다.
+    만약 너비 == 0 또는 높이 == 0 또는 알파값 == 0이면
+        정수(1)을 정수로 반환한다.
+    변수 왼쪽정수는 x이고, 정수이다.
+    변수 위정수는 y이고, 정수이다.
+    변수 오른쪽정수는 x + 정수(너비)이고, 정수이다.
+    변수 아래정수는 y + 정수(높이)이고, 정수이다.
+    만약 오른쪽정수 <= 0 또는 아래정수 <= 0 또는 왼쪽정수 >= 정수(HmjeGPU현재너비) 또는 위정수 >= 정수(HmjeGPU현재높이)이면
+        정수(1)을 정수로 반환한다.
+    만약 왼쪽정수 < 0이면
+        왼쪽정수는 0이다.
+    만약 위정수 < 0이면
+        위정수는 0이다.
+    만약 오른쪽정수 > 정수(HmjeGPU현재너비)이면
+        오른쪽정수는 정수(HmjeGPU현재너비)이다.
+    만약 아래정수 > 정수(HmjeGPU현재높이)이면
+        아래정수는 정수(HmjeGPU현재높이)이다.
+    변수 왼쪽은 자연수(왼쪽정수)이고, 자연수이다.
+    변수 위는 자연수(위정수)이고, 자연수이다.
+    변수 오른쪽은 자연수(오른쪽정수)이고, 자연수이다.
+    변수 아래는 자연수(아래정수)이고, 자연수이다.
+    만약 왼쪽 < HmjeGPU클립왼쪽이면
+        왼쪽은 HmjeGPU클립왼쪽이다.
+    만약 위 < HmjeGPU클립위이면
+        위는 HmjeGPU클립위이다.
+    만약 오른쪽 > HmjeGPU클립오른쪽이면
+        오른쪽은 HmjeGPU클립오른쪽이다.
+    만약 아래 > HmjeGPU클립아래이면
+        아래는 HmjeGPU클립아래이다.
+    만약 왼쪽 >= 오른쪽 또는 위 >= 아래이면
+        정수(1)을 정수로 반환한다.
+    상수 시작정점은 HmjeGPU정점길이 / HMJEGPU_정점바이트이고, 자연수이다.
+    만약 종류 == 0이면
+        HmjeGPU사각형정점를 (왼쪽: 왼쪽, 위: 위, 오른쪽: 오른쪽, 아래: 아래, 색워드: 색워드)로 실행한다.
+        HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_SOLID_SHADER)로 실행한다.
+    아니면
+        # 원본 도형의 local pixel 좌표를 GENERIC[0]으로 전달한다.
+        # 정점은 화면/클립으로 잘려도 local 원점은 바뀌지 않는다.
+        상수 u0는 실수32(정수(왼쪽) - x)이고, 실수32이다.
+        상수 v0는 실수32(정수(위) - y)이고, 실수32이다.
+        상수 u1는 실수32(정수(오른쪽) - x)이고, 실수32이다.
+        상수 v1는 실수32(정수(아래) - y)이고, 실수32이다.
+        HmjeGPU텍스처사각형정점를 (왼쪽: 실수32(왼쪽), 위: 실수32(위), 오른쪽: 실수32(오른쪽), 아래: 실수32(아래), u0: u0, v0: v0, u1: u1, v1: v1, 색워드: 색워드)로 실행한다.
+        만약 종류 == 1이면
+            HmjeGPU상수4인코딩을 (a: 실수32(너비), b: 실수32(높이), c: 실수32(반경), d: 실수32(0.0))로 실행한다.
+            HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_ROUNDED_SHADER)로 실행한다.
+        만약 종류 == 2이면
+            상수 안쪽너비는 실수32(너비) - (실수32(두께) * 실수32(2.0))이고, 실수32이다.
+            상수 안쪽높이는 실수32(높이) - (실수32(두께) * 실수32(2.0))이고, 실수32이다.
+            HmjeGPU상수8인코딩을 (a: 실수32(너비), b: 실수32(높이), c: 실수32(반경), d: 실수32(두께), e: 안쪽너비, f: 안쪽높이, g: 실수32(보조값), h: 실수32(0.0))로 실행한다.
+            HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_BORDER_SHADER)로 실행한다.
+        만약 종류 == 5이면
+            상수 원본로컬X는 실수32(원본상자X - x)이고, 실수32이다.
+            상수 원본로컬Y는 실수32(원본상자Y - y)이고, 실수32이다.
+            만약 보조값 == 0이면
+                HmjeGPU상수12인코딩을 (a: 실수32(너비), b: 실수32(높이), c: 실수32(반경), d: 실수32(0.0), e: 원본로컬X, f: 원본로컬Y, g: 실수32(원본상자너비), h: 실수32(원본상자높이), i: 실수32(두께), j: 실수32(0.0), k: 실수32(0.0), l: 실수32(0.0))로 실행한다.
+                HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_SHADOW_HARD_SHADER)로 실행한다.
+            아니면
+                상수 반블러역수는 실수32(1.0) / (실수32(보조값) * 실수32(2.0))이고, 실수32이다.
+                HmjeGPU상수12인코딩을 (a: 실수32(너비), b: 실수32(높이), c: 실수32(반경), d: 실수32(보조값), e: 원본로컬X, f: 원본로컬Y, g: 실수32(원본상자너비), h: 실수32(원본상자높이), i: 실수32(두께), j: 반블러역수, k: 실수32(0.0), l: 실수32(0.0))로 실행한다.
+                HmjeGPUshader선택를 (핸들: HMJEGPU_OBJECT_SHADOW_SHADER)로 실행한다.
+    HmjeGPUdraw인코딩를 (시작정점: 시작정점)로 실행한다.
+    만약 HmjeGPU인코딩실패이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU완료는
+    만약 HmjeGPU프레임활성 == 거짓이면
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 HmjeGPU레이어깊이 != 0이면
+        HmjeGPU취소를 실행한다.
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    HmjeGPU프레임활성은 거짓이다.
+    만약 HmjeGPU인코딩실패이면
+        HmjeGPU정점길이는 0이다.
+        HmjeGPU임시리소스정리를 실행한다.
+        HMJEGPU_오류_잘못됨을 정수로 반환한다.
+    만약 HmjeGPU정점길이 > 0이면
+        상수 쓰기결과는 GPU장치버퍼쓰기(HmjeGPU문맥핸들, HmjeGPU정점핸들, HmjeGPU정점주소, HmjeGPU정점길이, 0)이고, 정수이다.
+        만약 쓰기결과 != 0이면
+            HmjeGPU정점길이는 0이다.
+            HmjeGPU임시리소스정리를 실행한다.
+            쓰기결과를 정수로 반환한다.
+    # transient sampler view는 이 제출에서만 쓰고 리소스를 닫기
+    # 전에 같은 command stream의 끝에서 파기한다.
+    HmjeGPU임시view파기인코딩을 실행한다.
+    만약 HmjeGPU현재대상 == GPU_TARGET_SCREEN이면
+        # 마지막 GPU 명령만 scanout에 닿는다. 앞 명령이 실패하면 PRESENT까지
+        # 도달하지 않아 직전 정상 프레임이 그대로 남는다.
+        HmjeGPU패킷시작를 (명령: HMJEGPU_VIRGL_RESOURCE_COPY_REGION, 객체: 0, 길이: 자연수32(13))로 실행한다.
+        HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU스캔아웃wire))로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU화면대상wire))로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 0)로 실행한다.
+        HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU현재너비))로 실행한다.
+        HmjeGPU명령u32추가를 (값: 자연수32(HmjeGPU현재높이))로 실행한다.
+        HmjeGPU명령u32추가를 (값: 1)로 실행한다.
+        HmjeGPU참조추가를 (핸들: HmjeGPU스캔아웃핸들)로 실행한다.
+    상수 제출결과는 HmjeGPU제출()이고, 정수이다.
+    HmjeGPU정점길이는 0이다.
+    HmjeGPU임시리소스정리를 실행한다.
+    만약 제출결과 <= 0이면
+        제출결과를 정수로 반환한다.
+    만약 HmjeGPU현재대상 == GPU_TARGET_SCREEN이면
+        상수 표시결과는 GPU장치화면표시(HmjeGPU문맥핸들, HmjeGPU스캔아웃핸들, 자연수(제출결과), 0, 0, HmjeGPU현재너비, HmjeGPU현재높이)이고, 정수이다.
+        만약 표시결과 != 0이면
+            표시결과를 정수로 반환한다.
+    정수(1)을 정수로 반환한다.
+
+함수 HmjeGPU취소는
+    HmjeGPU프레임활성은 거짓이다.
+    HmjeGPU레이어깊이는 0이다.
+    HmjeGPU활성wire는 0이다.
+    HmjeGPU활성surface는 0이다.
+    HmjeGPU활성view는 0이다.
+    HmjeGPU임시리소스정리를 실행한다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU참조초기화를 실행한다.
+    HmjeGPU정점길이는 0이다.
+    정수(1)을 정수로 반환한다.
+
+# 장치 없이 실행하는 wire conformance 검사. 공식 virgl_protocol.h의 header/length
+# 규칙을 따라 packet 경계를 순회하고 state stream의 양 끝과 shader/link 수를
+# 검증한다. 실제 렌더링 검사는 virgl 지원 QEMU에서 별도로 수행한다.
+프로젝트 내부 함수 HmjeGPU인코더계약검사는
+    상수 이전명령주소는 HmjeGPU명령주소이고, 주소이다.
+    상수 이전명령길이는 HmjeGPU명령길이이고, 자연수이다.
+    상수 이전정점wire는 HmjeGPU정점wire이고, 자연수이다.
+    상수 이전글리프wire는 HmjeGPU글리프wire이고, 자연수이다.
+    상수 이전실패는 HmjeGPU인코딩실패이고, 참거짓이다.
+    상수 이전참조주소는 HmjeGPU참조주소이고, 주소이다.
+    상수 이전참조수는 HmjeGPU참조수이고, 자연수이다.
+    상수 이전최대참조는 HmjeGPU최대제출리소스이고, 자연수이다.
+    상수 이전프레임활성은 HmjeGPU프레임활성이고, 참거짓이다.
+    상수 이전현재대상은 HmjeGPU현재대상이고, 자연수이다.
+    상수 이전현재너비는 HmjeGPU현재너비이고, 자연수이다.
+    상수 이전현재높이는 HmjeGPU현재높이이고, 자연수이다.
+    상수 이전활성wire는 HmjeGPU활성wire이고, 자연수이다.
+    상수 이전활성surface는 HmjeGPU활성surface이고, 자연수32이다.
+    상수 이전활성view는 HmjeGPU활성view이고, 자연수32이다.
+    상수 이전레이어깊이는 HmjeGPU레이어깊이이고, 자연수이다.
+    상수 이전화면핸들은 HmjeGPU화면대상핸들이고, 자연수이다.
+    상수 이전화면wire는 HmjeGPU화면대상wire이고, 자연수이다.
+    상수 이전배경핸들은 HmjeGPU배경대상핸들이고, 자연수이다.
+    상수 이전배경wire는 HmjeGPU배경대상wire이고, 자연수이다.
+    상수 이전배경너비는 HmjeGPU배경대상너비이고, 자연수이다.
+    상수 이전배경높이는 HmjeGPU배경대상높이이고, 자연수이다.
+    상수 이전클립왼쪽은 HmjeGPU클립왼쪽이고, 자연수이다.
+    상수 이전클립위는 HmjeGPU클립위이고, 자연수이다.
+    상수 이전클립오른쪽은 HmjeGPU클립오른쪽이고, 자연수이다.
+    상수 이전클립아래는 HmjeGPU클립아래이고, 자연수이다.
+    상수 임시주소는 메모리요청(HMJEGPU_명령용량)이고, 주소이다.
+    상수 임시참조는 메모리요청(HMJEGPU_최대참조수 * 8)이고, 주소이다.
+    만약 임시주소 == 주소(0) 또는 임시참조 == 주소(0)이면
+        만약 임시주소 != 주소(0)이면
+            상수 임시주소해제는 메모리해제결과(임시주소)이고, 정수이다.
+        만약 임시참조 != 주소(0)이면
+            상수 임시참조해제는 메모리해제결과(임시참조)이고, 정수이다.
+        거짓을 참거짓로 반환한다.
+    HmjeGPU명령주소는 임시주소이다.
+    HmjeGPU정점wire는 자연수(77)이다.
+    HmjeGPU글리프wire는 자연수(88)이다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU고정상태인코딩을 실행한다.
+
+    변수 정상은 참이고, 참거짓이다.
+    만약 HmjeGPU인코딩실패 또는 HmjeGPU명령길이 < 64이면
+        정상은 거짓이다.
+    변수 첫헤더는 자연수32(0)이고, 자연수32이다.
+    변수 첫혼합RT는 자연수32(0)이고, 자연수32이다.
+    변수 끝헤더는 자연수32(0)이고, 자연수32이다.
+    변수 끝stride는 자연수32(0)이고, 자연수32이다.
+    변수 끝offset은 자연수32(0)이고, 자연수32이다.
+    변수 끝wire는 자연수32(0)이고, 자연수32이다.
+    위험 작업은
+        첫헤더는 임시주소에서 자연수32 값이다.
+        첫혼합RT는 임시주소 + 16에서 자연수32 값이다.
+        끝헤더는 임시주소 + HmjeGPU명령길이 - 16에서 자연수32 값이다.
+        끝stride는 임시주소 + HmjeGPU명령길이 - 12에서 자연수32 값이다.
+        끝offset은 임시주소 + HmjeGPU명령길이 - 8에서 자연수32 값이다.
+        끝wire는 임시주소 + HmjeGPU명령길이 - 4에서 자연수32 값이다.
+    상수 예상혼합RT는 자연수32(1 | (1 << 4) | (0x13 << 9) | (1 << 17) | (0x13 << 22) | (15 << 27))이고, 자연수32이다.
+    만약 첫헤더 != 자연수32(0x000b0101) 또는 첫혼합RT != 예상혼합RT이면
+        정상은 거짓이다.
+    만약 끝헤더 != 자연수32(0x00030006) 또는 끝stride != 자연수32(48) 또는 끝offset != 자연수32(0) 또는 끝wire != 자연수32(77)이면
+        정상은 거짓이다.
+
+    변수 위치는 자연수(0)이고, 자연수이다.
+    변수 패킷수는 자연수(0)이고, 자연수이다.
+    변수 shader수는 자연수(0)이고, 자연수이다.
+    변수 link수는 자연수(0)이고, 자연수이다.
+    변수 sampler수는 자연수(0)이고, 자연수이다.
+    변수 view수는 자연수(0)이고, 자연수이다.
+    위치 < HmjeGPU명령길이일 동안
+        만약 위치 + 4 > HmjeGPU명령길이이면
+            정상은 거짓이다.
+            위치는 HmjeGPU명령길이이다.
+        아니면
+            변수 헤더는 자연수32(0)이고, 자연수32이다.
+            위험 작업은
+                헤더는 임시주소 + 위치에서 자연수32 값이다.
+            상수 payload수는 자연수(헤더 >> 16)이고, 자연수이다.
+            상수 패킷바이트는 (payload수 + 1) * 4이고, 자연수이다.
+            만약 payload수 == 0 또는 위치 + 패킷바이트 > HmjeGPU명령길이이면
+                정상은 거짓이다.
+                위치는 HmjeGPU명령길이이다.
+            아니면
+                상수 명령값은 자연수32(헤더 & 자연수32(255))이고, 자연수32이다.
+                상수 객체값은 자연수32((헤더 >> 8) & 자연수32(255))이고, 자연수32이다.
+                만약 명령값 == HMJEGPU_VIRGL_CREATE_OBJECT 그리고 객체값 == HMJEGPU_VIRGL_OBJECT_SHADER이면
+                    shader수는 shader수 + 1이다.
+                만약 명령값 == HMJEGPU_VIRGL_CREATE_OBJECT 그리고 객체값 == HMJEGPU_VIRGL_OBJECT_SAMPLER_STATE이면
+                    sampler수는 sampler수 + 1이다.
+                만약 명령값 == HMJEGPU_VIRGL_CREATE_OBJECT 그리고 객체값 == HMJEGPU_VIRGL_OBJECT_SAMPLER_VIEW이면
+                    view수는 view수 + 1이다.
+                만약 명령값 == HMJEGPU_VIRGL_LINK_SHADER이면
+                    link수는 link수 + 1이다.
+                패킷수는 패킷수 + 1이다.
+                위치는 위치 + 패킷바이트이다.
+    만약 위치 != HmjeGPU명령길이 또는 패킷수 != 39 또는 shader수 != 13 또는 link수 != 12 또는 sampler수 != 1 또는 view수 != 1이면
+        정상은 거짓이다.
+
+    # COMPOSITE_TARGET이 destination clip으로 잘린 만큼 source 원점도
+    # 같이 이동시키는지, 두 opaque resource 핸들을 참조하는지 검증한다.
+    HmjeGPU명령초기화를 실행한다.
+    HmjeGPU참조주소는 임시참조이다.
+    HmjeGPU최대제출리소스는 HMJEGPU_최대참조수이다.
+    HmjeGPU참조초기화를 실행한다.
+    HmjeGPU화면대상핸들은 33이다.
+    HmjeGPU화면대상wire는 44이다.
+    HmjeGPU배경대상핸들은 55이다.
+    HmjeGPU배경대상wire는 66이다.
+    HmjeGPU배경대상너비는 100이다.
+    HmjeGPU배경대상높이는 80이다.
+    HmjeGPU프레임활성은 참이다.
+    HmjeGPU현재대상은 GPU_TARGET_SCREEN이다.
+    HmjeGPU현재너비는 80이다.
+    HmjeGPU현재높이는 60이다.
+    HmjeGPU활성wire는 44이다.
+    HmjeGPU클립왼쪽은 4이다.
+    HmjeGPU클립위는 5이다.
+    HmjeGPU클립오른쪽은 70이다.
+    HmjeGPU클립아래는 50이다.
+    HmjeGPU참조추가를 (핸들: HmjeGPU화면대상핸들)로 실행한다.
+    변수 합성요청은 [GPU_TARGET_BACKGROUND, 2, 3, 20, 15, 자연수(18446744073709551611), 1]이고, 자연수 7개의 고정배열이다.
+    상수 합성결과는 HmjeGPU대상합성(합성요청의 주소, 자연수(56))이고, 정수이다.
+    변수 합성헤더는 자연수32(0)이고, 자연수32이다.
+    변수 합성대상wire는 자연수32(0)이고, 자연수32이다.
+    변수 합성대상X는 자연수32(0)이고, 자연수32이다.
+    변수 합성대상Y는 자연수32(0)이고, 자연수32이다.
+    변수 합성원본wire는 자연수32(0)이고, 자연수32이다.
+    변수 합성원본X는 자연수32(0)이고, 자연수32이다.
+    변수 합성원본Y는 자연수32(0)이고, 자연수32이다.
+    변수 합성너비는 자연수32(0)이고, 자연수32이다.
+    변수 합성높이는 자연수32(0)이고, 자연수32이다.
+    변수 합성참조1은 자연수(0)이고, 자연수이다.
+    변수 합성참조2는 자연수(0)이고, 자연수이다.
+    위험 작업은
+        합성헤더는 임시주소에서 자연수32 값이다.
+        합성대상wire는 임시주소 + 4에서 자연수32 값이다.
+        합성대상X는 임시주소 + 12에서 자연수32 값이다.
+        합성대상Y는 임시주소 + 16에서 자연수32 값이다.
+        합성원본wire는 임시주소 + 24에서 자연수32 값이다.
+        합성원본X는 임시주소 + 32에서 자연수32 값이다.
+        합성원본Y는 임시주소 + 36에서 자연수32 값이다.
+        합성너비는 임시주소 + 44에서 자연수32 값이다.
+        합성높이는 임시주소 + 48에서 자연수32 값이다.
+        합성참조1은 임시참조에서 자연수 값이다.
+        합성참조2는 임시참조 + 8에서 자연수 값이다.
+    만약 합성결과 <= 0 또는 HmjeGPU명령길이 != 56 또는 합성헤더 != 자연수32(0x000d0011) 또는 합성대상wire != 44 또는 합성대상X != 4 또는 합성대상Y != 5 또는 합성원본wire != 66 또는 합성원본X != 11 또는 합성원본Y != 7 또는 합성너비 != 11 또는 합성높이 != 11 또는 HmjeGPU참조수 != 2 또는 합성참조1 != 33 또는 합성참조2 != 55이면
+        정상은 거짓이다.
+
+    상수 임시해제는 메모리해제결과(임시주소)이고, 정수이다.
+    상수 임시참조해제는 메모리해제결과(임시참조)이고, 정수이다.
+    HmjeGPU명령주소는 이전명령주소이다.
+    HmjeGPU명령길이는 이전명령길이이다.
+    HmjeGPU정점wire는 이전정점wire이다.
+    HmjeGPU글리프wire는 이전글리프wire이다.
+    HmjeGPU인코딩실패는 이전실패이다.
+    HmjeGPU참조주소는 이전참조주소이다.
+    HmjeGPU참조수는 이전참조수이다.
+    HmjeGPU최대제출리소스는 이전최대참조이다.
+    HmjeGPU프레임활성은 이전프레임활성이다.
+    HmjeGPU현재대상은 이전현재대상이다.
+    HmjeGPU현재너비는 이전현재너비이다.
+    HmjeGPU현재높이는 이전현재높이이다.
+    HmjeGPU활성wire는 이전활성wire이다.
+    HmjeGPU활성surface는 이전활성surface이다.
+    HmjeGPU활성view는 이전활성view이다.
+    HmjeGPU레이어깊이는 이전레이어깊이이다.
+    HmjeGPU화면대상핸들은 이전화면핸들이다.
+    HmjeGPU화면대상wire는 이전화면wire이다.
+    HmjeGPU배경대상핸들은 이전배경핸들이다.
+    HmjeGPU배경대상wire는 이전배경wire이다.
+    HmjeGPU배경대상너비는 이전배경너비이다.
+    HmjeGPU배경대상높이는 이전배경높이이다.
+    HmjeGPU클립왼쪽은 이전클립왼쪽이다.
+    HmjeGPU클립위는 이전클립위이다.
+    HmjeGPU클립오른쪽은 이전클립오른쪽이다.
+    HmjeGPU클립아래는 이전클립아래이다.
+    정상를 참거짓로 반환한다.
+
+# gpu_command_renderer.hmje의 high-level bridge와 같은 서명. v2가 탐지된 경우에만
+# 호출되며, 모든 포인터 읽기는 각 명령의 고정 길이를 확인한 뒤 수행한다.
+함수 HmjeGPUVirGL고정요청은 (종류: 자연수, 요청주소: 주소, 길이: 자연수)를 받아
+    만약 종류 == GPU_COMMAND_QUERY이면
+        만약 길이 != 32 또는 요청주소 == 주소(0) 또는 HmjeGPUVirGL장치탐지() == 거짓이면
+            HMJEGPU_오류_지원안함을 정수로 반환한다.
+        위험 작업은
+            요청주소에서 자연수 값은 자연수(2)이다.
+            요청주소 + 8에서 자연수 값은 자연수(5)이다.
+            요청주소 + 16에서 자연수 값은 자연수((1 << GPU_COMMAND_BEGIN) | (1 << GPU_COMMAND_CLIP) | (1 << GPU_COMMAND_UPLOAD_GLYPH) | (1 << GPU_COMMAND_DRAW) | (1 << GPU_COMMAND_IMAGE_BLIT) | (1 << GPU_COMMAND_END_PRESENT) | (1 << GPU_COMMAND_ABORT) | (1 << GPU_COMMAND_SCROLL_SHIFT) | (1 << GPU_COMMAND_IMAGE_SCALE_BLIT) | (1 << GPU_COMMAND_COMPOSITE_TARGET) | (1 << GPU_COMMAND_BACKDROP_BLUR) | (1 << GPU_COMMAND_GRADIENT_FILL) | (1 << GPU_COMMAND_LAYER_BEGIN) | (1 << GPU_COMMAND_LAYER_END) | (1 << GPU_COMMAND_PLANAR_SHIFT))이다.
+            요청주소 + 24에서 자연수 값은 GPU_BACKEND_POLICY_CPU_RASTER_ALLOWED이다.
+        정수(1)을 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_BEGIN이면
+        HmjeGPU시작(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_CLIP이면
+        HmjeGPU클립(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_UPLOAD_GLYPH이면
+        HmjeGPU글리프업로드(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_DRAW이면
+        HmjeGPU그리기(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_IMAGE_BLIT이면
+        HmjeGPU이미지(요청주소, 길이, 거짓)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_IMAGE_SCALE_BLIT이면
+        HmjeGPU이미지(요청주소, 길이, 참)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_COMPOSITE_TARGET이면
+        HmjeGPU대상합성(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_BACKDROP_BLUR이면
+        HmjeGPU배경블러(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_GRADIENT_FILL이면
+        HmjeGPU그라데이션채우기(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_SCROLL_SHIFT이면
+        HmjeGPU시프트복사(요청주소, 길이, 거짓)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_PLANAR_SHIFT이면
+        HmjeGPU시프트복사(요청주소, 길이, 참)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_LAYER_BEGIN이면
+        HmjeGPU레이어시작(요청주소, 길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_LAYER_END이면
+        HmjeGPU레이어끝(길이)를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_END_PRESENT 그리고 길이 == 0이면
+        HmjeGPU완료()를 정수로 반환한다.
+    만약 종류 == GPU_COMMAND_ABORT 그리고 길이 == 0이면
+        HmjeGPU취소()를 정수로 반환한다.
+    HMJEGPU_오류_지원안함을 정수로 반환한다.

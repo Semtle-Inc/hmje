@@ -1,0 +1,24 @@
+HmjeGraphics를 가져온다.
+
+# Opt-in logical extent of an already constrained Text. Keeps the renderer's
+# shaping, grapheme offsets, line limit and ellipsis; no global width policy change.
+# The original constraint must still be used to lay out/draw the child Text.
+공개 함수 화면텍스트내용너비는 (값: 화면노드, 제한너비: 자연수)를 받아
+    만약 값.종류 != 화면노드종류_텍스트이면
+        화면측정너비(값, 제한너비, 0)을 자연수로 반환한다.
+    상수 환경은 기본UI환경값()이고, UI환경값이다.
+    상수 비트맵은 폰트비트맵(텍스트뷰글꼴(값, 환경))이고, 비트맵폰트이다.
+    상수 실행은 텍스트뷰실행(값, 비트맵, 환경, 제한너비)이고, 글리프실행이다.
+    변수 끝은 정수(0)이고, 정수이다.
+    실행.글리프들에서 각 글리프마다
+        # Whitespace has no ink. Internal spaces remain represented in the next
+        # glyph's x; a retained trailing wrap-space must not widen the bubble.
+        상수 코드는 글리프.코드이고, 자연수이다.
+        상수 공백은 코드 == 9 또는 코드 == 10 또는 코드 == 13 또는 코드 == 32 또는 코드 == 160 또는 (코드 >= 0x2000 그리고 코드 <= 0x200b) 또는 코드 == 0x202f 또는 코드 == 0x205f 또는 코드 == 0x3000이고, 참거짓이다.
+        만약 공백 == 거짓이면
+            상수 오른쪽은 글리프.x + 정수(글리프.진행폭)이고, 정수이다.
+            만약 오른쪽 > 끝이면
+                끝은 오른쪽이다.
+    만약 끝 < 0이면
+        자연수(0)을 자연수로 반환한다.
+    자연수(끝)을 자연수로 반환한다.

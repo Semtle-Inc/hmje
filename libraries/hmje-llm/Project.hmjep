@@ -1,0 +1,152 @@
+프로젝트 hmje-llm의
+    버전은 "0.1.0"이다.
+
+의존 프로젝트 hmje-sem의
+    로컬 경로는 "../hmje-sem"이다.
+
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+
+모듈 HmjeLLM의
+    원본 경로는 "Sources/HmjeLLM"이고,
+    의존 라이브러리는
+        기반과,
+        HmjeSem이다.
+
+모듈 GemmaMetalCheck의
+    원본 경로는 "Sources/GemmaMetalCheck"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+모듈 GemmaDecodeBench의
+    원본 경로는 "Sources/GemmaDecodeBench"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+모듈 GemmaChat의
+    원본 경로는 "Sources/GemmaChat"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+라이브러리 HmjeLLM의
+    내보내는 모듈은 HmjeLLM이다.
+
+실행 파일 GemmaMetalCheck의
+    시작 모듈은 GemmaMetalCheck이다.
+
+실행 파일 GemmaDecodeBench의
+    시작 모듈은 GemmaDecodeBench이다.
+
+실행 파일 GemmaChat의
+    시작 모듈은 GemmaChat이다.
+
+모듈 InferenceBench의
+    원본 경로는 "Sources/InferenceBench"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 InferenceBench의
+    시작 모듈은 InferenceBench이다.
+
+모듈 InferenceProfile의
+    원본 경로는 "Sources/InferenceProfile"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 InferenceProfile의
+    시작 모듈은 InferenceProfile이다.
+
+모듈 Q4RepackBench의
+    원본 경로는 "Sources/Q4RepackBench"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 Q4RepackBench의
+    시작 모듈은 Q4RepackBench이다.
+
+모듈 ThreadScalingBench의
+    원본 경로는 "Sources/ThreadScalingBench"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 ThreadScalingBench의
+    시작 모듈은 ThreadScalingBench이다.
+
+모듈 GgufTest의
+    원본 경로는 "Sources/GgufTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 GgufTest의
+    시작 모듈은 GgufTest이다.
+
+모듈 InferenceCompileTest의
+    원본 경로는 "Sources/InferenceCompileTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 InferenceCompileTest의
+    시작 모듈은 InferenceCompileTest이다.
+
+모듈 RealInferenceTest의
+    원본 경로는 "Sources/RealInferenceTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 RealInferenceTest의
+    시작 모듈은 RealInferenceTest이다.
+
+모듈 RealLongContextTest의
+    원본 경로는 "Sources/RealLongContextTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 RealLongContextTest의
+    시작 모듈은 RealLongContextTest이다.
+
+모듈 RealModelTest의
+    원본 경로는 "Sources/RealModelTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 RealModelTest의
+    시작 모듈은 RealModelTest이다.
+
+모듈 RealTokenizerTest의
+    원본 경로는 "Sources/RealTokenizerTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 RealTokenizerTest의
+    시작 모듈은 RealTokenizerTest이다.
+
+모듈 SamplerTest의
+    원본 경로는 "Sources/SamplerTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 SamplerTest의
+    시작 모듈은 SamplerTest이다.
+
+모듈 TokenizerTest의
+    원본 경로는 "Sources/TokenizerTest"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 TokenizerTest의
+    시작 모듈은 TokenizerTest이다.
+
+모듈 GemmaStream의
+    원본 경로는 "Sources/GemmaStream"이고,
+    의존 모듈은 HmjeLLM이고,
+    의존 라이브러리는 HmjeSem이다.
+
+실행 파일 GemmaStream의
+    시작 모듈은 GemmaStream이다.
+
+모듈 GgufNumericTest의
+    원본 경로는 "Sources/GgufNumericTest"이고,
+    의존 모듈은 HmjeLLM이다.
+
+실행 파일 GgufNumericTest의
+    시작 모듈은 GgufNumericTest이다.

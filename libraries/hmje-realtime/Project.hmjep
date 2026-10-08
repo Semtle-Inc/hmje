@@ -1,0 +1,30 @@
+프로젝트 hmje-realtime의
+    버전은 "0.1.0"이다.
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+의존 프로젝트 hmje-network의
+    로컬 경로는 "../hmje-network"이다.
+모듈 HmjeRealtime의
+    원본 경로는 "Sources/HmjeRealtime"이고,
+    의존 라이브러리는
+        HmjeNetwork과,
+        기반이다.
+라이브러리 HmjeRealtime의
+    내보내는 모듈은 HmjeRealtime이다.
+외부 구현 RealtimeFixtureNative의
+    원본 경로는 "Tests/Native"이다.
+    macOS 설정의
+        원본 파일은 "fd_count.c"이다.
+    Linux 설정의
+        원본 파일은 "fd_count.c"이다.
+    Windows 설정의
+        원본 파일은 "fd_count_windows.c"이다.
+모듈 HmjeRealtimeTests의
+    외부 구현은 RealtimeFixtureNative이고,
+    원본 경로는 "Sources/HmjeRealtimeTests"이고,
+    의존 모듈은 HmjeRealtime이고,
+    의존 라이브러리는
+        HmjeNetwork과,
+        기반이다.
+실행 파일 RealtimeTests의
+    시작 모듈은 HmjeRealtimeTests이다.

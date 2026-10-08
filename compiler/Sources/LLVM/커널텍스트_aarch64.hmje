@@ -1,0 +1,1371 @@
+# 생성 파일. 재생성: python3 tools/gen_semtleos_text.py
+
+
+
+# aarch64_limine_entry_llvm
+함수 aarch64텍스트limine진입은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.start,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".section .bss.kstack,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 16\""를 추가한다.
+    줄들에 "module asm \"_hmje_kstack:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 0x10000\""를 추가한다.
+    줄들에 "module asm \"_hmje_kstack_top:\""를 추가한다.
+    줄들에 "module asm \".section .text.start,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global _start\""를 추가한다.
+    줄들에 "module asm \"_start:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_kstack_top\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_kstack_top\""를 추가한다.
+    줄들에 "module asm \"\\09msr SPSel, #1\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x0\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x1, _hmje_exc_vectors\""를 추가한다.
+    줄들에 "module asm \"\\09add x1, x1, :lo12:_hmje_exc_vectors\""를 추가한다.
+    줄들에 "module asm \"\\09msr vbar_el1, x1\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el1, xzr\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x0, cpacr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #3\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x2, x2, #20\""를 추가한다.
+    줄들에 "module asm \"\\09orr x0, x0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09msr cpacr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09bl main\""를 추가한다.
+    줄들에 "module asm \"1:\""를 추가한다.
+    줄들에 "module asm \"\\09wfi\""를 추가한다.
+    줄들에 "module asm \"\\09b 1b\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_limine_sysregs_llvm
+함수 aarch64텍스트limine시스템레지스터은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.limine_dbg,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_sysregs\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_sysregs:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, mair_el1\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, tcr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #8]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, ttbr0_el1\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, sctlr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #24]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, ttbr1_el1\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, CurrentEL\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #40]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, SPSel\""를 추가한다.
+    줄들에 "module asm \"\\09str x1, [x0, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_limine_set_ttbr0_llvm
+함수 aarch64텍스트TTBR0설정은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.limine_mmu,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_set_ttbr0\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_set_ttbr0:\""를 추가한다.
+    줄들에 "module asm \"\\09dsb sy\""를 추가한다.
+    줄들에 "module asm \"\\09msr ttbr0_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09tlbi vmalle1\""를 추가한다.
+    줄들에 "module asm \"\\09dsb sy\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_dmb_sy_llvm
+함수 aarch64텍스트DMB은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.hmje_aarch64_dmb_sy,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_dmb_sy\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_dmb_sy:\""를 추가한다.
+    줄들에 "module asm \"\\09dmb sy\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_tlbi_vae1is_llvm
+함수 aarch64텍스트TLBI은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.hmje_aarch64_tlbi_vae1is,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_tlbi_vae1is\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_tlbi_vae1is:\""를 추가한다.
+    줄들에 "module asm \"\\09lsr x0, x0, #12\""를 추가한다.
+    줄들에 "module asm \"\\09tlbi vae1is, x0\""를 추가한다.
+    줄들에 "module asm \"\\09dsb ish\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_neon_copy_llvm
+함수 aarch64텍스트NEON복사은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.hmje_aarch64_neon_copy,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_neon_copy\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_neon_copy:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, x2\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x2, #64\""를 추가한다.
+    줄들에 "module asm \"\\09b.lo 2f\""를 추가한다.
+    줄들에 "module asm \"1:\""를 추가한다.
+    줄들에 "module asm \"\\09ld1 {v0.16b, v1.16b, v2.16b, v3.16b}, [x1], #64\""를 추가한다.
+    줄들에 "module asm \"\\09st1 {v0.16b, v1.16b, v2.16b, v3.16b}, [x0], #64\""를 추가한다.
+    줄들에 "module asm \"\\09subs x2, x2, #64\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x2, #64\""를 추가한다.
+    줄들에 "module asm \"\\09b.hs 1b\""를 추가한다.
+    줄들에 "module asm \"2:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x2, #16\""를 추가한다.
+    줄들에 "module asm \"\\09b.lo 4f\""를 추가한다.
+    줄들에 "module asm \"3:\""를 추가한다.
+    줄들에 "module asm \"\\09ldr q0, [x1], #16\""를 추가한다.
+    줄들에 "module asm \"\\09str q0, [x0], #16\""를 추가한다.
+    줄들에 "module asm \"\\09subs x2, x2, #16\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x2, #16\""를 추가한다.
+    줄들에 "module asm \"\\09b.hs 3b\""를 추가한다.
+    줄들에 "module asm \"4:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x2, #8\""를 추가한다.
+    줄들에 "module asm \"\\09b.lo 5f\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x4, [x1], #8\""를 추가한다.
+    줄들에 "module asm \"\\09str x4, [x0], #8\""를 추가한다.
+    줄들에 "module asm \"\\09sub x2, x2, #8\""를 추가한다.
+    줄들에 "module asm \"5:\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x2, 7f\""를 추가한다.
+    줄들에 "module asm \"6:\""를 추가한다.
+    줄들에 "module asm \"\\09ldrb w4, [x1], #1\""를 추가한다.
+    줄들에 "module asm \"\\09strb w4, [x0], #1\""를 추가한다.
+    줄들에 "module asm \"\\09subs x2, x2, #1\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 6b\""를 추가한다.
+    줄들에 "module asm \"7:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x3\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_limine_user_llvm
+함수 aarch64텍스트limine유저은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.user,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_user_demo\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_user_demo:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, _hmje_kctx\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:_hmje_kctx\""를 추가한다.
+    줄들에 "module asm \"\\09stp x19, x20, [x9, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x21, x22, [x9, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x23, x24, [x9, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x25, x26, [x9, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x27, x28, [x9, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09str x29, [x9, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x10, sp\""를 추가한다.
+    줄들에 "module asm \"\\09str x10, [x9, #88]\""를 추가한다.
+    줄들에 "module asm \"\\09str x30, [x9, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_user_code\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_user_code\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x1, _hmje_user_code_end\""를 추가한다.
+    줄들에 "module asm \"\\09add x1, x1, :lo12:_hmje_user_code_end\""를 추가한다.
+    줄들에 "module asm \"\\09movz x2, #0x4200, lsl #16\""를 추가한다.
+    줄들에 "module asm \"11:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge 12f\""를 추가한다.
+    줄들에 "module asm \"\\09ldr w3, [x0], #4\""를 추가한다.
+    줄들에 "module asm \"\\09str w3, [x2], #4\""를 추가한다.
+    줄들에 "module asm \"\\09b 11b\""를 추가한다.
+    줄들에 "module asm \"12:\""를 추가한다.
+    줄들에 "module asm \"\\09ic iallu\""를 추가한다.
+    줄들에 "module asm \"\\09dsb sy\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09movz x4, #0x4210, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09msr sp_el0, x4\""를 추가한다.
+    줄들에 "module asm \"\\09movz x4, #0x4200, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x4\""를 추가한다.
+    줄들에 "module asm \"\\09movz x4, #0x3c0\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x4\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"_hmje_user_code:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #41\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09movz x1, #0x4201, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09str x0, [x1]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, #93\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"13:\""를 추가한다.
+    줄들에 "module asm \"\\09b 13b\""를 추가한다.
+    줄들에 "module asm \"_hmje_user_code_end:\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_limine_elf_llvm
+함수 aarch64텍스트limineELF은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.elf,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_enter_el0\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_enter_el0:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, _hmje_kctx\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:_hmje_kctx\""를 추가한다.
+    줄들에 "module asm \"\\09stp x19, x20, [x9, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x21, x22, [x9, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x23, x24, [x9, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x25, x26, [x9, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x27, x28, [x9, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09str x29, [x9, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x10, sp\""를 추가한다.
+    줄들에 "module asm \"\\09str x10, [x9, #88]\""를 추가한다.
+    줄들에 "module asm \"\\09str x30, [x9, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ic iallu\""를 추가한다.
+    줄들에 "module asm \"\\09dsb sy\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09msr sp_el0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, #0\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x4\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_app_output\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_app_output:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_outbuf\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_outbuf\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_app_outlen\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_app_outlen:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_outlen\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_outlen\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x0, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_limine_el0_stack_fallback_llvm
+함수 aarch64텍스트EL0스택폴백은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "@hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p = weak global i64 0"를 추가한다.
+    줄들에 "@hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a = weak global i64 0"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_exception_vectors_llvm (kernel_syscall=False) (+ 자립 덧붙임: EL0 IRQ 폴백 cbz 가드)
+함수 aarch64텍스트예외벡터은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.kctx,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 16\""를 추가한다.
+    줄들에 "module asm \"_hmje_kctx:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 128\""를 추가한다.
+    줄들에 "module asm \"_hmje_outbuf:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 0x4000\""를 추가한다.
+    줄들에 "module asm \"_hmje_outlen:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".section .text.exc,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".balign 2048\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_vectors:\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_irq_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_irq_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_el0_sync_entry\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_el0_irq_entry\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \".balign 128\""를 추가한다.
+    줄들에 "module asm \"_hmje_el0_sync_entry:\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidrro_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el0, x10\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x10, hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09add x10, x10, :lo12:hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [x10]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x10, 20f\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x9, x9, #9\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, #8\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x10, x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 20f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"\\09b 21f\""를 추가한다.
+    줄들에 "module asm \"20:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 21f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"21:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, tpidr_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidrro_el0\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"_hmje_el0_irq_entry:\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidrro_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el0, x10\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x10, hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09add x10, x10, :lo12:hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [x10]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x10, 22f\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x9, x9, #9\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, #8\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x10, x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 22f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"\\09b 23f\""를 추가한다.
+    줄들에 "module asm \"22:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 23f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"23:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, tpidr_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidrro_el0\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_irq_handler\""를 추가한다.
+    줄들에 "module asm \".balign 128\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_handler:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, esr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09lsr x9, x9, #26\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x9, #0x15\""를 추가한다.
+    줄들에 "module asm \"\\09b.eq _hmje_svc_dispatch\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_panic:\""를 추가한다.
+    줄들에 "module asm \"\\09movz x9, #0x0900, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09adr x10, _hmje_exc_msg\""를 추가한다.
+    줄들에 "module asm \"2:\""를 추가한다.
+    줄들에 "module asm \"\\09ldrb w11, [x10], #1\""를 추가한다.
+    줄들에 "module asm \"\\09cbz w11, 7f\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09b 2b\""를 추가한다.
+    줄들에 "module asm \"7:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x12, esr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_exc_puthex\""를 추가한다.
+    줄들에 "module asm \"\\09mov w11, #0x20\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x12, far_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_exc_puthex\""를 추가한다.
+    줄들에 "module asm \"\\09mov w11, #0x20\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x12, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_exc_puthex\""를 추가한다.
+    줄들에 "module asm \"\\09mov w11, #0x0A\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"3:\""를 추가한다.
+    줄들에 "module asm \"\\09wfe\""를 추가한다.
+    줄들에 "module asm \"\\09b 3b\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_puthex:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x13, #60\""를 추가한다.
+    줄들에 "module asm \"8:\""를 추가한다.
+    줄들에 "module asm \"\\09lsr x14, x12, x13\""를 추가한다.
+    줄들에 "module asm \"\\09and x14, x14, #0xf\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x14, #10\""를 추가한다.
+    줄들에 "module asm \"\\09b.lt 9f\""를 추가한다.
+    줄들에 "module asm \"\\09add x14, x14, #87\""를 추가한다.
+    줄들에 "module asm \"\\09b 10f\""를 추가한다.
+    줄들에 "module asm \"9:\""를 추가한다.
+    줄들에 "module asm \"\\09add x14, x14, #48\""를 추가한다.
+    줄들에 "module asm \"10:\""를 추가한다.
+    줄들에 "module asm \"\\09strb w14, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09subs x13, x13, #4\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge 8b\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \"_hmje_svc_dispatch:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x8, #93\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 14f\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, _hmje_kctx\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:_hmje_kctx\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x19, x20, [x9, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x21, x22, [x9, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x23, x24, [x9, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x25, x26, [x9, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x27, x28, [x9, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x29, [x9, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [x9, #88]\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x10\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x30, [x9, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \"14:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x8, #64\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 15f\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, _hmje_outlen\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:_hmje_outlen\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x11, _hmje_outbuf\""를 추가한다.
+    줄들에 "module asm \"\\09add x11, x11, :lo12:_hmje_outbuf\""를 추가한다.
+    줄들에 "module asm \"\\09add x11, x11, x10\""를 추가한다.
+    줄들에 "module asm \"\\09mov x12, #0\""를 추가한다.
+    줄들에 "module asm \"16:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x12, x2\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge 17f\""를 추가한다.
+    줄들에 "module asm \"\\09ldrb w13, [x1, x12]\""를 추가한다.
+    줄들에 "module asm \"\\09strb w13, [x11, x12]\""를 추가한다.
+    줄들에 "module asm \"\\09add x12, x12, #1\""를 추가한다.
+    줄들에 "module asm \"\\09b 16b\""를 추가한다.
+    줄들에 "module asm \"17:\""를 추가한다.
+    줄들에 "module asm \"\\09add x10, x10, x2\""를 추가한다.
+    줄들에 "module asm \"\\09str x10, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"15:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x8, #1\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 4f\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, #1\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"4:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #-1\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_msg:\""를 추가한다.
+    줄들에 "module asm \"\\09.asciz \\22aarch64-exc:caught\\0A\\22\""를 추가한다.
+    줄들에 "module asm \".balign 4\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_fault\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_fault:\""를 추가한다.
+    줄들에 "module asm \"\\09udf #0\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_syscall1\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_syscall1:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_exception_vectors_llvm (kernel_syscall=True) (+ 자립 덧붙임: EL0 IRQ 폴백 cbz 가드)
+함수 aarch64텍스트커널예외벡터은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.kctx,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 16\""를 추가한다.
+    줄들에 "module asm \"_hmje_kctx:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 128\""를 추가한다.
+    줄들에 "module asm \"_hmje_outbuf:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 0x4000\""를 추가한다.
+    줄들에 "module asm \"_hmje_outlen:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".section .text.exc,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".balign 2048\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_vectors:\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_irq_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_el1_sync_entry\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_irq_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_el0_sync_entry\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_el0_irq_entry\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"\\09.balign 128\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \".balign 128\""를 추가한다.
+    줄들에 "module asm \"_hmje_el0_sync_entry:\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidrro_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el0, x10\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x10, hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09add x10, x10, :lo12:hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [x10]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x10, 20f\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x9, x9, #9\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, #8\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x10, x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 20f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"\\09b 21f\""를 추가한다.
+    줄들에 "module asm \"20:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 21f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"21:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, tpidr_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidrro_el0\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_handler\""를 추가한다.
+    줄들에 "module asm \"_hmje_el0_irq_entry:\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidrro_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el0, x10\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x10, hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09add x10, x10, :lo12:hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [x10]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x10, 22f\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x9, x9, #9\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, #8\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x10, x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 22f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"\\09b 23f\""를 추가한다.
+    줄들에 "module asm \"22:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:hmje_global_h_m_j_e___k_e_r_n_e_l___s_t_a_c_k___t_o_p\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x9, 23f\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x9\""를 추가한다.
+    줄들에 "module asm \"23:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, tpidr_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidrro_el0\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_irq_handler\""를 추가한다.
+    줄들에 "module asm \".balign 128\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_handler:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, esr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09lsr x9, x9, #26\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x9, #0x15\""를 추가한다.
+    줄들에 "module asm \"\\09b.eq _hmje_svc_dispatch\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x9, #0x24\""를 추가한다.
+    줄들에 "module asm \"\\09b.eq _hmje_data_abort_dispatch\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x9, #0x20\""를 추가한다.
+    줄들에 "module asm \"\\09b.eq _hmje_data_abort_dispatch\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_panic:\""를 추가한다.
+    줄들에 "module asm \"\\09movz x9, #0x0900, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09adr x10, _hmje_exc_msg\""를 추가한다.
+    줄들에 "module asm \"2:\""를 추가한다.
+    줄들에 "module asm \"\\09ldrb w11, [x10], #1\""를 추가한다.
+    줄들에 "module asm \"\\09cbz w11, 7f\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09b 2b\""를 추가한다.
+    줄들에 "module asm \"7:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x12, esr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_exc_puthex\""를 추가한다.
+    줄들에 "module asm \"\\09mov w11, #0x20\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x12, far_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_exc_puthex\""를 추가한다.
+    줄들에 "module asm \"\\09mov w11, #0x20\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x12, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_exc_puthex\""를 추가한다.
+    줄들에 "module asm \"\\09mov w11, #0x0A\""를 추가한다.
+    줄들에 "module asm \"\\09strb w11, [x9]\""를 추가한다.
+    줄들에 "module asm \"3:\""를 추가한다.
+    줄들에 "module asm \"\\09wfe\""를 추가한다.
+    줄들에 "module asm \"\\09b 3b\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_puthex:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x13, #60\""를 추가한다.
+    줄들에 "module asm \"8:\""를 추가한다.
+    줄들에 "module asm \"\\09lsr x14, x12, x13\""를 추가한다.
+    줄들에 "module asm \"\\09and x14, x14, #0xf\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x14, #10\""를 추가한다.
+    줄들에 "module asm \"\\09b.lt 9f\""를 추가한다.
+    줄들에 "module asm \"\\09add x14, x14, #87\""를 추가한다.
+    줄들에 "module asm \"\\09b 10f\""를 추가한다.
+    줄들에 "module asm \"9:\""를 추가한다.
+    줄들에 "module asm \"\\09add x14, x14, #48\""를 추가한다.
+    줄들에 "module asm \"10:\""를 추가한다.
+    줄들에 "module asm \"\\09strb w14, [x9]\""를 추가한다.
+    줄들에 "module asm \"\\09subs x13, x13, #4\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge 8b\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \"_hmje_data_abort_dispatch:\""를 추가한다.
+    줄들에 "module asm \"\\09sub sp, sp, #816\""를 추가한다.
+    줄들에 "module asm \"\\09stp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, sp_el0\""를 추가한다.
+    줄들에 "module asm \"\\09stp x30, x9, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, tpidrro_el0\""를 추가한다.
+    줄들에 "module asm \"\\09str x9, [sp, #72]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x11, spsr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q0, q1, [sp, #272]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q2, q3, [sp, #304]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q4, q5, [sp, #336]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q6, q7, [sp, #368]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q8, q9, [sp, #400]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q10, q11, [sp, #432]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q12, q13, [sp, #464]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q14, q15, [sp, #496]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q16, q17, [sp, #528]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q18, q19, [sp, #560]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q20, q21, [sp, #592]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q22, q23, [sp, #624]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q24, q25, [sp, #656]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q26, q27, [sp, #688]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q28, q29, [sp, #720]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q30, q31, [sp, #752]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, fpsr\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x11, fpcr\""를 추가한다.
+    줄들에 "module asm \"\\09str x10, [sp, #784]\""를 추가한다.
+    줄들에 "module asm \"\\09str x11, [sp, #792]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x0, esr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, far_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x2, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_fn_h_m_j_e___a_a_r_c_h_6_4___a_p_p___e_x_c_e_p_t_i_o_n___r_e_c_o_v_e_r__u_6_4_u_6_4_u_6_4\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x0, _hmje_data_abort_unrecoverable\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [sp, #784]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x11, [sp, #792]\""를 추가한다.
+    줄들에 "module asm \"\\09msr fpsr, x10\""를 추가한다.
+    줄들에 "module asm \"\\09msr fpcr, x11\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q30, q31, [sp, #752]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q28, q29, [sp, #720]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q26, q27, [sp, #688]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q24, q25, [sp, #656]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q22, q23, [sp, #624]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q20, q21, [sp, #592]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q18, q19, [sp, #560]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q16, q17, [sp, #528]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q14, q15, [sp, #496]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q12, q13, [sp, #464]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q10, q11, [sp, #432]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q8, q9, [sp, #400]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q6, q7, [sp, #368]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q4, q5, [sp, #336]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q2, q3, [sp, #304]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q0, q1, [sp, #272]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x10\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x11\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x30, x9, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09msr sp_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #816\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"_hmje_data_abort_unrecoverable:\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #816\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_panic\""를 추가한다.
+    줄들에 "module asm \"_hmje_el1_sync_entry:\""를 추가한다.
+    줄들에 "module asm \"\\09sub sp, sp, #272\""를 추가한다.
+    줄들에 "module asm \"\\09stp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09str x30, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x11, spsr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x0, esr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, far_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x2, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_fn_h_m_j_e___a_a_r_c_h_6_4___k_e_r_n_e_l___e_x_c_e_p_t_i_o_n___r_e_c_o_v_e_r__u_6_4_u_6_4_u_6_4\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x0, _hmje_el1_sync_unrecoverable\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x11\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x30, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #272\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"_hmje_el1_sync_unrecoverable:\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #272\""를 추가한다.
+    줄들에 "module asm \"\\09b _hmje_exc_panic\""를 추가한다.
+    줄들에 "module asm \"_hmje_svc_dispatch:\""를 추가한다.
+    줄들에 "module asm \"\\09sub sp, sp, #272\""를 추가한다.
+    줄들에 "module asm \"\\09stp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, sp_el0\""를 추가한다.
+    줄들에 "module asm \"\\09stp x30, x9, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x11, spsr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #1\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_fn_ud604_uc7ac_C_P_U_uc2dc_uc2a4_ud15c_ud638_ucd9c_uc720_uc800_uc0c1_ud0dc_uc124_uc815__u_6_4\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x0, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x2, [sp, #8]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x4, [sp, #24]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x6, [sp, #40]\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_arch_syscall6\""를 추가한다.
+    줄들에 "module asm \"\\09str x0, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifset, #2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_fn_ud604_uc7ac_C_P_U_uc2dc_uc2a4_ud15c_ud638_ucd9c_uc720_uc800_uc0c1_ud0dc_uc124_uc815__u_6_4\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x10\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x11\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x30, x9, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09msr sp_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #272\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \"_hmje_exc_msg:\""를 추가한다.
+    줄들에 "module asm \"\\09.asciz \\22aarch64-exc:caught\\0A\\22\""를 추가한다.
+    줄들에 "module asm \".balign 4\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_fault\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_fault:\""를 추가한다.
+    줄들에 "module asm \"\\09udf #0\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_syscall1\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_syscall1:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x8, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09svc #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_entry_llvm (+ 자립 덧붙임: CPACR_EL1 FPEN·TPIDR_EL1=0)
+함수 aarch64텍스트직접진입은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.start,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global _start\""를 추가한다.
+    줄들에 "module asm \"_start:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _stack_top\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_stack_top\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x0\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x1, _hmje_exc_vectors\""를 추가한다.
+    줄들에 "module asm \"\\09add x1, x1, :lo12:_hmje_exc_vectors\""를 추가한다.
+    줄들에 "module asm \"\\09msr vbar_el1, x1\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el1, xzr\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x0, cpacr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #3\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x2, x2, #20\""를 추가한다.
+    줄들에 "module asm \"\\09orr x0, x0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09msr cpacr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09bl _hmje_mmu_init\""를 추가한다.
+    줄들에 "module asm \"\\09bl main\""를 추가한다.
+    줄들에 "module asm \"1:\""를 추가한다.
+    줄들에 "module asm \"\\09wfe\""를 추가한다.
+    줄들에 "module asm \"\\09b 1b\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_mmu_init_llvm
+함수 aarch64텍스트MMU초기화은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.mmu,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 4096\""를 추가한다.
+    줄들에 "module asm \"_hmje_l1_table:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 4096\""를 추가한다.
+    줄들에 "module asm \".section .text.mmu,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global _hmje_mmu_init\""를 추가한다.
+    줄들에 "module asm \"_hmje_mmu_init:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_l1_table\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_l1_table\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, #0\""를 추가한다.
+    줄들에 "module asm \"10:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x1, #512\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge 13f\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x1, #0\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 11f\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #0x405\""를 추가한다.
+    줄들에 "module asm \"\\09b 12f\""를 추가한다.
+    줄들에 "module asm \"11:\""를 추가한다.
+    줄들에 "module asm \"\\09cmp x1, #4\""를 추가한다.
+    줄들에 "module asm \"\\09b.ge 14f\""를 추가한다.
+    줄들에 "module asm \"\\09lsl x2, x1, #30\""를 추가한다.
+    줄들에 "module asm \"\\09movz x3, #0x0701\""를 추가한다.
+    줄들에 "module asm \"\\09orr x2, x2, x3\""를 추가한다.
+    줄들에 "module asm \"\\09b 12f\""를 추가한다.
+    줄들에 "module asm \"14:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #0\""를 추가한다.
+    줄들에 "module asm \"12:\""를 추가한다.
+    줄들에 "module asm \"\\09str x2, [x0, x1, lsl #3]\""를 추가한다.
+    줄들에 "module asm \"\\09add x1, x1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09b 10b\""를 추가한다.
+    줄들에 "module asm \"13:\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #0x00FF\""를 추가한다.
+    줄들에 "module asm \"\\09msr mair_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #0x3519\""를 추가한다.
+    줄들에 "module asm \"\\09movk x0, #0x80, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09msr tcr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_l1_table\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_l1_table\""를 추가한다.
+    줄들에 "module asm \"\\09msr ttbr0_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09tlbi vmalle1\""를 추가한다.
+    줄들에 "module asm \"\\09dsb sy\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x0, sctlr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09orr x0, x0, #1\""를 추가한다.
+    줄들에 "module asm \"\\09msr sctlr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_irq_llvm (kernel_scheduler=False)
+함수 aarch64텍스트IRQ은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.irq,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_timer_ticks:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_timer_last_counter:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_timer_last_delta:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".section .text.irq,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \"_hmje_irq_handler:\""를 추가한다.
+    줄들에 "module asm \"\\09sub sp, sp, #800\""를 추가한다.
+    줄들에 "module asm \"\\09stp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09str x30, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, spsr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09stp x9, x10, [sp, #248]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, sp_el0\""를 추가한다.
+    줄들에 "module asm \"\\09str x9, [sp, #264]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q0, q1, [sp, #272]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q2, q3, [sp, #304]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q4, q5, [sp, #336]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q6, q7, [sp, #368]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q8, q9, [sp, #400]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q10, q11, [sp, #432]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q12, q13, [sp, #464]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q14, q15, [sp, #496]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q16, q17, [sp, #528]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q18, q19, [sp, #560]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q20, q21, [sp, #592]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q22, q23, [sp, #624]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q24, q25, [sp, #656]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q26, q27, [sp, #688]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q28, q29, [sp, #720]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q30, q31, [sp, #752]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, fpsr\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, fpcr\""를 추가한다.
+    줄들에 "module asm \"\\09str x9, [sp, #784]\""를 추가한다.
+    줄들에 "module asm \"\\09str x10, [sp, #792]\""를 추가한다.
+    줄들에 "module asm \"\\09movz x19, #0x0801, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09ldr w20, [x19, #0x0C]\""를 추가한다.
+    줄들에 "module asm \"\\09and w0, w20, #0x3FF\""를 추가한다.
+    줄들에 "module asm \"\\09cmp w0, #27\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 5f\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09cbnz x10, .Lhmje_timer_rearm\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x1, _hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09add x1, x1, :lo12:_hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x2, [x1]\""를 추가한다.
+    줄들에 "module asm \"\\09add x2, x2, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str x2, [x1]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x5, cntpct_el0\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x6, _hmje_timer_last_counter\""를 추가한다.
+    줄들에 "module asm \"\\09add x6, x6, :lo12:_hmje_timer_last_counter\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x7, [x6]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x7, 4f\""를 추가한다.
+    줄들에 "module asm \"\\09sub x8, x5, x7\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, _hmje_timer_last_delta\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:_hmje_timer_last_delta\""를 추가한다.
+    줄들에 "module asm \"\\09str x8, [x9]\""를 추가한다.
+    줄들에 "module asm \"4:\""를 추가한다.
+    줄들에 "module asm \"\\09str x5, [x6]\""를 추가한다.
+    줄들에 "module asm \".Lhmje_timer_rearm:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x3, cntfrq_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, #1000\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x3, x3, x4\""를 추가한다.
+    줄들에 "module asm \"\\09msr cntv_tval_el0, x3\""를 추가한다.
+    줄들에 "module asm \"5:\""를 추가한다.
+    줄들에 "module asm \"\\09str w20, [x19, #0x10]\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x21, _hmje_sched_on\""를 추가한다.
+    줄들에 "module asm \"\\09add x21, x21, :lo12:_hmje_sched_on\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x22, [x21]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x22, 6f\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x21, _hmje_sched_cur\""를 추가한다.
+    줄들에 "module asm \"\\09add x21, x21, :lo12:_hmje_sched_cur\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x22, [x21]\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x23, _hmje_sched_sp\""를 추가한다.
+    줄들에 "module asm \"\\09add x23, x23, :lo12:_hmje_sched_sp\""를 추가한다.
+    줄들에 "module asm \"\\09mov x24, sp\""를 추가한다.
+    줄들에 "module asm \"\\09str x24, [x23, x22, lsl #3]\""를 추가한다.
+    줄들에 "module asm \"\\09eor x22, x22, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str x22, [x21]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x24, [x23, x22, lsl #3]\""를 추가한다.
+    줄들에 "module asm \"\\09mov sp, x24\""를 추가한다.
+    줄들에 "module asm \"6:\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [sp, #784]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [sp, #792]\""를 추가한다.
+    줄들에 "module asm \"\\09msr fpsr, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr fpcr, x10\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q30, q31, [sp, #752]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q28, q29, [sp, #720]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q26, q27, [sp, #688]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q24, q25, [sp, #656]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q22, q23, [sp, #624]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q20, q21, [sp, #592]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q18, q19, [sp, #560]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q16, q17, [sp, #528]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q14, q15, [sp, #496]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q12, q13, [sp, #464]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q10, q11, [sp, #432]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q8, q9, [sp, #400]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q6, q7, [sp, #368]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q4, q5, [sp, #336]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q2, q3, [sp, #304]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q0, q1, [sp, #272]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [sp, #264]\""를 추가한다.
+    줄들에 "module asm \"\\09msr sp_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x9, x10, [sp, #248]\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x10\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x30, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #800\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_irq_off\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_irq_off:\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifset, #2\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_irq_on\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_irq_on:\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifclr, #2\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_timer_ticks:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x0, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_time_us\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_time_us:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x3, cntpct_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, cntfrq_el0\""를 추가한다.
+    줄들에 "module asm \"\\09movz x2, #0x000f, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09movk x2, #0x4240\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x0, x3, x1\""를 추가한다.
+    줄들에 "module asm \"\\09msub x3, x0, x1, x3\""를 추가한다.
+    줄들에 "module asm \"\\09mul x0, x0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mul x3, x3, x2\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x3, x3, x1\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, x3\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_irq_init\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_irq_init:\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #0x0800, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #0x08000000\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0, #0x100]\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #0x0801, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #0xF0\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0, #0x04]\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x2, cntfrq_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #1000\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x2, x2, x3\""를 추가한다.
+    줄들에 "module asm \"\\09msr cntv_tval_el0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09msr cntv_ctl_el0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifclr, #2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_irq_llvm (kernel_scheduler=True, 스케줄러타이머선점요청·스케줄러인터럽트복귀선점)
+함수 aarch64텍스트커널IRQ은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.irq,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_timer_ticks:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_timer_last_counter:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_timer_last_delta:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".section .text.irq,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \"_hmje_irq_handler:\""를 추가한다.
+    줄들에 "module asm \"\\09sub sp, sp, #800\""를 추가한다.
+    줄들에 "module asm \"\\09stp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09stp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09str x30, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, elr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, spsr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09stp x9, x10, [sp, #248]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, sp_el0\""를 추가한다.
+    줄들에 "module asm \"\\09str x9, [sp, #264]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q0, q1, [sp, #272]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q2, q3, [sp, #304]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q4, q5, [sp, #336]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q6, q7, [sp, #368]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q8, q9, [sp, #400]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q10, q11, [sp, #432]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q12, q13, [sp, #464]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q14, q15, [sp, #496]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q16, q17, [sp, #528]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q18, q19, [sp, #560]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q20, q21, [sp, #592]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q22, q23, [sp, #624]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q24, q25, [sp, #656]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q26, q27, [sp, #688]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q28, q29, [sp, #720]\""를 추가한다.
+    줄들에 "module asm \"\\09stp q30, q31, [sp, #752]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x9, fpsr\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, fpcr\""를 추가한다.
+    줄들에 "module asm \"\\09str x9, [sp, #784]\""를 추가한다.
+    줄들에 "module asm \"\\09str x10, [sp, #792]\""를 추가한다.
+    줄들에 "module asm \"\\09movz x19, #0x0801, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09ldr w20, [x19, #0x0C]\""를 추가한다.
+    줄들에 "module asm \"\\09and w0, w20, #0x3FF\""를 추가한다.
+    줄들에 "module asm \"\\09cmp w0, #27\""를 추가한다.
+    줄들에 "module asm \"\\09b.ne 5f\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x10, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09cbnz x10, .Lhmje_timer_rearm\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x1, _hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09add x1, x1, :lo12:_hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x2, [x1]\""를 추가한다.
+    줄들에 "module asm \"\\09add x2, x2, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str x2, [x1]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x5, cntpct_el0\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x6, _hmje_timer_last_counter\""를 추가한다.
+    줄들에 "module asm \"\\09add x6, x6, :lo12:_hmje_timer_last_counter\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x7, [x6]\""를 추가한다.
+    줄들에 "module asm \"\\09cbz x7, 4f\""를 추가한다.
+    줄들에 "module asm \"\\09sub x8, x5, x7\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x9, _hmje_timer_last_delta\""를 추가한다.
+    줄들에 "module asm \"\\09add x9, x9, :lo12:_hmje_timer_last_delta\""를 추가한다.
+    줄들에 "module asm \"\\09str x8, [x9]\""를 추가한다.
+    줄들에 "module asm \"4:\""를 추가한다.
+    줄들에 "module asm \"\\09str x5, [x6]\""를 추가한다.
+    줄들에 "module asm \".Lhmje_timer_rearm:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x3, cntfrq_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x4, #1000\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x3, x3, x4\""를 추가한다.
+    줄들에 "module asm \"\\09msr cntv_tval_el0, x3\""를 추가한다.
+    줄들에 "module asm \"5:\""를 추가한다.
+    줄들에 "module asm \"\\09str w20, [x19, #0x10]\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_fn_uc2a4_ucf00_uc904_ub7ec_ud0c0_uc774_uba38_uc120_uc810_uc694_uccad__void\""를 추가한다.
+    줄들에 "module asm \"\\09bl hmje_fn_uc2a4_ucf00_uc904_ub7ec_uc778_ud130_ub7fd_ud2b8_ubcf5_uadc0_uc120_uc810__void\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [sp, #784]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x10, [sp, #792]\""를 추가한다.
+    줄들에 "module asm \"\\09msr fpsr, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr fpcr, x10\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q30, q31, [sp, #752]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q28, q29, [sp, #720]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q26, q27, [sp, #688]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q24, q25, [sp, #656]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q22, q23, [sp, #624]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q20, q21, [sp, #592]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q18, q19, [sp, #560]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q16, q17, [sp, #528]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q14, q15, [sp, #496]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q12, q13, [sp, #464]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q10, q11, [sp, #432]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q8, q9, [sp, #400]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q6, q7, [sp, #368]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q4, q5, [sp, #336]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q2, q3, [sp, #304]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp q0, q1, [sp, #272]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x9, [sp, #264]\""를 추가한다.
+    줄들에 "module asm \"\\09msr sp_el0, x9\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x9, x10, [sp, #248]\""를 추가한다.
+    줄들에 "module asm \"\\09msr elr_el1, x9\""를 추가한다.
+    줄들에 "module asm \"\\09msr spsr_el1, x10\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x0, x1, [sp, #0]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x2, x3, [sp, #16]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x4, x5, [sp, #32]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x6, x7, [sp, #48]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x8, x9, [sp, #64]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x10, x11, [sp, #80]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x12, x13, [sp, #96]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x14, x15, [sp, #112]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x16, x17, [sp, #128]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x18, x19, [sp, #144]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x20, x21, [sp, #160]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x22, x23, [sp, #176]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x24, x25, [sp, #192]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x26, x27, [sp, #208]\""를 추가한다.
+    줄들에 "module asm \"\\09ldp x28, x29, [sp, #224]\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x30, [sp, #240]\""를 추가한다.
+    줄들에 "module asm \"\\09add sp, sp, #800\""를 추가한다.
+    줄들에 "module asm \"\\09eret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_irq_off\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_irq_off:\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifset, #2\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_irq_on\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_irq_on:\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifclr, #2\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_timer_ticks:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_timer_ticks\""를 추가한다.
+    줄들에 "module asm \"\\09ldr x0, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_time_us\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_time_us:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x3, cntpct_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x1, cntfrq_el0\""를 추가한다.
+    줄들에 "module asm \"\\09movz x2, #0x000f, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09movk x2, #0x4240\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x0, x3, x1\""를 추가한다.
+    줄들에 "module asm \"\\09msub x3, x0, x1, x3\""를 추가한다.
+    줄들에 "module asm \"\\09mul x0, x0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mul x3, x3, x2\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x3, x3, x1\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, x3\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_irq_init\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_irq_init:\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #0x0800, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #0x08000000\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0, #0x100]\""를 추가한다.
+    줄들에 "module asm \"\\09movz x0, #0x0801, lsl #16\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #0xF0\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0, #0x04]\""를 추가한다.
+    줄들에 "module asm \"\\09mov w1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09str w1, [x0]\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x2, cntfrq_el0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #1000\""를 추가한다.
+    줄들에 "module asm \"\\09udiv x2, x2, x3\""를 추가한다.
+    줄들에 "module asm \"\\09msr cntv_tval_el0, x2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, #1\""를 추가한다.
+    줄들에 "module asm \"\\09msr cntv_ctl_el0, x1\""를 추가한다.
+    줄들에 "module asm \"\\09msr daifclr, #2\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_sched_llvm (+ 자립 덧붙임: 가짜 트랩 프레임 272B→800B)
+함수 aarch64텍스트스케줄러은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.sched,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 16\""를 추가한다.
+    줄들에 "module asm \"_hmje_task1_stack:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 0x4000\""를 추가한다.
+    줄들에 "module asm \"_hmje_task1_stack_top:\""를 추가한다.
+    줄들에 "module asm \".balign 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_sched_sp:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 16\""를 추가한다.
+    줄들에 "module asm \"_hmje_sched_cur:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \"_hmje_sched_on:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 8\""를 추가한다.
+    줄들에 "module asm \".section .text.sched,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_sched_start\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_sched_start:\""를 추가한다.
+    줄들에 "module asm \"\\09mov x5, x0\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_task1_stack_top\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_task1_stack_top\""를 추가한다.
+    줄들에 "module asm \"\\09sub x0, x0, #800\""를 추가한다.
+    줄들에 "module asm \"\\09mov x1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09mov x2, #800\""를 추가한다.
+    줄들에 "module asm \"7:\""를 추가한다.
+    줄들에 "module asm \"\\09str xzr, [x1], #8\""를 추가한다.
+    줄들에 "module asm \"\\09subs x2, x2, #8\""를 추가한다.
+    줄들에 "module asm \"\\09b.gt 7b\""를 추가한다.
+    줄들에 "module asm \"\\09str x5, [x0, #248]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #5\""를 추가한다.
+    줄들에 "module asm \"\\09str x3, [x0, #256]\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x4, _hmje_sched_sp\""를 추가한다.
+    줄들에 "module asm \"\\09add x4, x4, :lo12:_hmje_sched_sp\""를 추가한다.
+    줄들에 "module asm \"\\09str x0, [x4, #8]\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x4, _hmje_sched_cur\""를 추가한다.
+    줄들에 "module asm \"\\09add x4, x4, :lo12:_hmje_sched_cur\""를 추가한다.
+    줄들에 "module asm \"\\09str xzr, [x4]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x3, #1\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x4, _hmje_sched_on\""를 추가한다.
+    줄들에 "module asm \"\\09add x4, x4, :lo12:_hmje_sched_on\""를 추가한다.
+    줄들에 "module asm \"\\09str x3, [x4]\""를 추가한다.
+    줄들에 "module asm \"\\09mov x0, #0\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_ramfb_llvm
+함수 aarch64텍스트램FB은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .bss.ramfb,\\22aw\\22,@nobits\""를 추가한다.
+    줄들에 "module asm \".balign 4096\""를 추가한다.
+    줄들에 "module asm \"_hmje_fb_buffer:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 0x40000\""를 추가한다.
+    줄들에 "module asm \".balign 16\""를 추가한다.
+    줄들에 "module asm \"_hmje_fb_scratch:\""를 추가한다.
+    줄들에 "module asm \"\\09.space 0x4000\""를 추가한다.
+    줄들에 "module asm \".section .text.ramfb,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_fb_addr\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_fb_addr:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_fb_buffer\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_fb_buffer\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_fb_scratch\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_fb_scratch:\""를 추가한다.
+    줄들에 "module asm \"\\09adrp x0, _hmje_fb_scratch\""를 추가한다.
+    줄들에 "module asm \"\\09add x0, x0, :lo12:_hmje_fb_scratch\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_context_switch_llvm
+함수 aarch64텍스트문맥전환은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_context_switch(i64 %previous, i64 %next) naked noinline nounwind {"를 추가한다.
+    변수 조각2은 "  call void asm sideeffect \"mov x9, x30\\0A\\09mov x10, sp\\0A\\09str x10, [x0, #0]\\0A\\09stp x19, x20, [x0, #8]\\0A\\09stp x21, x22, [x0, #24]\\0A\\09stp x23, x24, [x0, #40]\\0A\\09stp x25, x26, [x0, #56]\\0A\\09stp x27, x28, [x0, #72]\\0A\\09stp x29, x9, [x0, #88]\\0A\\09ldp x29, x9, [x1, #88]\\0A\\09ldp x27, x28, [x1, #72]\\0A\\09ldp x25, x26, [x1, #56]\\0A\\09ldp x23, x24, [x1, #40]\\0A\\09ldp x21, x22, [x1, #24]\\0A\\0"이고, 문자열이다.
+    조각2은 문자열붙인값(조각2, "9ldp x19, x20, [x1, #8]\\0A\\09ldr x10, [x1, #0]\\0A\\09mov sp, x10\\0A\\09mov x30, x9\\0A\\09ret\", \"~{x9},~{x10},~{x19},~{x20},~{x21},~{x22},~{x23},~{x24},~{x25},~{x26},~{x27},~{x28},~{x29},~{x30},~{memory}\"()")이다.
+    줄들에 조각2을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_user_copy_llvm
+함수 aarch64텍스트사용자복사은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_copy_to_user(i64 %dst, i64 %src, i64 %len) naked noinline nounwind {"를 추가한다.
+    변수 조각2은 "  call void asm sideeffect \"adrp x6, hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\\0A\\09add x6, x6, :lo12:hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\\0A\\09ldr x6, [x6]\\0A\\09mrs x5, tpidr_el1\\0A\\09lsl x5, x5, #9\\0A\\09add x5, x6, x5\\0A\\09adr x6, .Lhmje_copy_to_user_fault\\0A\\09str x6, [x5, #312]\\0A\\09mov x3, #0\\0A.Lhmje_copy_to_user_loop:\\0A\\09cmp x3, x2\\0A\\09b.hs .Lhmje_copy_to_user_done\\0"이고, 문자열이다.
+    조각2은 문자열붙인값(조각2, "A\\09ldrb w4, [x1, x3]\\0A\\09strb w4, [x0, x3]\\0A\\09add x3, x3, #1\\0A\\09b .Lhmje_copy_to_user_loop\\0A.Lhmje_copy_to_user_done:\\0A\\09str xzr, [x5, #312]\\0A\\09mov x0, #0\\0A\\09ret\\0A.Lhmje_copy_to_user_fault:\\0A\\09mov x0, #-14\\0A\\09ret\", \"~{x0},~{x3},~{x4},~{x5},~{x6},~{memory}\"()")이다.
+    줄들에 조각2을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define i64 @hmje_arch_copy_from_user(i64 %dst, i64 %src, i64 %len) naked noinline nounwind {"를 추가한다.
+    변수 조각6은 "  call void asm sideeffect \"adrp x6, hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\\0A\\09add x6, x6, :lo12:hmje_global_h_m_j_e___c_p_u___l_o_c_a_l___d_a_t_a\\0A\\09ldr x6, [x6]\\0A\\09mrs x5, tpidr_el1\\0A\\09lsl x5, x5, #9\\0A\\09add x5, x6, x5\\0A\\09adr x6, .Lhmje_copy_from_user_fault\\0A\\09str x6, [x5, #312]\\0A\\09mov x3, #0\\0A.Lhmje_copy_from_user_loop:\\0A\\09cmp x3, x2\\0A\\09b.hs .Lhmje_copy_from_user_"이고, 문자열이다.
+    조각6은 문자열붙인값(조각6, "done\\0A\\09ldrb w4, [x1, x3]\\0A\\09strb w4, [x0, x3]\\0A\\09add x3, x3, #1\\0A\\09b .Lhmje_copy_from_user_loop\\0A.Lhmje_copy_from_user_done:\\0A\\09str xzr, [x5, #312]\\0A\\09mov x0, #0\\0A\\09ret\\0A.Lhmje_copy_from_user_fault:\\0A\\09mov x0, #-14\\0A\\09ret\", \"~{x0},~{x3},~{x4},~{x5},~{x6},~{memory}\"()")이다.
+    줄들에 조각6을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_smp_cpu_slot_llvm
+함수 aarch64텍스트SMPCPU슬롯은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 "module asm \".section .text.smp,\\22ax\\22,@progbits\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_set_cpu_slot\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_set_cpu_slot:\""를 추가한다.
+    줄들에 "module asm \"\\09msr tpidr_el1, x0\""를 추가한다.
+    줄들에 "module asm \"\\09isb\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들에 "module asm \".global hmje_aarch64_cpu_slot\""를 추가한다.
+    줄들에 "module asm \"hmje_aarch64_cpu_slot:\""를 추가한다.
+    줄들에 "module asm \"\\09mrs x0, tpidr_el1\""를 추가한다.
+    줄들에 "module asm \"\\09ret\""를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# aarch64_smp_ap_entry_llvm (SMPAP메인(address))
+함수 aarch64텍스트SMPAP진입은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_aarch64_smp_ap_entry() naked noinline nounwind {"를 추가한다.
+    변수 조각2은 "  call void asm sideeffect \"mov x19, x0\\0A\\09ldr x1, [x0, #32]\\0A\\09msr SPSel, #1\\0A\\09mov sp, x1\\0A\\09isb\\0A\\09adrp x1, _hmje_exc_vectors\\0A\\09add x1, x1, :lo12:_hmje_exc_vectors\\0A\\09msr vbar_el1, x1\\0A\\09isb\\0A\\09mrs x0, cpacr_el1\\0A\\09mov x2, #3\\0A\\09lsl x2, x2, #20\\0A\\09orr x0, x0, x2\\0A\\09msr cpacr_el1, x0\\0A\\09isb\\0A\\09movz x0, #0x4e00, lsl #16\\0A\\09bl hmje_aarch64_set_ttbr0\\0A\\09mov x0, x1"이고, 문자열이다.
+    조각2은 문자열붙인값(조각2, "9\\0A\\09bl hmje_fn_S_M_P_A_P_uba54_uc778__a_d_d_r_e_s_s\\0A1:\\0A\\09wfe\\0A\\09b 1b\", \"~{x0},~{x1},~{x2},~{x19},~{memory}\"()")이다.
+    줄들에 조각2을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# emit_aarch64_limine_kernel_llvm_ir가 지우는 선언 줄
+함수 aarch64커널제거줄인가은 (줄: 문자열)를 받아
+    상수 다듬은줄은 문자열다듬기(줄)이고, 문자열이다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_copy_to_user(i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_copy_from_user(i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    거짓을 참거짓으로 반환한다.

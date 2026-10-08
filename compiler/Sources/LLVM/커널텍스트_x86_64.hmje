@@ -1,0 +1,677 @@
+# 생성 파일. 재생성: python3 tools/gen_semtleos_text.py
+
+
+
+# x86_64_syscall_entry_llvm
+함수 커널텍스트시스템호출진입은 (소비하는 줄들: 문자열의 배열, 현재커널스택꼭대기: 문자열, CPU지역데이터: 문자열, SMP지원CPU수: 문자열, LAPIC준비: 문자열, HHDM오프셋: 문자열, 시스템호출복귀선점: 문자열, XSAVE켜짐: 문자열, XSAVE마스크하위: 문자열, XSAVE마스크상위: 문자열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_x86_64_syscall_entry() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각3은 "  call void asm sideeffect \"cli\\0A\\09swapgs\\0A\\09movq %rsp, %gs:176\\0A\\09movq %r10, %gs:168\\0A\\09movq %gs:8, %r10\\0A\\09testq %r10, %r10\\0A\\09jne 98f\\0A\\09movq "이고, 문자열이다.
+    조각3은 문자열붙인값(조각3, "\(현재커널스택꼭대기)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip), %r10\\0A98:\\0A\\09movq %r10, %rsp\\0A\\09pushq %gs:176\\0A\\09pushq %rcx\\0A\\09pushq %r11\\0A\\09pushq %rax\\0A\\09pushq %rdi\\0A\\09pushq %rsi\\0A\\09pushq %rdx\\0A\\09pushq %gs:168\\0A\\09pushq %r8\\0A\\09pushq %r9\\0A\\09pushq %r12\\0A\\09pushq %rbx\\0A\\09pushq %rbp\\0A\\09pushq %r13\\0A\\09pushq %r14\\0A\\09pushq %r15\\0A\\09movq %rsp, %r10\\0A\\09subq $$1088, %rsp\\0A\\09andq $$-64, %rsp\\0A\\09movq %r10, 1024(%rsp)\\0A\\09cm")이다.
+    조각3은 문자열붙인값(조각3, "pq $$0, ")이다.
+    조각3은 문자열붙인값(조각3, "\(XSAVE켜짐)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip)\\0A\\09je 700f\\0A\\09movq $$0, 512(%rsp)\\0A\\09movq $$0, 520(%rsp)\\0A\\09movq $$0, 528(%rsp)\\0A\\09movq $$0, 536(%rsp)\\0A\\09movq $$0, 544(%rsp)\\0A\\09movq $$0, 552(%rsp)\\0A\\09movq $$0, 560(%rsp)\\0A\\09movq $$0, 568(%rsp)\\0A\\09movq ")이다.
+    조각3은 문자열붙인값(조각3, "\(XSAVE마스크하위)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip), %rax\\0A\\09movq ")이다.
+    조각3은 문자열붙인값(조각3, "\(XSAVE마스크상위)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip), %rdx\\0A\\09xsave64 (%rsp)\\0A\\09jmp 701f\\0A700:\\0A\\09fxsave64 (%rsp)\\0A701:\\0A\\09subq $$16, %rsp\\0A\\09movq $$1, %gs:184\\0A\\09movq 1040(%rsp), %r11\\0A\\09movq 48(%r11), %rax\\0A\\09movq %rax, (%rsp)\\0A\\09movq 96(%r11), %rdi\\0A\\09movq 88(%r11), %rsi\\0A\\09movq 80(%r11), %rdx\\0A\\09movq 72(%r11), %rcx\\0A\\09movq 64(%r11), %r8\\0A\\09movq 56(%r11), %r9\\0A\\09callq hmje_arch_syscall6\\0A\\09movq $$0, %gs:18")이다.
+    조각3은 문자열붙인값(조각3, "4\\0A\\09movq %rax, (%rsp)\\0A\\09cli\\0A\\09callq ")이다.
+    조각3은 문자열붙인값(조각3, "\(시스템호출복귀선점)")이다.
+    조각3은 문자열붙인값(조각3, "\\0A\\09movq (%rsp), %r10\\0A\\09addq $$16, %rsp\\0A\\09cmpq $$0, ")이다.
+    조각3은 문자열붙인값(조각3, "\(XSAVE켜짐)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip)\\0A\\09je 720f\\0A\\09movq ")이다.
+    조각3은 문자열붙인값(조각3, "\(XSAVE마스크하위)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip), %rax\\0A\\09movq ")이다.
+    조각3은 문자열붙인값(조각3, "\(XSAVE마스크상위)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip), %rdx\\0A\\09xrstor64 (%rsp)\\0A\\09jmp 721f\\0A720:\\0A\\09fxrstor64 (%rsp)\\0A721:\\0A\\09movq 1024(%rsp), %rsp\\0A\\09movq %r10, %rax\\0A\\09movq $$0, %gs:184\\0A\\09popq %r15\\0A\\09popq %r14\\0A\\09popq %r13\\0A\\09popq %rbp\\0A\\09popq %rbx\\0A\\09popq %r12\\0A\\09popq %r9\\0A\\09popq %r8\\0A\\09popq %r10\\0A\\09popq %rdx\\0A\\09popq %rsi\\0A\\09popq %rdi\\0A\\09addq $$8, %rsp\\0A\\09popq %r11\\0A\\09popq %rcx\\0A\\09popq %r10\\0A")이다.
+    조각3은 문자열붙인값(조각3, "\\09movq %r10, %rsp\\0A\\09swapgs\\0A\\09sysretq\", \"~{rax},~{rbx},~{rbp},~{rdi},~{rsi},~{rdx},~{rcx},~{r8},~{r9},~{r10},~{r11},~{r12},~{r13},~{r14},~{r15},~{memory}\"()")이다.
+    줄들에 조각3을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_idt_stub_llvm
+함수 커널텍스트IDT스텁은 (소비하는 줄들: 문자열의 배열, IDT표: 문자열, 예외처리기: 문자열, 앱예외복구: 문자열, NMI처리기: 문자열, IRQ처리기: 문자열, 인터럽트복귀선점: 문자열, 현재커널스택꼭대기: 문자열, CPU지역데이터: 문자열, SMP지원CPU수: 문자열, LAPIC준비: 문자열, HHDM오프셋: 문자열, XSAVE켜짐: 문자열, XSAVE마스크하위: 문자열, XSAVE마스크상위: 문자열)를 받아
+    줄들에 ""를 추가한다.
+    변수 조각1은 "@"이고, 문자열이다.
+    조각1은 문자열붙인값(조각1, "\(IDT표)")이다.
+    조각1은 문자열붙인값(조각1, " = constant [64 x i64] [i64 ptrtoint (void ()* @hmje_idt_stub_0 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_1 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_2 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_3 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_4 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_5 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_6 to i64), i64 ptrtoint (void ()* @hmje_idt_")이다.
+    조각1은 문자열붙인값(조각1, "stub_7 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_8 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_9 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_10 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_11 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_12 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_13 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_14 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_15 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_16 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_17 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_18 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_19 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_20 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_21 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_22 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_23 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_24 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_25 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_26 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_27 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_28 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_29 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_30 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_31 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_32 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_33 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_34 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_35 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_36 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_37 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_38 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_39 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_40 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_41 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_42 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_43 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_44 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_45 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_46 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_47 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_48 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_49 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_50 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_51 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_52 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_53 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_54 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_55 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_56 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_57 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_58 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_59 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_60 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_61 to i64), i64 ptrtoint (void ()* @hmje_idt_stub_62 to i64), i64 ptrtoint (void ()* @hmje_idt_stu")이다.
+    조각1은 문자열붙인값(조각1, "b_63 to i64)]")이다.
+    줄들에 조각1을 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_idt_stub_0() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$0\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_1() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$1\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_2() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$2\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_3() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$3\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_4() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$4\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_5() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$5\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_6() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$6\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_7() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$7\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_8() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$8\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_9() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$9\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_10() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$10\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_11() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$11\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_12() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$12\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_13() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$13\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_14() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$14\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_15() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$15\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_16() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$16\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_17() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$17\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_18() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$18\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_19() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$19\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_20() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$20\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_21() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$21\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_22() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$22\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_23() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$23\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_24() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$24\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_25() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$25\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_26() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$26\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_27() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$27\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_28() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$28\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_29() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$29\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_30() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$30\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_31() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$31\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_32() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$32\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_33() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$33\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_34() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$34\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_35() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$35\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_36() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$36\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_37() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$37\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_38() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$38\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_39() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$39\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_40() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$40\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_41() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$41\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_42() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$42\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_43() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$43\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_44() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$44\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_45() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$45\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_46() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$46\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_47() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$47\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_48() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$48\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_49() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$49\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_50() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$50\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_51() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$51\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_52() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$52\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_53() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$53\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_54() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$54\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_55() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$55\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_56() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$56\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_57() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$57\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_58() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$58\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_59() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$59\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_60() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$60\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_61() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$61\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_62() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$62\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 "define void @hmje_idt_stub_63() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"pushq $$0\\0A\\09pushq $$63\\0A\\09jmp hmje_idt_common\", \"~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_idt_common() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각326은 "  call void asm sideeffect \"cmpq $$32, (%rsp)\\0A\\09jb 1f\\0A\\09testq $$3, 24(%rsp)\\0A\\09jz 4f\\0A\\09swapgs\\0A4:\\0A\\09pushq %rax\\0A\\09pushq %rbx\\0A\\09pushq %rcx\\0A\\09pushq %rdx\\0A\\09pushq %rsi\\0A\\09pushq %rdi\\0A\\09pushq %rbp\\0A\\09pushq %r8\\0A\\09pushq %r9\\0A\\09pushq %r10\\0A\\09pushq %r11\\0A\\09pushq %r12\\0A\\09pushq %r13\\0A\\09pushq %r14\\0A\\09pushq %r15\\0A\\09movq 120(%rsp), %rdi\\0A\\09movq 144(%rsp), %rsi\\"이고, 문자열이다.
+    조각326은 문자열붙인값(조각326, "0A\\09andq $$3, %rsi\\0A\\09movq %rsp, %r10\\0A\\09subq $$1088, %rsp\\0A\\09andq $$-64, %rsp\\0A\\09movq %r10, 1024(%rsp)\\0A\\09cmpq $$0, ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE켜짐)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip)\\0A\\09je 800f\\0A\\09movq $$0, 512(%rsp)\\0A\\09movq $$0, 520(%rsp)\\0A\\09movq $$0, 528(%rsp)\\0A\\09movq $$0, 536(%rsp)\\0A\\09movq $$0, 544(%rsp)\\0A\\09movq $$0, 552(%rsp)\\0A\\09movq $$0, 560(%rsp)\\0A\\09movq $$0, 568(%rsp)\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크하위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rax\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크상위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rdx\\0A\\09xsave64 (%rsp)\\0A\\09jmp 801f\\0A800:\\0A\\09fxsave64 (%rsp)\\0A801:\\0A\\09callq ")이다.
+    조각326은 문자열붙인값(조각326, "\(IRQ처리기)")이다.
+    조각326은 문자열붙인값(조각326, "\\0A\\09callq ")이다.
+    조각326은 문자열붙인값(조각326, "\(인터럽트복귀선점)")이다.
+    조각326은 문자열붙인값(조각326, "\\0A\\09cmpq $$0, ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE켜짐)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip)\\0A\\09je 820f\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크하위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rax\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크상위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rdx\\0A\\09xrstor64 (%rsp)\\0A\\09jmp 821f\\0A820:\\0A\\09fxrstor64 (%rsp)\\0A821:\\0A\\09movq 1024(%rsp), %rsp\\0A\\09popq %r15\\0A\\09popq %r14\\0A\\09popq %r13\\0A\\09popq %r12\\0A\\09popq %r11\\0A\\09popq %r10\\0A\\09popq %r9\\0A\\09popq %r8\\0A\\09popq %rbp\\0A\\09popq %rdi\\0A\\09popq %rsi\\0A\\09popq %rdx\\0A\\09popq %rcx\\0A\\09popq %rbx\\0A\\09popq %rax\\0A\\09testq $$3, 24(%rsp)\\0A\\09jz 5f\\0A\\09swapgs\\0A5:\\0A\\09addq $$1")이다.
+    조각326은 문자열붙인값(조각326, "6, %rsp\\0A\\09iretq\\0A1:\\0A\\09cmpq $$2, (%rsp)\\0A\\09jne 10f\\0A\\09pushq %rax\\0A\\09pushq %rbx\\0A\\09pushq %rcx\\0A\\09pushq %rdx\\0A\\09pushq %rsi\\0A\\09pushq %rdi\\0A\\09pushq %rbp\\0A\\09pushq %r8\\0A\\09pushq %r9\\0A\\09pushq %r10\\0A\\09pushq %r11\\0A\\09pushq %r12\\0A\\09pushq %r13\\0A\\09pushq %r14\\0A\\09pushq %r15\\0A\\09pushq $$0\\0A\\09testq $$3, 152(%rsp)\\0A\\09jz 91f\\0A\\09swapgs\\0A\\09movq $$1, (%rsp)\\0A\\09jmp 95f\\0A9")이다.
+    조각326은 문자열붙인값(조각326, "1:\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(CPU지역데이터)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %r11\\0A\\09testq %r11, %r11\\0A\\09je 95f\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(SMP지원CPU수)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %r10\\0A\\09cmpq $$4096, %r10\\0A\\09jbe 92f\\0A\\09movq $$4096, %r10\\0A92:\\0A\\09movl $$3221225730, %ecx\\0A\\09rdmsr\\0A\\09shlq $$32, %rdx\\0A\\09orq %rdx, %rax\\0A\\09testq %rax, %rax\\0A\\09je 95f\\0A\\09xorq %r9, %r9\\0A93:\\0A\\09cmpq %r10, %r9\\0A\\09jae 95f\\0A\\09movq %r9, %r8\\0A\\09imulq $$280, %r8\\0A\\09leaq (%r11,%r8,1), %r8\\0A\\09cmpq %r8, %rax\\0A\\09je 94f\\0A\\09incq %r9\\0A\\09jmp 93b\\0A94:\\0A\\09swapgs\\0A\\")이다.
+    조각326은 문자열붙인값(조각326, "09movq $$1, (%rsp)\\0A95:\\0A\\09movq %rsp, %r10\\0A\\09subq $$1088, %rsp\\0A\\09andq $$-64, %rsp\\0A\\09movq %r10, 1024(%rsp)\\0A\\09cmpq $$0, ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE켜짐)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip)\\0A\\09je 880f\\0A\\09movq $$0, 512(%rsp)\\0A\\09movq $$0, 520(%rsp)\\0A\\09movq $$0, 528(%rsp)\\0A\\09movq $$0, 536(%rsp)\\0A\\09movq $$0, 544(%rsp)\\0A\\09movq $$0, 552(%rsp)\\0A\\09movq $$0, 560(%rsp)\\0A\\09movq $$0, 568(%rsp)\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크하위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rax\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크상위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rdx\\0A\\09xsave64 (%rsp)\\0A\\09jmp 881f\\0A880:\\0A\\09fxsave64 (%rsp)\\0A881:\\0A\\09movq 1024(%rsp), %r11\\0A\\09movq 128(%r11), %rdi\\0A\\09movq 136(%r11), %rsi\\0A\\09movq 144(%r11), %rdx\\0A\\09movq 152(%r11), %rcx\\0A\\09andq $$3, %rcx\\0A\\09callq ")이다.
+    조각326은 문자열붙인값(조각326, "\(NMI처리기)")이다.
+    조각326은 문자열붙인값(조각326, "\\0A\\09testq %rax, %rax\\0A\\09jz 3f\\0A\\09cmpq $$0, ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE켜짐)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip)\\0A\\09je 900f\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크하위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rax\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크상위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rdx\\0A\\09xrstor64 (%rsp)\\0A\\09jmp 901f\\0A900:\\0A\\09fxrstor64 (%rsp)\\0A901:\\0A\\09movq 1024(%rsp), %rsp\\0A\\09cmpq $$0, (%rsp)\\0A\\09je 96f\\0A\\09swapgs\\0A96:\\0A\\09addq $$8, %rsp\\0A\\09popq %r15\\0A\\09popq %r14\\0A\\09popq %r13\\0A\\09popq %r12\\0A\\09popq %r11\\0A\\09popq %r10\\0A\\09popq %r9\\0A\\09popq %r8\\0A\\09popq %rbp\\0A\\09popq %rdi\\0A\\09popq %rsi\\0A\\09popq %rdx\\0A\\09popq %rcx\\0A\\09popq %rbx\\0A\\09popq")이다.
+    조각326은 문자열붙인값(조각326, " %rax\\0A\\09addq $$16, %rsp\\0A\\09iretq\\0A10:\\0A\\09cmpq $$2, (%rsp)\\0A\\09je 60f\\0A\\09cmpq $$8, (%rsp)\\0A\\09je 60f\\0A\\09cmpq $$18, (%rsp)\\0A\\09jne 69f\\0A60:\\0A\\09testq $$3, 24(%rsp)\\0A\\09jnz 69f\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(CPU지역데이터)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %r11\\0A\\09testq %r11, %r11\\0A\\09je 69f\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(SMP지원CPU수)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %r10\\0A\\09cmpq $$4096, %r10\\0A\\09jbe 61f\\0A\\09movq $$4096, %r10\\0A61:\\0A\\09movl $$3221225730, %ecx\\0A\\09rdmsr\\0A\\09shlq $$32, %rdx\\0A\\09orq %rdx, %rax\\0A\\09testq %rax, %rax\\0A\\09je 69f\\0A\\09xorq %r9, %r9\\0A62:\\0A\\09cmpq %r10, %r9\\0A\\09jae 69f\\0A\\09movq %r9, %r8\\0A\\09imulq $$280, %r8\\0A\\09leaq (%r11,%r8,1), %r8\\0A\\09cmpq %r8, %rax\\0A\\09je 63f\\0A\\09incq %r9\\0A\\09jmp 62b\\0A63:\\0A\\09swapgs\\0A6")이다.
+    조각326은 문자열붙인값(조각326, "9:\\0A\\09testq $$3, 24(%rsp)\\0A\\09jz 2f\\0A\\09swapgs\\0A\\09pushq %rax\\0A\\09pushq %rbx\\0A\\09pushq %rcx\\0A\\09pushq %rdx\\0A\\09pushq %rsi\\0A\\09pushq %rdi\\0A\\09pushq %rbp\\0A\\09pushq %r8\\0A\\09pushq %r9\\0A\\09pushq %r10\\0A\\09pushq %r11\\0A\\09pushq %r12\\0A\\09pushq %r13\\0A\\09pushq %r14\\0A\\09pushq %r15\\0A\\09movq 120(%rsp), %rdi\\0A\\09movq 128(%rsp), %rsi\\0A\\09movq 136(%rsp), %rdx\\0A\\09movq %cr2, %rcx\\0A\\09movq %r")이다.
+    조각326은 문자열붙인값(조각326, "sp, %r10\\0A\\09subq $$1088, %rsp\\0A\\09andq $$-64, %rsp\\0A\\09movq %r10, 1024(%rsp)\\0A\\09cmpq $$0, ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE켜짐)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip)\\0A\\09je 840f\\0A\\09movq $$0, 512(%rsp)\\0A\\09movq $$0, 520(%rsp)\\0A\\09movq $$0, 528(%rsp)\\0A\\09movq $$0, 536(%rsp)\\0A\\09movq $$0, 544(%rsp)\\0A\\09movq $$0, 552(%rsp)\\0A\\09movq $$0, 560(%rsp)\\0A\\09movq $$0, 568(%rsp)\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크하위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rax\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크상위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rdx\\0A\\09xsave64 (%rsp)\\0A\\09jmp 841f\\0A840:\\0A\\09fxsave64 (%rsp)\\0A841:\\0A\\09callq ")이다.
+    조각326은 문자열붙인값(조각326, "\(앱예외복구)")이다.
+    조각326은 문자열붙인값(조각326, "\\0A\\09testq %rax, %rax\\0A\\09jz 3f\\0A\\09cmpq $$0, ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE켜짐)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip)\\0A\\09je 860f\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크하위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rax\\0A\\09movq ")이다.
+    조각326은 문자열붙인값(조각326, "\(XSAVE마스크상위)")이다.
+    조각326은 문자열붙인값(조각326, "(%rip), %rdx\\0A\\09xrstor64 (%rsp)\\0A\\09jmp 861f\\0A860:\\0A\\09fxrstor64 (%rsp)\\0A861:\\0A\\09movq 1024(%rsp), %rsp\\0A\\09popq %r15\\0A\\09popq %r14\\0A\\09popq %r13\\0A\\09popq %r12\\0A\\09popq %r11\\0A\\09popq %r10\\0A\\09popq %r9\\0A\\09popq %r8\\0A\\09popq %rbp\\0A\\09popq %rdi\\0A\\09popq %rsi\\0A\\09popq %rdx\\0A\\09popq %rcx\\0A\\09popq %rbx\\0A\\09popq %rax\\0A\\09swapgs\\0A\\09addq $$16, %rsp\\0A\\09iretq\\0A2:\\0A\\09movq (%rsp),")이다.
+    조각326은 문자열붙인값(조각326, " %rdi\\0A\\09movq 8(%rsp), %rsi\\0A\\09movq 16(%rsp), %rdx\\0A\\09movq %cr2, %rcx\\0A\\09subq $$8, %rsp\\0A\\09callq ")이다.
+    조각326은 문자열붙인값(조각326, "\(예외처리기)")이다.
+    조각326은 문자열붙인값(조각326, "\\0A\\09addq $$8, %rsp\\0A\\09testq %rax, %rax\\0A\\09jz 3f\\0A\\09movq %rax, 16(%rsp)\\0A\\09movq $$-14, %rax\\0A\\09addq $$16, %rsp\\0A\\09iretq\\0A3:\\0A\\09cli\\0A\\09hlt\\0A\\09jmp .-1\", \"~{rax},~{rbx},~{rdi},~{rsi},~{rdx},~{rcx},~{r8},~{r9},~{r10},~{r11},~{r12},~{r13},~{r14},~{r15},~{memory}\"()")이다.
+    줄들에 조각326을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_context_switch_llvm
+함수 커널텍스트문맥전환은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_context_switch(i64 %previous, i64 %next) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각3은 "  call void asm sideeffect \"leaq 1f(%rip), %rax\\0A\\09pushq %rax\\0A\\09movq %rsp, 0(%rdi)\\0A\\09movq %rbp, 8(%rdi)\\0A\\09movq %rbx, 16(%rdi)\\0A\\09movq %r12, 24(%rdi)\\0A\\09movq %r13, 32(%rdi)\\0A\\09movq %r14, 40(%rdi)\\0A\\09movq %r15, 48(%rdi)\\0A\\09movq 48(%rsi), %r15\\0A\\09movq 40(%rsi), %r14\\0A\\09movq 32(%rsi), %r13\\0A\\09movq 24(%rsi), %r12\\0A\\09movq 16(%rsi), %rbx\\0A\\09movq 8(%rsi), %rbp\\0A\\09movq 0(%r"이고, 문자열이다.
+    조각3은 문자열붙인값(조각3, "si), %rsp\\0A\\09retq\\0A1:\\0A\\09retq\", \"~{rax},~{memory}\"()")이다.
+    줄들에 조각3을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_user_copy_llvm
+함수 커널텍스트사용자복사은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_copy_to_user(i64 %dest, i64 %src, i64 %len) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"testq %rdx, %rdx\\0A\\09je 3f\\0A\\09leaq 2f(%rip), %rax\\0A\\09movq %rax, %gs:240\\0A\\09xorq %rax, %rax\\0A1:\\0A\\09cmpq %rdx, %rax\\0A\\09jae 3f\\0A\\09movb (%rsi,%rax,1), %cl\\0A\\09movb %cl, (%rdi,%rax,1)\\0A\\09incq %rax\\0A\\09jmp 1b\\0A2:\\0A\\09movq $$0, %gs:240\\0A\\09movq $$-14, %rax\\0A\\09retq\\0A3:\\0A\\09movq $$0, %gs:240\\0A\\09xorq %rax, %rax\\0A\\09retq\", \"~{rax},~{rcx},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_arch_copy_from_user(i64 %dest, i64 %src, i64 %len) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"testq %rdx, %rdx\\0A\\09je 3f\\0A\\09leaq 2f(%rip), %rax\\0A\\09movq %rax, %gs:240\\0A\\09xorq %rax, %rax\\0A1:\\0A\\09cmpq %rdx, %rax\\0A\\09jae 3f\\0A\\09movb (%rsi,%rax,1), %cl\\0A\\09movb %cl, (%rdi,%rax,1)\\0A\\09incq %rax\\0A\\09jmp 1b\\0A2:\\0A\\09movq $$0, %gs:240\\0A\\09movq $$-14, %rax\\0A\\09retq\\0A3:\\0A\\09movq $$0, %gs:240\\0A\\09xorq %rax, %rax\\0A\\09retq\", \"~{rax},~{rcx},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_time_llvm
+함수 커널텍스트시간은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_x86_64_tsc_read() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"lfence\\0A\\09rdtsc\\0A\\09shlq $$32, %rdx\\0A\\09orq %rdx, %rax\\0A\\09retq\", \"~{rax},~{rdx},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_x86_64_tsc_usable() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각9은 "  call void asm sideeffect \"pushq %rbx\\0A\\09movl $$1, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09testl $$16, %edx\\0A\\09jz .Lhmje_tsc_usable_no\\0A\\09movl $$0x80000000, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09cmpl $$0x80000007, %eax\\0A\\09jb .Lhmje_tsc_check_hypervisor\\0A\\09movl $$0x80000007, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09testl $$256, %edx\\0A\\09jnz .Lhmje_tsc_usable_yes\\0A.Lhmje_tsc_chec"이고, 문자열이다.
+    조각9은 문자열붙인값(조각9, "k_hypervisor:\\0A\\09movl $$1, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09testl $$-2147483648, %ecx\\0A\\09jz .Lhmje_tsc_usable_no\\0A.Lhmje_tsc_usable_yes:\\0A\\09movq $$1, %rax\\0A\\09jmp .Lhmje_tsc_usable_done\\0A.Lhmje_tsc_usable_no:\\0A\\09xorq %rax, %rax\\0A.Lhmje_tsc_usable_done:\\0A\\09popq %rbx\\0A\\09retq\", \"~{rax},~{rcx},~{rdx},~{memory}\"()")이다.
+    줄들에 조각9을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_x86_64_tsc_frequency() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각15은 "  call void asm sideeffect \"pushq %rbx\\0A\\09xorl %eax, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09cmpl $$21, %eax\\0A\\09jb .Lhmje_tsc_fail\\0A\\09movl $$21, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09testl %eax, %eax\\0A\\09jz .Lhmje_tsc_fail\\0A\\09testl %ebx, %ebx\\0A\\09jz .Lhmje_tsc_fail\\0A\\09testl %ecx, %ecx\\0A\\09jz .Lhmje_tsc_fail\\0A\\09movl %eax, %r9d\\0A\\09movl %ecx, %eax\\0A\\09movl %ebx, %ecx\\0A\\09imul"이고, 문자열이다.
+    조각15은 문자열붙인값(조각15, "q %rcx, %rax\\0A\\09xorl %edx, %edx\\0A\\09divq %r9\\0A\\09testq %rax, %rax\\0A\\09jnz .Lhmje_tsc_done\\0A.Lhmje_tsc_fail:\\0A\\09xorq %rax, %rax\\0A.Lhmje_tsc_done:\\0A\\09popq %rbx\\0A\\09retq\", \"~{rax},~{rcx},~{rdx},~{r9},~{memory}\"()")이다.
+    줄들에 조각15을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_monotonic_time_llvm
+함수 커널텍스트단조시간은 (소비하는 줄들: 문자열의 배열, TSC마지막마이크로초: 문자열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_x86_64_monotonic_us(i64 %candidate) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각3은 "  call void asm sideeffect \"movq "이고, 문자열이다.
+    조각3은 문자열붙인값(조각3, "\(TSC마지막마이크로초)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip), %rax\\0A1:\\0A\\09cmpq %rdi, %rax\\0A\\09jae 2f\\0A\\09lock cmpxchgq %rdi, ")이다.
+    조각3은 문자열붙인값(조각3, "\(TSC마지막마이크로초)")이다.
+    조각3은 문자열붙인값(조각3, "(%rip)\\0A\\09jne 1b\\0A\\09movq %rdi, %rax\\0A2:\\0A\\09retq\", \"~{rax},~{cc},~{memory}\"()")이다.
+    줄들에 조각3을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_cpu_slot_llvm
+함수 커널텍스트CPU슬롯은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_x86_64_cpu_slot_tag() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"movq %gs:48, %rax\\0A\\09shrq $$32, %rax\\0A\\09andq $$8191, %rax\\0A\\09retq\", \"~{rax},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_smp_ap_entry_llvm
+함수 커널텍스트SMPAP진입은 (소비하는 줄들: 문자열의 배열, AP메인: 문자열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define void @hmje_x86_64_smp_ap_entry() naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각3은 "  call void asm sideeffect \"cli\\0A\\09movq %rdi, %r12\\0A\\09movq 24(%r12), %rsp\\0A\\09andq $$-16, %rsp\\0A\\09movq %r12, %rdi\\0A\\09callq "이고, 문자열이다.
+    조각3은 문자열붙인값(조각3, "\(AP메인)")이다.
+    조각3은 문자열붙인값(조각3, "\\0A\\09cli\\0A\\091:\\0A\\09hlt\\0A\\09jmp 1b\", \"~{rdi},~{r12},~{memory}\"()")이다.
+    줄들에 조각3을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_freestanding_memlib_llvm
+함수 커널텍스트메모리라이브러리은 (소비하는 줄들: 문자열의 배열)를 받아
+    줄들에 ""를 추가한다.
+    줄들에 "define ptr @memset(ptr %dest, i32 %val, i64 %len) noinline optnone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %v8 = trunc i32 %val to i8"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "cond:"를 추가한다.
+    줄들에 "  %i = phi i64 [ 0, %entry ], [ %inext, %body ]"를 추가한다.
+    줄들에 "  %c = icmp ult i64 %i, %len"를 추가한다.
+    줄들에 "  br i1 %c, label %body, label %done"를 추가한다.
+    줄들에 "body:"를 추가한다.
+    줄들에 "  %p = getelementptr i8, ptr %dest, i64 %i"를 추가한다.
+    줄들에 "  store i8 %v8, ptr %p"를 추가한다.
+    줄들에 "  %inext = add i64 %i, 1"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret ptr %dest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define ptr @memcpy(ptr %dest, ptr %src, i64 %len) noinline optnone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "cond:"를 추가한다.
+    줄들에 "  %i = phi i64 [ 0, %entry ], [ %inext, %body ]"를 추가한다.
+    줄들에 "  %c = icmp ult i64 %i, %len"를 추가한다.
+    줄들에 "  br i1 %c, label %body, label %done"를 추가한다.
+    줄들에 "body:"를 추가한다.
+    줄들에 "  %sp = getelementptr i8, ptr %src, i64 %i"를 추가한다.
+    줄들에 "  %b = load i8, ptr %sp"를 추가한다.
+    줄들에 "  %dp = getelementptr i8, ptr %dest, i64 %i"를 추가한다.
+    줄들에 "  store i8 %b, ptr %dp"를 추가한다.
+    줄들에 "  %inext = add i64 %i, 1"를 추가한다.
+    줄들에 "  br label %cond"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret ptr %dest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define ptr @memmove(ptr %dest, ptr %src, i64 %len) noinline optnone {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %d = ptrtoint ptr %dest to i64"를 추가한다.
+    줄들에 "  %s = ptrtoint ptr %src to i64"를 추가한다.
+    줄들에 "  %fwd = icmp ule i64 %d, %s"를 추가한다.
+    줄들에 "  br i1 %fwd, label %fcond, label %bentry"를 추가한다.
+    줄들에 "fcond:"를 추가한다.
+    줄들에 "  %fi = phi i64 [ 0, %entry ], [ %finext, %fbody ]"를 추가한다.
+    줄들에 "  %fc = icmp ult i64 %fi, %len"를 추가한다.
+    줄들에 "  br i1 %fc, label %fbody, label %done"를 추가한다.
+    줄들에 "fbody:"를 추가한다.
+    줄들에 "  %fsp = getelementptr i8, ptr %src, i64 %fi"를 추가한다.
+    줄들에 "  %fb = load i8, ptr %fsp"를 추가한다.
+    줄들에 "  %fdp = getelementptr i8, ptr %dest, i64 %fi"를 추가한다.
+    줄들에 "  store i8 %fb, ptr %fdp"를 추가한다.
+    줄들에 "  %finext = add i64 %fi, 1"를 추가한다.
+    줄들에 "  br label %fcond"를 추가한다.
+    줄들에 "bentry:"를 추가한다.
+    줄들에 "  br label %bcond"를 추가한다.
+    줄들에 "bcond:"를 추가한다.
+    줄들에 "  %bi = phi i64 [ %len, %bentry ], [ %binext, %bbody ]"를 추가한다.
+    줄들에 "  %bc = icmp ugt i64 %bi, 0"를 추가한다.
+    줄들에 "  br i1 %bc, label %bbody, label %done"를 추가한다.
+    줄들에 "bbody:"를 추가한다.
+    줄들에 "  %binext = sub i64 %bi, 1"를 추가한다.
+    줄들에 "  %bsp = getelementptr i8, ptr %src, i64 %binext"를 추가한다.
+    줄들에 "  %bb = load i8, ptr %bsp"를 추가한다.
+    줄들에 "  %bdp = getelementptr i8, ptr %dest, i64 %binext"를 추가한다.
+    줄들에 "  store i8 %bb, ptr %bdp"를 추가한다.
+    줄들에 "  br label %bcond"를 추가한다.
+    줄들에 "done:"를 추가한다.
+    줄들에 "  ret ptr %dest"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define internal i64 @hmje_x86_64_copy_bytes_legacy_simd(i64 %dest, i64 %src, i64 %len) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    변수 조각72은 "  call void asm sideeffect \"movq %rdx, %rax\\0A\\09cmpq $$64, %rdx\\0A\\09jb 2f\\0A\\09movq %rdx, %rcx\\0A\\09shrq $$6, %rcx\\0A1:\\0A\\09movdqu 0(%rsi), %xmm0\\0A\\09movdqu 16(%rsi), %xmm1\\0A\\09movdqu 32(%rsi), %xmm2\\0A\\09movdqu 48(%rsi), %xmm3\\0A\\09movdqu %xmm0, 0(%rdi)\\0A\\09movdqu %xmm1, 16(%rdi)\\0A\\09movdqu %xmm2, 32(%rdi)\\0A\\09movdqu %xmm3, 48(%rdi)\\0A\\09addq $$64, %rsi\\0A\\09addq $$64, %rdi\\0A\\09decq %rcx"이고, 문자열이다.
+    조각72은 문자열붙인값(조각72, "\\0A\\09jne 1b\\0A\\09andq $$63, %rdx\\0A2:\\0A\\09cmpq $$16, %rdx\\0A\\09jb 4f\\0A3:\\0A\\09movdqu (%rsi), %xmm0\\0A\\09movdqu %xmm0, (%rdi)\\0A\\09addq $$16, %rsi\\0A\\09addq $$16, %rdi\\0A\\09subq $$16, %rdx\\0A\\09cmpq $$16, %rdx\\0A\\09jae 3b\\0A4:\\0A\\09cmpq $$8, %rdx\\0A\\09jb 6f\\0A5:\\0A\\09movq (%rsi), %r8\\0A\\09movq %r8, (%rdi)\\0A\\09addq $$8, %rsi\\0A\\09addq $$8, %rdi\\0A\\09subq $$8, %rdx\\0A6:\\0A\\09testq %rdx, %rdx\\0A\\0")이다.
+    조각72은 문자열붙인값(조각72, "9je 8f\\0A7:\\0A\\09movb (%rsi), %cl\\0A\\09movb %cl, (%rdi)\\0A\\09incq %rsi\\0A\\09incq %rdi\\0A\\09decq %rdx\\0A\\09jne 7b\\0A8:\\0A\\09retq\", \"~{rax},~{rcx},~{rdi},~{rsi},~{rdx},~{r8},~{xmm0},~{xmm1},~{xmm2},~{xmm3},~{memory}\"()")이다.
+    줄들에 조각72을 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i64 @hmje_x86_64_copy_bytes(i64 %dest, i64 %src, i64 %len) naked noinline nounwind {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  call void asm sideeffect \"movq %rdx, %rax\\0A\\09movq %rdx, %rcx\\0A\\09rep movsb\\0A\\09retq\", \"~{rax},~{rcx},~{rdi},~{rsi},~{memory}\"()"를 추가한다.
+    줄들에 "  unreachable"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# x86_64_syscall_setup_asm (시스템호출테이블적용의 asm 본문)
+함수 커널asm시스템호출설정은 (XSAVE마스크하위: 문자열, XSAVE마스크상위: 문자열, XSAVE전부지원: 문자열, AVX2전부지원: 문자열)를 받아
+    변수 결과는 ""이고, 문자열이다.
+    변수 조각0은 "movq %cr0, %rax\\0A\\09andq $$-13, %rax\\0A\\09orq $$2, %rax\\0A\\09movq %rax, %cr0\\0A\\09movq %cr4, %rax\\0A\\09andq $$-262145, %rax\\0A\\09orq $$1536, %rax\\0A\\09movq %rax, %cr4\\0A\\09movl $$1, %eax\\0A\\09cpuid\\0A\\09movl %ecx, %ebx\\0A\\09testl $$128, %edx\\0A\\09jz 8f\\0A\\09movq %cr4, %rax\\0A\\09orq $$64, %rax\\0A\\09movq %rax, %cr4\\0A\\09testl $$16384, %edx\\0A\\09jz 8f\\0A\\09movl $$377, %ecx\\0A\\09rdmsr\\0A\\09movl %eax,"이고, 문자열이다.
+    조각0은 문자열붙인값(조각0, " %r11d\\0A\\09testl $$256, %eax\\0A\\09jz 6f\\0A\\09movl $$379, %ecx\\0A\\09movl $$-1, %eax\\0A\\09movl $$-1, %edx\\0A\\09wrmsr\\0A6:\\0A\\09andl $$255, %r11d\\0A\\09cmpl $$0, %r11d\\0A\\09je 8f\\0A\\09xorl %r10d, %r10d\\0A7:\\0A\\09movl %r10d, %ecx\\0A\\09shll $$2, %ecx\\0A\\09addl $$1024, %ecx\\0A\\09movl $$-1, %eax\\0A\\09movl $$-1, %edx\\0A\\09wrmsr\\0A\\09incl %r10d\\0A\\09cmpl %r11d, %r10d\\0A\\09jb 7b\\0A8:\\0A\\09movl %ebx, %r10d\\0")이다.
+    조각0은 문자열붙인값(조각0, "A\\09movl %r10d, %r11d\\0A\\09andl $$335544320, %r11d\\0A\\09cmpl $$335544320, %r11d\\0A\\09jne 11f\\0A\\09movq %cr4, %rax\\0A\\09orq $$262144, %rax\\0A\\09movq %rax, %cr4\\0A\\09xorl %ecx, %ecx\\0A\\09movl $$7, %eax\\0A\\09xorl %edx, %edx\\0A\\09xsetbv\\0A\\09movq $$7, ")이다.
+    조각0은 문자열붙인값(조각0, "\(XSAVE마스크하위)")이다.
+    조각0은 문자열붙인값(조각0, "(%rip)\\0A\\09movq $$0, ")이다.
+    조각0은 문자열붙인값(조각0, "\(XSAVE마스크상위)")이다.
+    조각0은 문자열붙인값(조각0, "(%rip)\\0A\\09movl $$0, %eax\\0A\\09cpuid\\0A\\09cmpl $$7, %eax\\0A\\09jb 12f\\0A\\09movl $$7, %eax\\0A\\09xorl %ecx, %ecx\\0A\\09cpuid\\0A\\09testl $$32, %ebx\\0A\\09jz 12f\\0A\\09jmp 10f\\0A11:\\0A\\09movq $$0, ")이다.
+    조각0은 문자열붙인값(조각0, "\(XSAVE전부지원)")이다.
+    조각0은 문자열붙인값(조각0, "(%rip)\\0A\\09movq $$0, ")이다.
+    조각0은 문자열붙인값(조각0, "\(AVX2전부지원)")이다.
+    조각0은 문자열붙인값(조각0, "(%rip)\\0A\\09jmp 10f\\0A12:\\0A\\09movq $$0, ")이다.
+    조각0은 문자열붙인값(조각0, "\(AVX2전부지원)")이다.
+    조각0은 문자열붙인값(조각0, "(%rip)\\0A10:\\0A\\09fninit\\0A\\09movl $$3221225600, %ecx\\0A\\09rdmsr\\0A\\09orl $$2049, %eax\\0A\\09wrmsr\\0A\\09movl $$3221225601, %ecx\\0A\\09movl $$0, %eax\\0A\\09movl $$1245192, %edx\\0A\\09wrmsr\\0A\\09movl $$3221225602, %ecx\\0A\\09movq $0, %rax\\0A\\09movq %rax, %rdx\\0A\\09shrq $$32, %rdx\\0A\\09wrmsr\\0A\\09movl $$3221225729, %ecx\\0A\\09movq $1, %rax\\0A\\09movq %rax, %rdx\\0A\\09shrq $$32, %rdx\\0A\\09wrmsr\\0A\\09movl $$32")이다.
+    조각0은 문자열붙인값(조각0, "21225730, %ecx\\0A\\09movl $$0, %eax\\0A\\09movl $$0, %edx\\0A\\09wrmsr\\0A\\09movl $$3221225604, %ecx\\0A\\09movl $$292608, %eax\\0A\\09movl $$0, %edx\\0A\\09wrmsr\\0A\\09btsq $$63, 48($1)")이다.
+    결과는 조각0이다.
+    결과를 문자열로 반환한다.
+
+# x86_64_user_entry_simd_reset_asm (유저모드진입 asm 머리)
+함수 커널asm유저진입SIMD리셋은 (XSAVE켜짐: 문자열)를 받아
+    변수 결과는 ""이고, 문자열이다.
+    변수 조각0은 "fninit\\0A\\09cmpq $$0, "이고, 문자열이다.
+    조각0은 문자열붙인값(조각0, "\(XSAVE켜짐)")이다.
+    조각0은 문자열붙인값(조각0, "(%rip)\\0A\\09je 20f\\0A\\09vzeroall\\0A\\09jmp 21f\\0A20:\\0A\\09pxor %xmm0, %xmm0\\0A\\09pxor %xmm1, %xmm1\\0A\\09pxor %xmm2, %xmm2\\0A\\09pxor %xmm3, %xmm3\\0A\\09pxor %xmm4, %xmm4\\0A\\09pxor %xmm5, %xmm5\\0A\\09pxor %xmm6, %xmm6\\0A\\09pxor %xmm7, %xmm7\\0A\\09pxor %xmm8, %xmm8\\0A\\09pxor %xmm9, %xmm9\\0A\\09pxor %xmm10, %xmm10\\0A\\09pxor %xmm11, %xmm11\\0A\\09pxor %xmm12, %xmm12\\0A\\09pxor %xmm13, %xmm13\\0A\\09pxor %xmm14, ")이다.
+    조각0은 문자열붙인값(조각0, "%xmm14\\0A\\09pxor %xmm15, %xmm15\\0A21:\\0A\\09")이다.
+    결과는 조각0이다.
+    결과를 문자열로 반환한다.
+
+# emit_limine_llvm_ir가 지우는 선언 줄
+함수 커널제거줄인가은 (줄: 문자열, IDT표: 문자열)를 받아
+    상수 다듬은줄은 문자열다듬기(줄)이고, 문자열이다.
+    만약 다듬은줄이 문자열붙인값(문자열붙인값("@", "\(IDT표)"), " = external global [32 x i64]")이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 문자열붙인값(문자열붙인값("@", "\(IDT표)"), " = external global [48 x i64]")이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 문자열붙인값(문자열붙인값("@", "\(IDT표)"), " = external global [64 x i64]")이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_copy_to_user(i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_arch_copy_from_user(i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_x86_64_copy_bytes(i64, i64, i64)"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_x86_64_tsc_read()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_x86_64_tsc_usable()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_x86_64_tsc_frequency()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_x86_64_cpu_slot_tag()"이면
+        참을 참거짓으로 반환한다.
+    만약 다듬은줄이 "declare i64 @hmje_x86_64_monotonic_us(i64)"이면
+        참을 참거짓으로 반환한다.
+    거짓을 참거짓으로 반환한다.

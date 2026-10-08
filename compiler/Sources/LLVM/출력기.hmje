@@ -1,0 +1,267 @@
+# HMIR → LLVM 변환기의 출력기 계층.
+
+외부 함수 hmje_host_file_replace_atomic는 (후보주소: 자연수, 후보길이: 자연수, 대상주소: 자연수, 대상길이: 자연수)를 받아 정수로 반환한다.
+
+# lowering 중 발견한 alloca를 그 자리에서 append한 뒤 함수가 끝날 때 한 번만
+# entry 앞으로 모은다. 마지막으로 발견한 alloca가 먼저 오도록 할당 줄만 역순으로 쓴다.
+
+
+프로젝트 내부 함수 진입할당정리는 (소비하는 줄들: 문자열의 배열, 진입색인: 자연수)를 받아
+    변수 할당줄들은 []이고, 문자열의 배열이다.
+    변수 본문줄들은 []이고, 문자열의 배열이다.
+    변수 번은 진입색인 + 1이고, 자연수이다.
+    번 < 줄들.길이일 동안
+        만약 문자열찾기(줄들[번], " = alloca ")가 있으면
+            할당줄들에 줄들[번]을 추가한다.
+        아니면
+            본문줄들에 줄들[번]을 추가한다.
+        번은 번 + 1이다.
+    변수 쓸번은 진입색인 + 1이고, 자연수이다.
+    변수 할번은 할당줄들.길이이고, 자연수이다.
+    할번 > 0일 동안
+        할번은 할번 - 1이다.
+        줄들[쓸번]은 할당줄들[할번]이다.
+        쓸번은 쓸번 + 1이다.
+    번은 0이다.
+    번 < 본문줄들.길이일 동안
+        줄들[쓸번]은 본문줄들[번]이다.
+        쓸번은 쓸번 + 1이다.
+        번은 번 + 1이다.
+    줄들을 문자열의 배열로 반환한다.
+
+함수 서문출력은
+    "target triple = \"x86_64-unknown-none\""를 출력한다.
+    "declare void @llvm.lifetime.start.p0(i64, ptr)"를 출력한다.
+    "declare void @llvm.lifetime.end.p0(i64, ptr)"를 출력한다.
+    "declare token @llvm.coro.id(i32, i8*, i8*, i8*)"를 출력한다.
+    "declare i64 @llvm.coro.size.i64()"를 출력한다.
+    "declare i8* @llvm.coro.begin(token, i8*)"를 출력한다.
+    "declare token @llvm.coro.save(i8*)"를 출력한다.
+    "declare i8 @llvm.coro.suspend(token, i1)"를 출력한다.
+    "declare i1 @llvm.coro.done(i8*)"를 출력한다.
+    "declare void @llvm.coro.resume(i8*)"를 출력한다.
+    "declare i8* @llvm.coro.promise(i8*, i32, i1)"를 출력한다.
+    "declare i8* @llvm.coro.free(token, i8*)"를 출력한다.
+    "declare void @llvm.coro.destroy(i8*)"를 출력한다.
+    "declare i1 @llvm.coro.end(i8*, i1, token)"를 출력한다.
+    "declare void @llvm.trap()"를 출력한다.
+    "declare i64 @hmje_async_event_create()"를 출력한다.
+    "declare i32 @hmje_async_event_is_ready(i64)"를 출력한다.
+    "declare i32 @hmje_async_event_take_u64(i64, i64*, i32*)"를 출력한다.
+    "declare i32 @hmje_async_event_abandon(i64)"를 출력한다.
+    "declare void @hmje_async_handle_set_blocked(i8*, i32)"를 출력한다.
+    "declare i32 @hmje_async_handle_is_blocked(i8*)"를 출력한다.
+    "declare void @hmje_async_handle_request_cancel(i8*)"를 출력한다.
+    "declare i32 @hmje_async_handle_is_cancelled(i8*)"를 출력한다.
+    "declare void @hmje_async_cancellation_shield_enter(i8*)"를 출력한다.
+    "declare void @hmje_async_cancellation_shield_exit(i8*)"를 출력한다.
+    "declare void @hmje_async_handle_set_failure(i8*, i64)"를 출력한다.
+    "declare i64 @hmje_async_handle_failure(i8*)"를 출력한다.
+    "declare i64 @hmje_async_handle_take_failure(i8*)"를 출력한다.
+    "declare i64 @hmje_async_deadline_begin(i64, i8*)"를 출력한다.
+    "declare void @hmje_async_deadline_end(i64)"를 출력한다.
+    "declare void @hmje_async_deadline_cancel_for_handle(i8*)"를 출력한다.
+    "declare void @hmje_async_handle_forget(i8*)"를 출력한다.
+    "declare i32 @hmje_async_handle_poll_once(i64)"를 출력한다.
+    "declare i8* @hmje_async_group_create()"를 출력한다.
+    "declare void @hmje_async_group_add(i8*, i8*)"를 출력한다.
+    "declare i32 @hmje_async_group_poll(i8*, i8*)"를 출력한다.
+    "declare void @hmje_async_group_finish(i8*, i8*)"를 출력한다.
+    "declare void @hmje_async_unstructured_add(i8*, i64, i64)"를 출력한다.
+    "declare i32 @hmje_async_unstructured_poll()"를 출력한다.
+    "declare void @hmje_async_wait_for_wake()"를 출력한다.
+    "declare float @llvm.vector.reduce.fadd.v16f32(float, <16 x float>)"를 출력한다.
+    "declare float @llvm.vector.reduce.fadd.v8f32(float, <8 x float>)"를 출력한다.
+    "declare float @llvm.vector.reduce.fmax.v16f32(<16 x float>)"를 출력한다.
+    "declare float @llvm.vector.reduce.fmax.v32f32(<32 x float>)"를 출력한다.
+    "declare <32 x float> @llvm.fabs.v32f32(<32 x float>)"를 출력한다.
+    "declare <32 x float> @llvm.round.v32f32(<32 x float>)"를 출력한다.
+    "declare i32 @llvm.vector.reduce.add.v16i32(<16 x i32>)"를 출력한다.
+
+# ═══ v1: 유틸 ═══════════════════════════════════════════════════════════
+
+# 소문자 16진 문자열 (%x 대응, 선행 0 없음)
+
+# 출력은 같은 디렉터리의 후보에 끝까지 쓰고 동기화/닫기 이후에만 교체한다.
+# ENOSPC나 부분 쓰기를 성공으로 넘기면 잘린 LLVM이 캐시에 게시될 수 있다.
+함수 LLVM출력실패는 (경로: 문자열, 임시: 문자열, 핸들: 정수, 단계: 문자열, 오류: 정수)를 받아
+    만약 핸들 > 0이면
+        상수 닫은수는 파일닫기(핸들)이고, 정수이다.
+    상수 삭제결과는 파일삭제(임시)이고, 정수이다.
+    "LLVM 출력 실패: \(단계) (오류 \(오류)): \(경로)"를 오류로 출력한다.
+    코드 1로 종료한다.
+
+함수 LLVM출력모두쓰기는 (경로: 문자열, 임시: 문자열, 핸들: 정수, 위치: 자연수, 내용: 문자열)를 받아
+    변수 쓴길이는 0이고, 자연수이다.
+    쓴길이 < 내용.길이일 동안
+        상수 쓴수는 파일쓰기(핸들, 위치 + 쓴길이, 내용.주소 + 쓴길이, 내용.길이 - 쓴길이)이고, 정수이다.
+        만약 쓴수 > 0 그리고 자연수(쓴수) <= 내용.길이 - 쓴길이이면
+            쓴길이는 쓴길이 + 자연수(쓴수)이다.
+        그렇지 않고 쓴수 != 정수(-4)이면
+            LLVM출력실패를 (경로, 임시, 핸들, "쓰기", 쓴수)로 실행한다.
+    위치 + 쓴길이를 자연수로 반환한다.
+
+# Bound each batch to roughly 64 KiB (one exceptionally long line may exceed it).
+# Copy each byte once, instead of issuing two system calls per LLVM line.
+함수 LLVM출력줄묶음쓰기는 (경로: 문자열, 임시: 문자열, 핸들: 정수, 시작위치: 자연수, 줄들: 문자열의 배열, 시작: 자연수, 끝: 자연수)를 받아
+    변수 위치는 시작위치이고, 자연수이다.
+    변수 번은 시작이고, 자연수이다.
+    번 < 끝일 동안
+        변수 다음은 번이고, 자연수이다.
+        변수 길이는 0이고, 자연수이다.
+        다음 < 끝 그리고 길이 < 65536일 동안
+            길이는 길이 + 줄들[다음].길이 + 1이다.
+            다음은 다음 + 1이다.
+        상수 버퍼는 메모리할당(길이)이고, 주소이다.
+        만약 버퍼 == 주소(0)이면
+            LLVM출력실패를 (경로, 임시, 핸들, "출력 버퍼 할당", (-12))로 실행한다.
+        변수 채움은 0이고, 자연수이다.
+        번 < 다음일 동안
+            상수 줄은 줄들[번]이고, 문자열이다.
+            메모리복사를 (버퍼 + 채움, 줄.주소, 줄.길이)로 실행한다.
+            채움은 채움 + 줄.길이이다.
+            상수 개행은 "\n"이고, 문자열이다.
+            메모리복사를 (버퍼 + 채움, 개행.주소, 1)로 실행한다.
+            채움은 채움 + 1이다.
+            번은 번 + 1이다.
+        상수 내용은 바이트영역문자열(버퍼, 길이)이고, 문자열이다.
+        메모리해제를 (버퍼)로 실행한다.
+        위치는 LLVM출력모두쓰기(경로, 임시, 핸들, 위치, 내용)이다.
+    위치를 자연수로 반환한다.
+
+# 참이면 출력 파일을 원자 교체만 하고 디스크 동기화는 하지 않는다(--동기화생략).
+프로젝트 내부 전역 변수 LLVM출력동기화생략은 거짓이고, 참거짓이다.
+
+프로젝트 내부 함수 파일로쓰기는 (경로: 문자열, 줄들: 문자열의 배열, 전역줄들: 문자열의 배열)를 받아
+    상수 임시는 문자열붙인값(경로, 문자열붙인값(".hmje-tmp-", 문자열로만들기(현재프로세스번호())))이고, 문자열이다.
+    상수 핸들은 파일열기(임시, 파일모드_쓰기 | 파일모드_생성 | 파일모드_배타생성)이고, 정수이다.
+    만약 핸들 <= 0이면
+        "LLVM 출력 실패: 후보 파일 열기 (오류 \(핸들)): \(임시)"를 오류로 출력한다.
+        코드 1로 종료한다.
+    변수 위치는 0이고, 자연수이다.
+    변수 번은 0이고, 자연수이다.
+    번 < 줄들.길이 그리고 줄들[번].길이 != 0일 동안
+        번은 번 + 1이다.
+    만약 번 < 줄들.길이이면
+        번은 번 + 1이다.
+        위치는 LLVM출력줄묶음쓰기(경로, 임시, 핸들, 위치, 줄들, 0, 번)이다.
+        위치는 LLVM출력줄묶음쓰기(경로, 임시, 핸들, 위치, 전역줄들, 0, 전역줄들.길이)이다.
+        만약 전역줄들.길이 > 0이면
+            위치는 LLVM출력모두쓰기(경로, 임시, 핸들, 위치, "\n")이다.
+        위치는 LLVM출력줄묶음쓰기(경로, 임시, 핸들, 위치, 줄들, 번, 줄들.길이)이다.
+    아니면
+        위치는 LLVM출력줄묶음쓰기(경로, 임시, 핸들, 위치, 줄들, 0, 줄들.길이)이다.
+    만약 LLVM출력동기화생략 == 거짓이면
+        상수 동기화는 파일동기화(핸들)이고, 정수이다.
+        만약 동기화 != 0이면
+            LLVM출력실패를 (경로, 임시, 핸들, "동기화", 동기화)로 실행한다.
+    상수 닫기결과는 파일닫기(핸들)이고, 정수이다.
+    만약 닫기결과 != 0이면
+        LLVM출력실패를 (경로, 임시, 0, "닫기", 닫기결과)로 실행한다.
+    상수 교체는 파일원자교체(임시, 경로)이고, 파일원자교체결과이다.
+    만약 교체.오류 == 0 - 38 그리고 교체.적용됐나 == 거짓이면
+        # Windows 범용 파일 API는 디렉터리 영속성을 보증하지 못해 ENOSYS를
+        # 반환한다. 컴파일러 생성 출력은 이미 동기화된 같은 폴더의 후보를
+        # 원자적으로 게시하되, 전원 상실 내구성까지 약속하지 않는다.
+        상수 호스트오류는 hmje_host_file_replace_atomic(자연수(임시.주소), 임시.길이, 자연수(경로.주소), 경로.길이)이고, 정수이다.
+        만약 호스트오류 != 0이면
+            LLVM출력실패를 (경로, 임시, 0, "호스트 게시", 호스트오류)로 실행한다.
+        반환한다.
+    만약 교체.오류 != 0 또는 교체.적용됐나 == 거짓이면
+        LLVM출력실패를 (경로, 임시, 0, "게시", 교체.오류)로 실행한다.
+
+# 2자리 대문자 16진.
+# 코루틴끝void: LLVM 22의 void coro.end 방언.
+# semtleOS 커널·앱 방출이 켠다.
+프로젝트 내부 함수 고정서문줄들은 (대상트리플: 문자열, 코루틴끝void: 참거짓)을 받아
+    변수 출력줄들은 []이고, 문자열의 배열이다.
+    출력줄들에 "; ModuleID = 'hunminjeongeum'"를 추가한다.
+    출력줄들에 "target triple = \"\(대상트리플)\""를 추가한다.
+    # 클로저 환경의 할당 신분. 함수마다 방출하면 한 모듈 안에 중복 정의가 생긴다.
+    출력줄들에 "@__hmje_closure_identity = global i64 0, align 8"을 추가한다.
+    출력줄들에 "@__hmje_closure_empty_identity = constant i64 0, align 8"을 추가한다.
+    출력줄들에 "declare void @llvm.lifetime.start.p0(i64, ptr)"를 추가한다.
+    출력줄들에 "declare void @llvm.lifetime.end.p0(i64, ptr)"를 추가한다.
+    출력줄들에 "declare token @llvm.coro.id(i32, i8*, i8*, i8*)"를 추가한다.
+    출력줄들에 "declare i64 @llvm.coro.size.i64()"를 추가한다.
+    출력줄들에 "declare i8* @llvm.coro.begin(token, i8*)"를 추가한다.
+    출력줄들에 "declare token @llvm.coro.save(i8*)"를 추가한다.
+    출력줄들에 "declare i8 @llvm.coro.suspend(token, i1)"를 추가한다.
+    출력줄들에 "declare i1 @llvm.coro.done(i8*)"를 추가한다.
+    출력줄들에 "declare void @llvm.coro.resume(i8*)"를 추가한다.
+    출력줄들에 "declare i8* @llvm.coro.promise(i8*, i32, i1)"를 추가한다.
+    출력줄들에 "declare i8* @llvm.coro.free(token, i8*)"를 추가한다.
+    출력줄들에 "declare void @llvm.coro.destroy(i8*)"를 추가한다.
+    만약 코루틴끝void이면
+        출력줄들에 "declare void @llvm.coro.end(i8*, i1, token)"를 추가한다.
+    아니면
+        출력줄들에 "declare i1 @llvm.coro.end(i8*, i1, token)"를 추가한다.
+    출력줄들에 "declare void @llvm.trap()"를 추가한다.
+    출력줄들은 LLVM숫자서문(출력줄들)이다.
+    출력줄들은 LLVM변환검사서문(출력줄들)이다.
+    출력줄들에 "declare i64 @hmje_async_event_create()"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_event_is_ready(i64)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_event_take_u64(i64, i64*, i32*)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_event_abandon(i64)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_handle_set_blocked(i8*, i32)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_handle_is_blocked(i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_handle_request_cancel(i8*)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_handle_is_cancelled(i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_cancellation_shield_enter(i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_cancellation_shield_exit(i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_handle_set_failure(i8*, i64)"를 추가한다.
+    출력줄들에 "declare i64 @hmje_async_handle_failure(i8*)"를 추가한다.
+    출력줄들에 "declare i64 @hmje_async_handle_take_failure(i8*)"를 추가한다.
+    출력줄들에 "declare i64 @hmje_async_deadline_begin(i64, i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_deadline_end(i64)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_deadline_cancel_for_handle(i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_handle_forget(i8*)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_handle_poll_once(i64)"를 추가한다.
+    출력줄들에 "declare i8* @hmje_async_group_create()"를 추가한다.
+    출력줄들에 "declare void @hmje_async_group_add(i8*, i8*)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_group_poll(i8*, i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_group_finish(i8*, i8*)"를 추가한다.
+    출력줄들에 "declare void @hmje_async_unstructured_add(i8*, i64, i64)"를 추가한다.
+    출력줄들에 "declare i32 @hmje_async_unstructured_poll()"를 추가한다.
+    출력줄들에 "declare void @hmje_async_wait_for_wake()"를 추가한다.
+    출력줄들에 "declare float @llvm.vector.reduce.fadd.v16f32(float, <16 x float>)"를 추가한다.
+    출력줄들에 "declare float @llvm.vector.reduce.fadd.v8f32(float, <8 x float>)"를 추가한다.
+    출력줄들에 "declare float @llvm.vector.reduce.fmax.v16f32(<16 x float>)"를 추가한다.
+    출력줄들에 "declare float @llvm.vector.reduce.fmax.v32f32(<32 x float>)"를 추가한다.
+    출력줄들에 "declare <32 x float> @llvm.fabs.v32f32(<32 x float>)"를 추가한다.
+    출력줄들에 "declare <32 x float> @llvm.round.v32f32(<32 x float>)"를 추가한다.
+    출력줄들에 "declare i32 @llvm.vector.reduce.add.v16i32(<16 x i32>)"를 추가한다.
+
+    출력줄들을 문자열의 배열로 반환한다.
+
+프로젝트 내부 함수 포직스파일ABI추가는 (소비하는 줄들: 문자열의 배열)을 받아
+    줄들에 ""를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "declare i32 @open(i8*, i32, ...)"를 추가한다.
+    줄들에 "declare i32 @openat(i32, i8*, i32, ...)"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_posix_open(i64 %path, i32 %flags, i32 %mode) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %path.ptr = inttoptr i64 %path to i8*"를 추가한다.
+    줄들에 "  %result = call i32 (i8*, i32, ...) @open(i8* %path.ptr, i32 %flags, i32 %mode)"를 추가한다.
+    줄들에 "  ret i32 %result"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들에 ""를 추가한다.
+    줄들에 "define i32 @hmje_posix_openat(i32 %directory, i64 %path, i32 %flags, i32 %mode) {"를 추가한다.
+    줄들에 "entry:"를 추가한다.
+    줄들에 "  %path.ptr = inttoptr i64 %path to i8*"를 추가한다.
+    줄들에 "  %result = call i32 (i32, i8*, i32, ...) @openat(i32 %directory, i8* %path.ptr, i32 %flags, i32 %mode)"를 추가한다.
+    줄들에 "  ret i32 %result"를 추가한다.
+    줄들에 "}"를 추가한다.
+    줄들을 문자열의 배열로 반환한다.
+
+# 앞 `길이` 줄만 남긴다. 실패한 함수의 부분 출력을 되돌리는 데 쓴다.
+프로젝트 내부 함수 줄들자르기는 (소비하는 줄들: 문자열의 배열, 길이: 자연수)를 받아
+    만약 줄들.길이 <= 길이이면
+        줄들을 문자열의 배열로 반환한다.
+    변수 결과는 []이고, 문자열의 배열이다.
+    변수 번은 0이고, 자연수이다.
+    번 < 길이일 동안
+        결과에 줄들[번]을 추가한다.
+        번은 번 + 1이다.
+    결과를 문자열의 배열로 반환한다.

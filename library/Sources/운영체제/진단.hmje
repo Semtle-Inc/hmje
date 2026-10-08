@@ -1,0 +1,61 @@
+# semtleOS 커널 진단 서비스. 일반 앱이 쓰는 API가 아니며 권한이 없으면 오류를 돌려준다.
+# 표준의 내부 시스템 호출 계층 위에 선 운영체제 모듈의 공개 API다.
+
+# 임시 진단용: 타이머 선점 횟수(perf 조사).
+공개 함수 디버그선점횟수는
+    시스템호출0(SYS_DEBUG_PREEMPT_COUNT)를 정수로 반환한다.
+
+공개 함수 소켓재정렬진단은
+    시스템호출0(SYS_DEBUG_SOCKET_REORDER)를 정수로 반환한다.
+
+공개 함수 소켓RTO진단은
+    시스템호출0(SYS_DEBUG_SOCKET_RTO)를 정수로 반환한다.
+
+공개 함수 스케줄러진단값은 (항목: 자연수)를 받아
+    상수 결과는 시스템호출1(SYS_SCHED_DIAG, 항목)이고, 정수이다.
+
+    만약 결과 <= 0이면
+        자연수(0)를 자연수로 반환한다.
+
+    자연수(결과)를 자연수로 반환한다.
+
+공개 함수 디버그선점금지중재스케줄요청은
+    시스템호출0(SYS_DEBUG_PREEMPT_GUARDED_REQUEST)를 정수로 반환한다.
+
+공개 함수 블록입출력대기진단은
+    시스템호출0(SYS_DEBUG_BLOCK_IO_WAIT)를 정수로 반환한다.
+
+공개 함수 버티오블록입출력대기진단은
+    시스템호출0(SYS_DEBUG_VIRTIO_BLOCK_IO_WAIT)를 정수로 반환한다.
+
+공개 함수 버티오다중블록입출력대기진단은
+    시스템호출0(SYS_DEBUG_VIRTIO_MULTI_BLOCK_IO_WAIT)를 정수로 반환한다.
+
+공개 함수 디버그페이지캐시가상매핑은
+    상수 결과는 시스템호출0(SYS_DEBUG_PAGE_CACHE_VM_MAP)이고, 정수이다.
+
+    만약 결과 <= 0이면
+        주소(0)를 주소로 반환한다.
+
+    주소(자연수(결과))를 주소로 반환한다.
+
+공개 함수 디버그객체게이트공유유지는 (밀리초: 자연수, 반복횟수: 자연수)를 받아
+    시스템호출3(SYS_DEBUG_OBJECT_GATE_HOLD_SHARED, 밀리초, 반복횟수, 자연수(0))를 정수로 반환한다.
+
+공개 함수 객체ATA백엔드준비는
+    시스템호출0(SYS_DEBUG_OBJECT_ATA_BACKEND)를 정수로 반환한다.
+
+공개 함수 디버그VMA빈영역반환실패는 (횟수: 자연수)를 받아
+    시스템호출1(SYS_DEBUG_VMA_FREE_FAIL, 횟수)를 정수로 반환한다.
+
+공개 함수 디버그유저복사장애는 (모드: 자연수)를 받아
+    시스템호출1(SYS_DEBUG_USER_COPY_FAULT, 모드)를 정수로 반환한다.
+
+공개 함수 디버그객체테이블롤백은
+    시스템호출0(SYS_DEBUG_OBJECT_TABLE_ROLLBACK)를 정수로 반환한다.
+
+공개 함수 디버그Provenance다시읽기는
+    시스템호출0(SYS_DEBUG_PROVENANCE_RELOAD)를 정수로 반환한다.
+
+공개 함수 디버그영속Provenance개수는
+    시스템호출0(SYS_DEBUG_PROVENANCE_PERSISTED_COUNT)를 정수로 반환한다.

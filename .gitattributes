@@ -1,0 +1,14 @@
+*.hmje text eol=lf
+*.hmjep text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+vendor/** linguist-vendored=true
+**/vendor/** linguist-vendored=true
+**/sqlite3.c linguist-vendored=true
+**/sqlite3.h linguist-vendored=true
+platforms/tools/targets/** linguist-vendored=true
+**/Native/** linguist-vendored=true
+compiler/runtime/** linguist-vendored=true
+library/runtime/** linguist-vendored=true
+*.ttf binary
+*.otf binary

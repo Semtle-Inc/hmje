@@ -1,0 +1,59 @@
+{
+  "verified_date": "2026-10-09",
+  "status": "passed",
+  "host": "macos-arm64",
+  "source_export_commit": "8a8cd291756a53ac9ee3faba9423ef78abf5fcb0",
+  "compiler_source_commit": "032483bd83c275837d0a277db125f651bf34b678",
+  "package_toolchain_commit": "d2ce1c947dcc32ea40fd242a530e36bbf22a1790",
+  "hmje_ui_commit": "f86d7421e77349f4c053d25a836862dde89c1358",
+  "build_from_verified_beta1_tools": true,
+  "isolated_install": true,
+  "checks": [
+    "smoke",
+    "async",
+    "failures",
+    "hello",
+    "kinds",
+    "screen (compile only)",
+    "types",
+    "HostSmoke",
+    "SyntaxSmoke",
+    "shape-winding"
+  ],
+  "check_count": 10,
+  "binary_reproduction_claim": false,
+  "excluded": [
+    "Windows and Linux execution",
+    "iOS and Android deployment",
+    "interactive UI behavior"
+  ],
+  "tools": [
+    {
+      "source_revision": "8a8cd291756a53ac9ee3faba9423ef78abf5fcb0",
+      "sha256": "3275a6877e3e69fb3d4f7b23a31e2b9c5596032254e8d0826c8539e28b868677",
+      "name": "컴파일러"
+    },
+    {
+      "source_revision": "8a8cd291756a53ac9ee3faba9423ef78abf5fcb0",
+      "sha256": "edd3b0afd44fe1926f168b71cf08e9e84618e768f34a2858a59ec488c211c2a6",
+      "name": "hmir을llvm으로"
+    },
+    {
+      "source_revision": "8a8cd291756a53ac9ee3faba9423ef78abf5fcb0",
+      "sha256": "1f46635f34899e62fcd469639f1f8a7c550c79571d5f42bb83082d6754f6dcf3",
+      "name": "제품조정기"
+    },
+    {
+      "source_revision": "8a8cd291756a53ac9ee3faba9423ef78abf5fcb0",
+      "sha256": "ec571cc3fc8d65a17dd50c204c66854a296abf389615990c92fbd5d2f66c69ab",
+      "name": "프로젝트조정기"
+    }
+  ],
+  "upstream_file_check": {
+    "matched": 421,
+    "public_adaptations": [
+      "compiler/Sources/제품/진단.hmje",
+      "library/README.md"
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+프로젝트 hmje-crypto의
+    버전은 "0.1.0"이다.
+의존 프로젝트 hmje-library의
+    로컬 경로는 "../../library"이다.
+모듈 HmjeCrypto의
+    원본 경로는 "Sources/HmjeCrypto"이고,
+    외부 구현은 CryptoNative이고,
+    의존 라이브러리는 기반이다.
+외부 구현 CryptoNative의
+    원본 경로는 "Native"이다.
+    macOS 설정의
+        원본 파일은
+            "kdf.c"와,
+            "crypto_common.c"와,
+            "crypto_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            Security이다.
+    iOS 설정의
+        원본 파일은
+            "kdf.c"와,
+            "crypto_common.c"와,
+            "crypto_apple.m"이고,
+        시스템 프레임워크는
+            Foundation과,
+            Security이다.
+    Android 설정의
+        원본 파일은
+            "kdf.c"와,
+            "crypto_common.c"와,
+            "crypto_android.c"이다.
+    Linux 설정의
+        원본 파일은
+            "kdf.c"와,
+            "crypto_common.c"와,
+            "crypto_unsupported.c"와,
+            "random_linux.c"이다.
+    Windows 설정의
+        원본 파일은
+            "kdf.c"와,
+            "crypto_common.c"와,
+            "crypto_windows.c"와,
+            "random_windows.c"이고,
+        시스템 라이브러리는 bcrypt이다.
+라이브러리 HmjeCrypto의
+    내보내는 모듈은 HmjeCrypto이다.
+모듈 CryptoTests의
+    원본 경로는 "Tests/Hmje"이고,
+    의존 모듈은 HmjeCrypto이고,
+    의존 라이브러리는 기반이다.
+실행 파일 CryptoTests의
+    시작 모듈은 CryptoTests이다.
+
+모듈 KdfTests의
+    원본 경로는 "Tests/Kdf"이고,
+    의존 모듈은 HmjeCrypto이고,
+    의존 라이브러리는 기반이다.
+실행 파일 KdfTests의
+    시작 모듈은 KdfTests이다.

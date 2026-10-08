@@ -1,0 +1,53 @@
+# HmjeUI 파사드 — 실제 구현은 아래 모듈로 분할되어 있다(가져오기 순서 = 원본 정의 순서).
+# 소비자는 계속 이 파일만 가져오면 된다. 각 모듈은 앞 모듈을 가져오므로 순서가 보존된다.
+HmjeGraphics를 가져온다.
+HmjeNetwork를 가져온다.
+
+# HmjeUI를 가져온 파일은 아래 HmjeGraphics 이름을 `HmjeGraphics를 가져온다.` 없이
+# 쓴다(재내보내기, 한 단계). HmjeUI 공개 API에 나오는 타입과 앱이 흔히 쓰는 색·
+# 테마·사각형·각도·도형·이미지 이름만 고른다. 저수준 그리기(`그래픽…` 함수,
+# 명령 태그, 픽셀 읽기)는 HmjeGraphics를 직접 가져와 쓴다.
+# 타입과 열거형
+HmjeGraphics의 색상과, 사각형과, 그래픽과, 폰트와, 도형과, 각도와, 그래픽이미지와, 이미지자산을 내보낸다.
+HmjeGraphics의 시스템색상종류와, 시스템폰트종류와, 폰트웨이트와, 시스템테마종류와, 시스템브랜드종류와, 시스템뉴트럴종류를 내보낸다.
+# 색
+HmjeGraphics의 색상RGB와, 색상RGBA와, 색상HEX와, 색상헥스와, 색상값과, 색상빨강과, 색상초록과, 색상파랑과, 색상알파와, 색상알파혼합과, 흰색과, 검정색과, 빈칠과, 투명칠을 내보낸다.
+# 테마
+HmjeGraphics의 시스템색상과, 시스템폰트와, 테마설정과, 브랜드설정과, 뉴트럴설정과, 현재테마값과, 현재브랜드값과, 현재뉴트럴값과, 시스템테마따르기를 내보낸다.
+# 테마(ui_theme.hmje `UI테마`가 받는 기본 처리와 번호 공간). 디자인 시스템 라이브러리가 쓴다.
+HmjeGraphics의 기본테마색값과, 기본테마토큰정규와, 기본테마눌림토큰과, 테마토큰정규와, 색테마이름과, 테마역할번호시작과, 테마역할개수와, 테마색낱말번호시작을 내보낸다.
+# 사각형·각도·도형·이미지
+HmjeGraphics의 사각형만들기와, 빈사각형과, 도각도와, 라디안각도와, 영각도와, 각도의도와, 각도의라디안과, 각도더하기와, 각도빼기를 내보낸다.
+HmjeGraphics의 빈도형과, 도형이동과, 도형선과, 도형곡선과, 도형닫기와, 도형사각추가와, 도형원추가와, 도형둥근사각추가와, 이미지자산불러오기를 내보낸다.
+# HmjeUI 매개(`이미지`의 맞춤, `텍스트말줄임지정`, 그라데이션)가 받는 상수
+HmjeGraphics의 이미지맞춤_늘리기와, 이미지맞춤_여백맞춤과, 이미지맞춤_채우기와, 말줄임위치_뒤와, 말줄임위치_앞과, 말줄임위치_가운데를 내보낸다.
+HmjeGraphics의 그라데이션방향_세로와, 그라데이션방향_가로와, 그라데이션방향_대각과, 그라데이션방향_방사형과, 그라데이션방향_타원형을 내보낸다.
+
+"ui_theme.hmje"를 가져온다.
+"ui_app_state.hmje"를 가져온다.
+"ui_view.hmje"를 가져온다.
+"ui_widget.hmje"를 가져온다.
+"ui_view_tree.hmje"를 가져온다.
+"ui_words.hmje"를 가져온다.
+"ui_fill.hmje"를 가져온다.
+"ui_common_modifier.hmje"를 가져온다.
+"ui_lazy.hmje"를 가져온다.
+"ui_layout.hmje"를 가져온다.
+"ui_interaction.hmje"를 가져온다.
+"ui_drag_drop.hmje"를 가져온다.
+"ui_draw.hmje"를 가져온다.
+"ui_text_input.hmje"를 가져온다.
+"ui_text_layout.hmje"를 가져온다.
+"ui_text_session.hmje"를 가져온다.
+"ui_animation.hmje"를 가져온다.
+"ui_task.hmje"를 가져온다.
+# `ui_async_image.hmje`(비동기이미지화면)는 HmjeNetwork 모듈에 기댄다. 이 우산
+# 파일의 가져오기 사슬에서는 빼고, 모듈 빌드는 디렉터리 전체가 HmjeUI 모듈이므로
+# 그대로 들어간다.
+"ui_navigation.hmje"를 가져온다.
+"ui_accessibility.hmje"를 가져온다.
+"ui_design_tree.hmje"를 가져온다.
+"ui_transform_gesture.hmje"를 가져온다.
+"ui_app_event.hmje"를 가져온다.
+"ui_app_loop.hmje"를 가져온다.
+"ui_block_rules.hmje"를 가져온다.

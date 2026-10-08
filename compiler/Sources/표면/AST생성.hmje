@@ -1,0 +1,98 @@
+기반을 가져온다.
+
+# UI·DB·라우트 낮추기가 공유하는 코어 AST 생성 API다. 각 영역이
+# JSON 필드 모양을 복제하지 않으므로 AST ABI 변경은 이 파일에서 끝난다.
+함수 표면AST이름은 (이름: 문자열)를 받아
+    파싱AST노드("NameExpr", ["name", "compiler_generated"], [JSON문자열값(이름), JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST정수는 (값: 자연수)를 받아
+    파싱AST노드("IntLiteral", ["value"], [파싱정수태그(값)])을 JSON값으로 반환한다.
+
+함수 표면AST논리는 (값: 참거짓)를 받아
+    파싱AST노드("BoolLiteral", ["value"], [JSON참거짓값(값)])을 JSON값으로 반환한다.
+
+함수 표면AST문자열은 (값: 문자열)를 받아
+    파싱AST노드("StringLiteral", ["value"], [JSON문자열값(값)])을 JSON값으로 반환한다.
+
+함수 표면AST필드는 (바탕: JSON값, 이름: 문자열)를 받아
+    파싱AST노드("FieldAccessExpr", ["base", "field"], [바탕, JSON문자열값(이름)])을 JSON값으로 반환한다.
+
+함수 표면AST변환은 (타입: 문자열, 식: JSON값)를 받아
+    파싱AST노드("CastExpr", ["type_name", "expr", "compiler_generated"], [JSON문자열값(타입), 식, JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST호출은 (이름: 문자열, 인자들: JSON값의 배열)를 받아
+    파싱AST노드("CallExpr", ["name", "args", "compiler_generated"], [JSON문자열값(이름), JSON배열값(인자들), JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST배열은 (원소들: JSON값의 배열)를 받아
+    파싱AST노드("ArrayLiteral", ["elements"], [JSON배열값(원소들)])을 JSON값으로 반환한다.
+
+함수 표면AST구조체값은 (이름: 문자열, 필드이름들: 문자열의 배열, 필드값들: JSON값의 배열)를 받아
+    상수 필드들은 JSON객체값(필드이름들, 필드값들)이고, JSON값이다.
+    파싱AST노드("StructInitExpr", ["name", "fields", "unsafe", "base", "compiler_generated"], [JSON문자열값(이름), 필드들, JSON참거짓값(거짓), JSON널(), JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+# 구조체 갱신(`타입(바탕에서, 필드: 값)`). 반복 항목 끌기가 원소 하나만
+# 새로 만들 때 쓴다 — 나머지 필드를 손으로 옮겨 적지 않는다.
+함수 표면AST구조체갱신값은 (이름: 문자열, 바탕: JSON값, 필드이름들: 문자열의 배열, 필드값들: JSON값의 배열)를 받아
+    상수 필드들은 JSON객체값(필드이름들, 필드값들)이고, JSON값이다.
+    파싱AST노드("StructInitExpr", ["name", "fields", "unsafe", "base", "compiler_generated"], [JSON문자열값(이름), 필드들, JSON참거짓값(거짓), 바탕, JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST클로저값은 (함수이름: 문자열, 캡처이름들: 문자열의 배열, 캡처타입들: 문자열의 배열)를 받아
+    변수 캡처들은 []이고, JSON값의 배열이다.
+    변수 번은 0이고, 자연수이다.
+    번 < 캡처이름들.길이 그리고 번 < 캡처타입들.길이일 동안
+        캡처들에 JSON배열값([JSON문자열값(캡처이름들[번]), JSON문자열값(캡처타입들[번])])을 추가한다.
+        번은 번 + 1이다.
+    파싱AST노드("ClosureValueExpr", ["function_name", "captures"], [JSON문자열값(함수이름), JSON배열값(캡처들)])을 JSON값으로 반환한다.
+
+함수 표면AST매개는 (이름: 문자열, 타입: 문자열)를 받아
+    파싱AST노드("Parameter", ["name", "type_name", "consuming", "compiler_generated"], [JSON문자열값(이름), JSON문자열값(타입), JSON참거짓값(거짓), JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST정의는 (이름: 문자열, 타입: JSON값, 식: JSON값)를 받아
+    파싱AST노드("Define", ["mutable", "name", "type_name", "expr", "retain_borrowed_owner", "compiler_generated"], [JSON참거짓값(거짓), JSON문자열값(이름), 타입, 식, JSON참거짓값(거짓), JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST변수정의는 (이름: 문자열, 타입: 문자열, 식: JSON값)를 받아
+    파싱AST노드("Define", ["mutable", "name", "type_name", "expr", "retain_borrowed_owner", "compiler_generated"], [JSON참거짓값(참), JSON문자열값(이름), JSON문자열값(타입), 식, JSON참거짓값(거짓), JSON참거짓값(참)])을 JSON값으로 반환한다.
+
+함수 표면AST대입은 (이름: 문자열, 식: JSON값)를 받아
+    상수 대상은 파싱AST노드("NameTarget", ["name"], [JSON문자열값(이름)])이고, JSON값이다.
+    파싱AST노드("Assign", ["target", "expr"], [대상, 식])을 JSON값으로 반환한다.
+
+함수 표면AST조건노드는 (식: JSON값)를 받아
+    # 이미 조건 노드면 그대로 쓴다(자연어 조건 파서가 낸 것).
+    상수 종류는 파싱AST종류(식)이고, 문자열이다.
+    만약 종류 == "CompareCondition" 또는 종류 == "LogicalCondition" 또는 종류 == "BoolExprCondition" 또는 종류 == "NotCondition"이면
+        식을 JSON값으로 반환한다.
+    만약 파싱AST종류(식) == "BinaryExpr"이면
+        상수 연산자는 파싱AST문자필드(식, "op")이고, 문자열이다.
+        만약 연산자 == "==" 또는 연산자 == "!=" 또는 연산자 == "<" 또는 연산자 == "<=" 또는 연산자 == ">" 또는 연산자 == ">="이면
+            파싱AST노드("CompareCondition", ["left", "op", "right"], [파싱JSON필드(식, "left"), JSON문자열값(연산자), 파싱JSON필드(식, "right")])을 JSON값으로 반환한다.
+    파싱AST노드("BoolExprCondition", ["expr"], [식])을 JSON값으로 반환한다.
+
+함수 표면AST조건은 (조건식: JSON값, 본문: JSON값의 배열)를 받아
+    상수 가지는 JSON배열값([표면AST조건노드(조건식), JSON배열값(본문)])이고, JSON값이다.
+    파싱AST노드("If", ["branches", "else_body"], [JSON배열값([가지]), JSON널()])을 JSON값으로 반환한다.
+
+함수 표면AST조건아니면은 (조건식: JSON값, 본문: JSON값의 배열, 아니면본문: JSON값의 배열)를 받아
+    상수 가지는 JSON배열값([표면AST조건노드(조건식), JSON배열값(본문)])이고, JSON값이다.
+    파싱AST노드("If", ["branches", "else_body"], [JSON배열값([가지]), JSON배열값(아니면본문)])을 JSON값으로 반환한다.
+
+함수 표면AST식문은 (식: JSON값)를 받아
+    파싱AST노드("ExprStmt", ["expr"], [식])을 JSON값으로 반환한다.
+
+함수 표면AST반환은 (식: JSON값, 타입: JSON값)를 받아
+    파싱AST노드("Return", ["expr", "type_name", "compiler_generated", "opaque_trait_name"], [식, 타입, JSON참거짓값(참), JSON널()])을 JSON값으로 반환한다.
+
+함수 표면AST빈반환은
+    표면AST반환(JSON널(), JSON널())을 JSON값으로 반환한다.
+
+함수 표면AST함수는 (이름: 문자열, 매개들: JSON값의 배열, 본문: JSON값의 배열, 반환타입: JSON값)를 받아
+    파싱AST노드("FunctionDef", ["name", "params", "body", "return_type", "external_name", "unsafe", "can_fail", "type_params", "type_constraints", "visibility", "compiler_generated", "is_async", "opaque_trait_name"], [JSON문자열값(이름), JSON배열값(매개들), JSON배열값(본문), 반환타입, JSON널(), JSON참거짓값(거짓), JSON참거짓값(거짓), JSON배열값([]), JSON배열값([]), 파싱열거값("Visibility", "module"), JSON참거짓값(참), JSON참거짓값(거짓), JSON널()])을 JSON값으로 반환한다.
+
+# 비동기 함수 선언(`is_async`). 화면 수명 비동기 작업 본문이 여기 담긴다.
+함수 표면AST비동기함수는 (이름: 문자열, 매개들: JSON값의 배열, 본문: JSON값의 배열, 반환타입: JSON값)를 받아
+    파싱AST노드("FunctionDef", ["name", "params", "body", "return_type", "external_name", "unsafe", "can_fail", "type_params", "type_constraints", "visibility", "compiler_generated", "is_async", "opaque_trait_name"], [JSON문자열값(이름), JSON배열값(매개들), JSON배열값(본문), 반환타입, JSON널(), JSON참거짓값(거짓), JSON참거짓값(거짓), JSON배열값([]), JSON배열값([]), 파싱열거값("Visibility", "module"), JSON참거짓값(참), JSON참거짓값(참), JSON널()])을 JSON값으로 반환한다.
+
+# 화면 수명 비동기 작업 하나를 띄운다(시작·등록·인계
+# 부분). 방문 토큰이 0이 아닌지 보는 분기는 이 노드 밖 조건문이 맡는다.
+함수 표면AST비동기작업시작은 (토큰식: JSON값, 호출: JSON값)를 받아
+    파싱AST노드("UIAsyncTaskStart", ["token", "call", "compiler_generated"], [토큰식, 호출, JSON참거짓값(참)])을 JSON값으로 반환한다.

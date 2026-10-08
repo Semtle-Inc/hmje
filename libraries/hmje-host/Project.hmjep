@@ -1,0 +1,41 @@
+프로젝트 hmje-host의
+    버전은 "0.1.0"이다.
+
+# 표준·기반·HmjeUI는 설치된 툴체인의 플랫폼 라이브러리에서 찾는다(`의존 프로젝트` 불필요).
+
+# 호스트(데스크톱 OS) 자원을 앱이 쓰기 쉬운 크기로 감싼 두 모듈.
+# - HmjeFiles: 파일 라이브러리 위의 텍스트 단위 읽기/원자 쓰기, 디렉터리 항목, 경로 조작
+# - HmjeProcess: 셸 없는 자식 프로세스 + 논블로킹 파이프 + 줄 단위 출력 모음
+# macOS·Linux·Windows에서 동작한다. 네이티브 경계는 툴체인 호스트 런타임의 hmje_host_* 계약이다
+# (Windows: CreateProcessW·이름 있는 파이프·작업 객체). 경로 규칙(구분자·홈·임시·PATH)만 플랫폼별
+# 원본(Sources/HmjeFilesPosix · Sources/HmjeFilesWindows)이 나눈다.
+모듈 HmjeFiles의
+    원본 경로는 "Sources/HmjeFiles"이다.
+    macOS 설정의
+        원본 경로는 "Sources/HmjeFilesPosix"이다.
+    Linux 설정의
+        원본 경로는 "Sources/HmjeFilesPosix"이다.
+    Windows 설정의
+        원본 경로는 "Sources/HmjeFilesWindows"이다.
+
+모듈 HmjeProcess의
+    원본 경로는 "Sources/HmjeProcess"이다.
+
+라이브러리 HmjeFiles의
+    내보내는 모듈은 HmjeFiles이다.
+
+라이브러리 HmjeProcess의
+    내보내는 모듈은 HmjeProcess이다.
+
+모듈 HostSmoke의
+    원본 경로는 "Tests/HostSmoke"이고,
+    의존 모듈은
+        HmjeFiles와,
+        HmjeProcess이다.
+
+실행 파일 HostSmoke의
+    시작 모듈은 HostSmoke이고,
+    지원 플랫폼은
+        macOS 14 이상과,
+        Windows 11 이상과,
+        Linux이다.

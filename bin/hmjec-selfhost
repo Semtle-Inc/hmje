@@ -1,0 +1,632 @@
+#!/bin/sh
+
+# Owned scratch survives only when explicitly requested for debugging.
+hmje_temp_remove() {
+    if [ "${HMJE_KEEP_TEMP:-0}" = 1 ]; then
+        for hmje_temp_path do
+            [ "$hmje_temp_path" = -- ] || [ -z "$hmje_temp_path" ] || printf 'HMJE_KEEP_TEMP=1: %s\n' "$hmje_temp_path" >&2
+        done
+    else
+        rm -rf "$@"
+    fi
+}
+set -eu
+
+HMJE_DRIVER=$0
+while [ -L "$HMJE_DRIVER" ]; do
+    HMJE_LINK=$(readlink "$HMJE_DRIVER")
+    case "$HMJE_LINK" in
+        /*) HMJE_DRIVER=$HMJE_LINK ;;
+        *) HMJE_DRIVER=$(dirname -- "$HMJE_DRIVER")/$HMJE_LINK ;;
+    esac
+done
+ROOT=$(CDPATH= cd -- "$(dirname -- "$HMJE_DRIVER")/.." && pwd)
+. "$ROOT/bin/hmje-environment.sh"
+# stage0 자산은 플랫폼별로 갈린다. 릴리스 자산 슬롯은 uname으로 고르고,
+# 슬롯이 없으면 Darwin 시절부터 있던 bootstrap/current 심링크로 되돌아간다.
+hmje_bootstrap_slot() {
+    HMJE_SLOT_OS=
+    HMJE_SLOT_ARCH=
+    case "$(uname -s)" in
+        Darwin) HMJE_SLOT_OS=darwin ;;
+        Linux) HMJE_SLOT_OS=linux ;;
+    esac
+    case "$(uname -m)" in
+        arm64|aarch64) HMJE_SLOT_ARCH=aarch64 ;;
+        x86_64|amd64) HMJE_SLOT_ARCH=x86_64 ;;
+    esac
+    if [ -n "$HMJE_SLOT_OS" ] && [ -n "$HMJE_SLOT_ARCH" ]; then
+        printf '%s-%s' "$HMJE_SLOT_OS" "$HMJE_SLOT_ARCH"
+    fi
+}
+if [ -d "$ROOT/compiler/Sources" ] && [ -d "$ROOT/library" ]; then
+    # 전환 뒤의 통합 hmje-toolchain 배치.
+    TOOLCHAIN_ROOT=${HMJE_TOOLCHAIN_ROOT:-"$ROOT"}
+    COMPILER_ROOT=${HMJE_COMPILER_ROOT:-"$ROOT/compiler"}
+    BOOTSTRAP_SLOT=$(hmje_bootstrap_slot)
+    BOOTSTRAP_DEFAULT=$ROOT/bootstrap/current/bin
+    if [ -n "$BOOTSTRAP_SLOT" ] && [ -d "$ROOT/bootstrap/$BOOTSTRAP_SLOT/bin" ]; then
+        BOOTSTRAP_DEFAULT=$ROOT/bootstrap/$BOOTSTRAP_SLOT/bin
+    fi
+    BOOTSTRAP_BIN=${HMJE_TOOL_BIN:-${HMJE_BOOTSTRAP_BIN:-"$BOOTSTRAP_DEFAULT"}}
+    CACHE_ROOT=${HMJE_CACHE_ROOT:-"$HMJE_CACHE_HOME/v1/products"}
+    PARSE_CACHE=${HMJE_PARSE_CACHE:-"$HMJE_CACHE_HOME/v1/parse"}
+else
+    # 물리 전환 전 hmje-bootstrap + 형제 hmje-toolchain 배치.
+    TOOLCHAIN_ROOT=${HMJE_TOOLCHAIN_ROOT:-"$ROOT/../hmje-toolchain"}
+    COMPILER_ROOT=${HMJE_COMPILER_ROOT:-"$ROOT"}
+    BOOTSTRAP_BIN=${HMJE_BOOTSTRAP_BIN:-"$ROOT/build"}
+    CACHE_ROOT=${HMJE_CACHE_ROOT:-"$ROOT/build/자립제품캐시"}
+    PARSE_CACHE=${HMJE_PARSE_CACHE:-"$ROOT/build/자립파싱캐시"}
+fi
+# 파싱 결과 모듈 캐시(compiler/Sources/프론트엔드/모듈적재.hmje). 프론트엔드는
+# 디렉터리를 만들지 않는다 — 없으면 캐시가 조용히 꺼진다. `--캐시끄기`는
+# 프론트엔드 쪽에서 같은 자리를 막으므로 여기서는 뿌리만 준다.
+mkdir -p "$PARSE_CACHE" 2>/dev/null || true
+HMJE_PARSE_CACHE=$PARSE_CACHE
+export HMJE_PARSE_CACHE
+TARGET=
+SOURCE=
+OUTPUT=
+TARGET_ARCH=
+MEASURE=0
+NO_CACHE=0
+LIBRARY_ROOT=$TOOLCHAIN_ROOT/library
+MODULE_MAP=
+NATIVE_PLAN=
+IOS_SIM=0
+WINDOWS=0
+IOS_DEVICE=0
+IOS_DEPLOYMENT=
+OS_ROOT=
+LLVM_IR=
+SEMTLEOS_ELF=0
+SEMTLEOS_LLVM=0
+DUMP_DEPS=0
+MACOS_PRODUCT=0
+SEMTLEOS_ARCH=
+SEMTLEOS_PLATFORM=
+ANDROID=0
+ANDROID_KIND=
+TARGET_OS=
+EMIT_IR_ONLY=0
+HMIR_ONLY=0
+RUN_USER=0
+trap 'HMJE_EXIT_STATUS=$?; hmje_failed_output_remove "$HMJE_EXIT_STATUS" "$OUTPUT"; [ -z "${USER_WORK:-}" ] || hmje_temp_remove "$USER_WORK"; [ -z "${HMIR_COPY:-}" ] || hmje_temp_remove "$HMIR_COPY"; exit "$HMJE_EXIT_STATUS"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+usage() {
+    echo 'Native worker limit: --jobs N / -j N (1..64); defaults to min(CPUs, 4).'
+    echo 'Platform libraries: hmjec --platform-libraries lists the bundled libraries; project builds accept --verbose to show where each 의존 라이브러리 resolved.'
+    echo "Shared cache: $HMJE_CACHE_HOME/v1 (override with --cache-dir DIR)."
+    echo "usage: hmjec --project ROOT --artifact NAME --target TARGET -o OUTPUT [--define NAME=VALUE] [--cache-dir DIR] [--no-cache]"
+    echo "additional native targets: user hmir posix-host-hmir limine-hmir app-hmir aarch64-limine-kernel-hmir limine-llvm-ir app-llvm-ir aarch64-llvm-ir aarch64-limine-llvm-ir aarch64-limine-kernel-llvm-ir aarch64-stdapp-llvm-ir aarch64-app-llvm-ir"
+    echo "usage: hmjec-selfhost --target {posix-host-llvm-ir|posix-host-exe|macos-app|macos-launch-agent-pkg|ios-sim-llvm-ir|ios-llvm-ir|ios-sim-app|ios-app|android-llvm-ir|android-exe|android-apk|windows-llvm-ir|windows-exe|llvm-ir|limine-elf64|app-elf64|aarch64-elf64|aarch64-limine-elf64|aarch64-limine-kernel-elf64|aarch64-stdapp-elf64|aarch64-app-elf64} source.hmje|source.hmir -o output [--platform {darwin|linux}] [--target-arch {aarch64|x86_64}] [--os-root DIR] [--ui-root DIR] [--llvm-ir FILE] [--ios-deployment-target VERSION] [--계측] [--캐시끄기]"
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --jobs|-j)
+            [ "$#" -ge 2 ] || { echo 'error: --jobs requires a value' >&2; exit 2; }
+            HMJE_JOBS=$2; hmje_validate_jobs; export HMJE_JOBS; shift 2 ;;
+        --target)
+            [ "$#" -ge 2 ] || { echo "error: --target requires a value" >&2; exit 2; }
+            TARGET=$2
+            shift 2
+            ;;
+        -o|--output)
+            [ "$#" -ge 2 ] || { echo "error: -o requires a value" >&2; exit 2; }
+            OUTPUT=$2
+            shift 2
+            ;;
+        --target-arch)
+            [ "$#" -ge 2 ] || { echo "error: --target-arch requires a value" >&2; exit 2; }
+            TARGET_ARCH=$2
+            shift 2
+            ;;
+        --cache-dir|--cache-root)
+            [ "$#" -ge 2 ] && [ -n "$2" ] || { echo "error: $1 requires a value" >&2; exit 2; }
+            CACHE_ROOT=$2
+            HMJE_CACHE_ROOT=$CACHE_ROOT
+            HMJE_PARSE_CACHE=$CACHE_ROOT/parse
+            mkdir -p "$HMJE_PARSE_CACHE"
+            export HMJE_CACHE_ROOT HMJE_PARSE_CACHE
+            shift 2
+            ;;
+        --platform)
+            [ "$#" -ge 2 ] || { echo "error: --platform requires a value" >&2; exit 2; }
+            TARGET_OS=$2
+            shift 2
+            ;;
+        --module-map)
+            [ "$#" -ge 2 ] || { echo "error: --module-map requires a value" >&2; exit 2; }
+            MODULE_MAP=$2
+            shift 2
+            ;;
+        --native-plan)
+            [ "$#" -ge 2 ] || { echo "error: --native-plan requires a value" >&2; exit 2; }
+            NATIVE_PLAN=$2
+            shift 2
+            ;;
+        --library-root)
+            [ "$#" -ge 2 ] && [ -f "$2/Project.hmjep" ] || { echo 'error: invalid library root' >&2; exit 2; }
+            LIBRARY_ROOT=$2
+            shift 2
+            ;;
+        --os-root)
+            [ "$#" -ge 2 ] || { echo "error: --os-root requires a value" >&2; exit 2; }
+            OS_ROOT=$2
+            shift 2
+            ;;
+        # UI·그래픽 소스를 소유하는 저장소(hmje-ui). 정본 project_paths가 읽는
+        # 환경변수와 같은 이름을 쓰므로 옵션은 그 변수로 옮기기만 한다.
+        --ui-root)
+            [ "$#" -ge 2 ] || { echo "error: --ui-root requires a value" >&2; exit 2; }
+            HMJE_UI_ROOT=$2
+            export HMJE_UI_ROOT
+            shift 2
+            ;;
+        --llvm-ir)
+            [ "$#" -ge 2 ] || { echo "error: --llvm-ir requires a value" >&2; exit 2; }
+            LLVM_IR=$2
+            shift 2
+            ;;
+        --android-min-sdk)
+            [ "$#" -ge 2 ] || { echo 'error: --android-min-sdk requires a value' >&2; exit 2; }
+            HMJE_ANDROID_MIN_SDK=$2
+            export HMJE_ANDROID_MIN_SDK
+            shift 2
+            ;;
+        --ios-deployment-target)
+            [ "$#" -ge 2 ] || { echo "error: --ios-deployment-target requires a value" >&2; exit 2; }
+            IOS_DEPLOYMENT=$2
+            shift 2
+            ;;
+        -v|--verbose|--자세히)
+            HMJE_PROJECT_VERBOSE=1
+            export HMJE_PROJECT_VERBOSE
+            shift
+            ;;
+        --계측)
+            MEASURE=1
+            shift
+            ;;
+        --dump-deps)
+            DUMP_DEPS=1
+            shift
+            ;;
+        --no-cache|--캐시끄기)
+            NO_CACHE=1
+            shift
+            ;;
+        --version)
+            echo "hmjec native $(hmje_tool_revision "${HMJE_FRONTEND:-$BOOTSTRAP_BIN/컴파일러}")"
+            echo "hmir을llvm으로 $(hmje_tool_revision "${HMJE_BACKEND:-$BOOTSTRAP_BIN/hmir을llvm으로}")"
+            echo "제품조정기 $(hmje_tool_revision "${HMJE_COORDINATOR:-$BOOTSTRAP_BIN/제품조정기}")"
+            echo "프로젝트조정기 $(hmje_tool_revision "${HMJE_PROJECT_COORDINATOR:-$BOOTSTRAP_BIN/프로젝트조정기}")"
+            if [ -f "$ROOT/platform-libraries/index.tsv" ]; then
+                echo "플랫폼 라이브러리 $(grep -vc '^#' "$ROOT/platform-libraries/index.tsv")개 + 툴체인 library (hmjec --platform-libraries)"
+            fi
+            exit 0
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --*)
+            echo "error: unsupported self-hosted option: $1" >&2
+            exit 2
+            ;;
+        *)
+            [ -z "$SOURCE" ] || { echo "error: multiple source files are not supported" >&2; exit 2; }
+            SOURCE=$1
+            shift
+            ;;
+    esac
+done
+
+# Automatic shared-cache maintenance for every compiler writing the default
+# cache (installed, build-native output, stage0). The tool throttles itself
+# (hourly, every 5 minutes while the volume is low on space) and never fails
+# the compilation. An explicit --cache-dir is caller-owned and left alone.
+if [ "$NO_CACHE" -eq 0 ] && [ "${HMJE_CACHE_GC:-on}" != off ] \
+    && [ "$PARSE_CACHE" = "$HMJE_CACHE_HOME/v1/parse" ] \
+    && [ "$CACHE_ROOT" = "$HMJE_CACHE_HOME/v1/products" ]; then
+    HMJE_GC_TOOL=$(hmje_cache_tool "$BOOTSTRAP_BIN" 2>/dev/null) || HMJE_GC_TOOL=
+    [ -z "$HMJE_GC_TOOL" ] || "$HMJE_GC_TOOL" prune "$HMJE_CACHE_HOME/v1" --automatic >/dev/null 2>&1 || true
+fi
+
+case "$TARGET_ARCH" in
+    ""|aarch64|x86_64) ;;
+    arm64) TARGET_ARCH=aarch64 ;;
+    *) echo "error: unsupported --target-arch: $TARGET_ARCH" >&2; exit 2 ;;
+esac
+# IR aliases select the same lowering policy as their executable counterpart.
+case "$TARGET" in
+    limine-llvm-ir) TARGET=limine-elf64; EMIT_IR_ONLY=1 ;;
+    app-llvm-ir) TARGET=app-elf64; EMIT_IR_ONLY=1 ;;
+    aarch64-llvm-ir) TARGET=aarch64-elf64; EMIT_IR_ONLY=1 ;;
+    aarch64-limine-llvm-ir) TARGET=aarch64-limine-elf64; EMIT_IR_ONLY=1 ;;
+    aarch64-limine-kernel-llvm-ir) TARGET=aarch64-limine-kernel-elf64; EMIT_IR_ONLY=1 ;;
+    aarch64-stdapp-llvm-ir) TARGET=aarch64-stdapp-elf64; EMIT_IR_ONLY=1 ;;
+    aarch64-app-llvm-ir) TARGET=aarch64-app-elf64; EMIT_IR_ONLY=1 ;;
+    hmir) TARGET=llvm-ir; HMIR_ONLY=1 ;;
+    posix-host-hmir) TARGET=posix-host-llvm-ir; HMIR_ONLY=1 ;;
+    limine-hmir) TARGET=limine-elf64; HMIR_ONLY=1 ;;
+    app-hmir) TARGET=app-elf64; HMIR_ONLY=1 ;;
+    aarch64-limine-kernel-hmir) TARGET=aarch64-limine-kernel-elf64; HMIR_ONLY=1 ;;
+    user)
+        TARGET=posix-host-exe; RUN_USER=1
+        USER_WORK=$(mktemp -d "${TMPDIR:-/tmp}/hmje-user.XXXXXXXX")
+        OUTPUT=$USER_WORK/program ;;
+esac
+[ -z "${HMJE_JOBS+x}" ] || hmje_validate_jobs
+[ -n "$TARGET" ] || { echo "error: --target is required; use --target posix-host-exe for a console program (hmjec --help lists targets)" >&2; exit 2; }
+[ -n "$SOURCE" ] || { echo "error: source is required" >&2; exit 2; }
+if [ "$DUMP_DEPS" -eq 1 ] && [ -z "$OUTPUT" ]; then OUTPUT=/dev/null; fi
+[ -n "$OUTPUT" ] || { echo "error: -o output is required" >&2; exit 2; }
+
+case "$TARGET" in
+    posix-host-llvm-ir) OUTPUT_KIND=llvm ;;
+    posix-host-exe) OUTPUT_KIND=exe ;;
+    # macOS 제품 타깃(정본 platforms/tools/targets/macos_app.py,
+    # macos_launch_agent.py). 링크는 posix-host-exe와 같은 hosted 경로를 타고
+    # 번들 포장·서명·pkg만 compiler/Sources/제품/macOS.hmje가 더한다.
+    macos-app) OUTPUT_KIND=macos-app; MACOS_PRODUCT=1 ;;
+    macos-launch-agent-pkg) OUTPUT_KIND=macos-pkg; MACOS_PRODUCT=1 ;;
+    ios-sim-llvm-ir) OUTPUT_KIND=llvm; IOS_SIM=1 ;;
+    # 정본 ios-llvm-ir/ios-sim-app/ios-app: 시뮬레이터와 실기기는 SDK 이름과
+    # 트리플 접미사만 다르다(정본 ios_sim.py의 device= 플래그와 같은 경계).
+    ios-llvm-ir) OUTPUT_KIND=llvm; IOS_SIM=1; IOS_DEVICE=1 ;;
+    ios-sim-app) OUTPUT_KIND=ios-app; IOS_SIM=1 ;;
+    ios-app) OUTPUT_KIND=ios-app; IOS_SIM=1; IOS_DEVICE=1 ;;
+    # Android(Bionic, arm64-v8a) hosted 제품. llvm-ir은 posix hosted 방출과
+    # 같은 경로를 트리플만 바꿔 타고, exe/apk는 자립 Android 링크로 간다.
+    android-llvm-ir) OUTPUT_KIND=android-llvm; ANDROID=1; ANDROID_KIND=exe ;;
+    android-exe) OUTPUT_KIND=android-exe; ANDROID=1; ANDROID_KIND=exe ;;
+    android-apk) OUTPUT_KIND=android-apk; ANDROID=1; ANDROID_KIND=apk ;;
+    # 정본 windows-llvm-ir/windows-exe: hosted지만 컴파일 호스트(이 Mac) ≠ 실행
+    # 호스트(Parallels VM). IR 방출은 여기서 하고 obj·링크만 VM 안의 clang.exe로
+    # 넘긴다. 트리플은 정본 DEFAULT_WINDOWS_TRIPLE(=VM이 arm64 Windows 11)이고
+    # HMJE_WINDOWS_TRIPLE로 갈아끼울 수 있다.
+    windows-llvm-ir) OUTPUT_KIND=llvm; WINDOWS=1 ;;
+    windows-exe) OUTPUT_KIND=windows-exe; WINDOWS=1 ;;
+    # semtleOS x86_64: 정본 limine-elf64/app-elf64. 프론트엔드 플랫폼은
+    # limine-x86_64/app-x86_64, 가져오기 뿌리는 HMJE_OS_ROOT(기본 작업 디렉터리).
+    limine-elf64) OUTPUT_KIND=kernel-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=x86_64 ;;
+    # llvm-ir: 맨 x86_64 plain LLVM IR(일반 소스는 전체 표준·input, 최상위 문장이 main,
+    # 후처리 없음). semtleOS의 context-switch-intrinsic 검사가 쓴다.
+    llvm-ir) OUTPUT_KIND=bare-llvm; SEMTLEOS_LLVM=1 ;;
+    app-elf64) OUTPUT_KIND=app-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=x86_64 ;;
+    # semtleOS aarch64: 정본 aarch64-elf64(-kernel 직접 부팅)/-limine-elf64(최소
+    # limine)/-limine-kernel-elf64(풀 커널)/-stdapp-elf64(표준 EL0 앱)/
+    # -app-elf64(최소 EL0 앱). 트리플은 다섯 모두 aarch64-unknown-none이고
+    # 적재 정책만 플랫폼 낱말로 갈린다.
+    aarch64-elf64) OUTPUT_KIND=aarch64-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=aarch64; SEMTLEOS_PLATFORM=bare-aarch64 ;;
+    aarch64-limine-elf64) OUTPUT_KIND=aarch64-limine-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=aarch64; SEMTLEOS_PLATFORM=limine-min-aarch64 ;;
+    aarch64-limine-kernel-elf64) OUTPUT_KIND=aarch64-kernel-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=aarch64; SEMTLEOS_PLATFORM=limine-aarch64 ;;
+    aarch64-stdapp-elf64) OUTPUT_KIND=aarch64-stdapp-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=aarch64; SEMTLEOS_PLATFORM=app-aarch64 ;;
+    aarch64-app-elf64) OUTPUT_KIND=aarch64-app-elf; SEMTLEOS_ELF=1; SEMTLEOS_ARCH=aarch64; SEMTLEOS_PLATFORM=app-min-aarch64 ;;
+    *) echo "error: target is not self-hosted yet: $TARGET" >&2; exit 2 ;;
+esac
+
+if [ -n "$IOS_DEPLOYMENT" ] && [ "$IOS_SIM" -eq 0 ]; then
+    echo 'error: --ios-deployment-target only applies to iOS targets' >&2; exit 2
+fi
+if [ -n "$LLVM_IR" ] && [ "$SEMTLEOS_ELF" -eq 0 ]; then
+    echo 'error: --llvm-ir only applies to semtleOS executable targets' >&2; exit 2
+fi
+if [ "$SEMTLEOS_ELF" -eq 1 ] && [ -n "$TARGET_ARCH" ] && [ "$TARGET_ARCH" != "$SEMTLEOS_ARCH" ]; then
+    echo "error: --target-arch $TARGET_ARCH conflicts with $TARGET" >&2; exit 2
+fi
+SYSTEM=$(uname -s)
+MACHINE=$(uname -m)
+case "$SYSTEM" in
+    Darwin) PLATFORM=darwin ;;
+    Linux) PLATFORM=linux ;;
+    *) echo "error: unsupported hosted system: $SYSTEM" >&2; exit 2 ;;
+esac
+case "$MACHINE" in
+    arm64|aarch64) HOST_ARCH=aarch64 ;;
+    x86_64|amd64) HOST_ARCH=x86_64 ;;
+    *) echo "error: unsupported hosted architecture: $MACHINE" >&2; exit 2 ;;
+esac
+HMJE_BUILD_HOST_ARCH=$HOST_ARCH
+export HMJE_BUILD_HOST_ARCH
+# --platform: hosted 산출물의 대상 OS를 uname 대신 명시로 고른다. 프론트엔드
+# 플랫폼 낱말(darwin|linux)과 hosted 트리플의 OS 자리를 함께 바꾼다. 링크는
+# 그 OS의 SDK가 필요하므로 교차 OS는 IR만 낼 수 있다(Linux stage0 씨앗 경로).
+if [ -n "$TARGET_OS" ]; then
+    case "$TARGET_OS" in
+        darwin|linux) ;;
+        *) echo "error: unsupported --platform: $TARGET_OS" >&2; exit 2 ;;
+    esac
+    if [ "$IOS_SIM" -eq 1 ] || [ "$SEMTLEOS_ELF" -eq 1 ] || [ "$SEMTLEOS_LLVM" -eq 1 ] || [ "$ANDROID" -eq 1 ] || [ "$WINDOWS" -eq 1 ]; then
+        echo "error: --platform only applies to posix-host targets" >&2
+        exit 2
+    fi
+    if [ "$TARGET_OS" != "$PLATFORM" ] && [ "$OUTPUT_KIND" != llvm ]; then
+        echo "error: cross OS build needs --target posix-host-llvm-ir: $TARGET_OS" >&2
+        exit 2
+    fi
+    PLATFORM=$TARGET_OS
+fi
+# windows는 semtleOS x86 ELF·Android와 같은 이유로 이 검사를 건너뛴다: 백엔드는
+# 트리플만 다르고, obj·링크는 어차피 VM 안 clang.exe가 한다(교차 링크가 아니다).
+if [ "$IOS_SIM" -eq 0 ] && [ "$SEMTLEOS_ELF" -eq 0 ] && [ "$SEMTLEOS_LLVM" -eq 0 ] && [ "$ANDROID" -eq 0 ] && [ "$WINDOWS" -eq 0 ] && [ -n "$TARGET_ARCH" ] && [ "$TARGET_ARCH" != "$HOST_ARCH" ]; then
+    # 교차 아키텍처는 링크가 없는 IR 출력에서만 연다(Linux stage0 씨앗 경로).
+    # 백엔드에는 트리플만의 문제다.
+    if [ "$OUTPUT_KIND" != llvm ] && [ "$PLATFORM" != darwin ]; then
+        echo "error: cross architecture is not self-hosted yet: $TARGET_ARCH" >&2
+        exit 2
+    fi
+    HOST_ARCH=$TARGET_ARCH
+fi
+first_existing() {
+    for CANDIDATE in "$@"; do
+        if [ -x "$CANDIDATE" ]; then printf '%s' "$CANDIDATE"; return 0; fi
+    done
+    return 1
+}
+if [ "$SEMTLEOS_ELF" -eq 1 ]; then
+    if [ "$SEMTLEOS_ARCH" = aarch64 ]; then
+        # 호스트가 arm64 Mac이라 --target-arch aarch64가 와도 위의 교차 아키텍처
+        # 거부에 걸리지 않는다(ELF 타깃은 그 검사 자체를 건너뛴다).
+        PLATFORM=$SEMTLEOS_PLATFORM
+        HOST_ARCH=aarch64
+        TRIPLE=aarch64-unknown-none
+    else
+        if [ "$TARGET" = limine-elf64 ]; then PLATFORM=limine-x86_64; else PLATFORM=app-x86_64; fi
+        HOST_ARCH=x86_64
+        TRIPLE=x86_64-unknown-none
+    fi
+    [ -n "$OS_ROOT" ] || OS_ROOT=${HMJE_OS_ROOT:-$PWD}
+    # 정본 limine_clang_command/limine_lld_command: Homebrew LLVM을 먼저 본다.
+    if [ -z "${HMJE_CLANG:-}" ]; then
+        HMJE_CLANG=$(first_existing /opt/homebrew/opt/llvm/bin/clang /usr/local/opt/llvm/bin/clang) || HMJE_CLANG=$(command -v clang || echo clang)
+    fi
+    if [ -z "${HMJE_LD_LLD:-}" ]; then
+        HMJE_LD_LLD=$(first_existing /opt/homebrew/opt/lld/bin/ld.lld /usr/local/opt/lld/bin/ld.lld /opt/homebrew/opt/llvm/bin/ld.lld /usr/local/opt/llvm/bin/ld.lld) || HMJE_LD_LLD=$(command -v ld.lld || true)
+    fi
+    [ "$EMIT_IR_ONLY" -eq 1 ] || [ "$HMIR_ONLY" -eq 1 ] || [ -n "$HMJE_LD_LLD" ] || { echo "error: $TARGET needs ld.lld (macOS: brew install lld)" >&2; exit 2; }
+elif [ "$SEMTLEOS_LLVM" -eq 1 ]; then
+    PLATFORM=bare-x86_64
+    HOST_ARCH=x86_64
+    TRIPLE=x86_64-unknown-none
+    [ -n "$OS_ROOT" ] || OS_ROOT=${HMJE_OS_ROOT:-$PWD}
+elif [ "$WINDOWS" -eq 1 ]; then
+    PLATFORM=windows
+    if [ -n "$TARGET_ARCH" ]; then
+        TRIPLE=$TARGET_ARCH-pc-windows-msvc
+        if [ -n "${HMJE_WINDOWS_TRIPLE:-}" ] && [ "$HMJE_WINDOWS_TRIPLE" != "$TRIPLE" ]; then
+            echo 'error: --target-arch conflicts with HMJE_WINDOWS_TRIPLE' >&2; exit 2
+        fi
+    else
+        TRIPLE=${HMJE_WINDOWS_TRIPLE:-aarch64-pc-windows-msvc}
+    fi
+    HMJE_WINDOWS_TRIPLE=$TRIPLE
+    export HMJE_WINDOWS_TRIPLE
+    case "$TRIPLE" in
+        aarch64*|arm64*) HOST_ARCH=aarch64 ;;
+        *) HOST_ARCH=x86_64 ;;
+    esac
+elif [ "$IOS_SIM" -eq 1 ]; then
+    PLATFORM=ios
+    HOST_ARCH=${TARGET_ARCH:-aarch64}
+    if [ "$IOS_DEVICE" -eq 1 ] && [ "$HOST_ARCH" != aarch64 ]; then
+        echo 'error: iOS devices require --target-arch aarch64' >&2; exit 2
+    fi
+    # 정본 ios_sim_deployment_target: 빌드 호스트의 최신 SDK와 배포 버전을 떼어
+    # 재현 가능한 트리플을 만든다. 프로젝트 모드는 manifest의 최소 시스템 버전을
+    # --ios-deployment-target으로 넘긴다.
+    [ -n "$IOS_DEPLOYMENT" ] || IOS_DEPLOYMENT=${HMJE_IOS_SIM_DEPLOYMENT_TARGET:-17.0}
+    case "$IOS_DEPLOYMENT" in
+        *[!0-9.]*|.*|*.|*..*|"") echo "error: invalid iOS deployment target: $IOS_DEPLOYMENT" >&2; exit 2 ;;
+    esac
+    if [ "$IOS_DEVICE" -eq 1 ]; then
+        TRIPLE=arm64-apple-ios$IOS_DEPLOYMENT
+    else
+        if [ "$HOST_ARCH" = aarch64 ]; then IOS_ARCH=arm64; else IOS_ARCH=x86_64; fi
+        TRIPLE=$IOS_ARCH-apple-ios$IOS_DEPLOYMENT-simulator
+    fi
+    if [ "$OUTPUT_KIND" = ios-app ]; then
+        if [ "$IOS_DEVICE" -eq 1 ]; then IOS_SDK_NAME=iphoneos; else IOS_SDK_NAME=iphonesimulator; fi
+        IOS_SDK_PATH=$(/usr/bin/xcrun -sdk "$IOS_SDK_NAME" --show-sdk-path 2>/dev/null) || IOS_SDK_PATH=
+        [ -n "$IOS_SDK_PATH" ] || { echo "error: $TARGET needs the Xcode $IOS_SDK_NAME SDK (xcrun)" >&2; exit 2; }
+        if [ -z "${HMJE_CLANG:-}" ]; then
+            HMJE_CLANG=$(/usr/bin/xcrun -sdk "$IOS_SDK_NAME" -find clang 2>/dev/null) || HMJE_CLANG=
+            [ -n "$HMJE_CLANG" ] || { echo "error: cannot find Xcode clang for $IOS_SDK_NAME" >&2; exit 2; }
+        fi
+    fi
+elif [ "$ANDROID" -eq 1 ]; then
+    # 정본 android_triple(): aarch64-linux-android<minSdk>. NDK/SDK 도구 해석은
+    # bin/hmje-android-tools가 맡고 자립 Android 코드가 환경변수로 읽는다.
+    if [ -n "$TARGET_ARCH" ] && [ "$TARGET_ARCH" != aarch64 ]; then
+        echo 'error: Android currently requires --target-arch aarch64 (arm64-v8a)' >&2; exit 2
+    fi
+    [ -f "$ROOT/bin/hmje-android-tools" ] || { echo "error: Android tool resolver is missing: $ROOT/bin/hmje-android-tools" >&2; exit 2; }
+    . "$ROOT/bin/hmje-android-tools"
+    if [ "$OUTPUT_KIND" = android-llvm ]; then
+        HMJE_ANDROID_MIN_SDK=${HMJE_ANDROID_MIN_SDK:-33}
+        case "$HMJE_ANDROID_MIN_SDK" in
+            ''|*[!0-9]*) echo 'error: invalid Android minimum SDK' >&2; exit 2 ;;
+        esac
+        [ "$HMJE_ANDROID_MIN_SDK" -ge 21 ] || { echo 'error: Android arm64 requires API 21 or later' >&2; exit 2; }
+        export HMJE_ANDROID_MIN_SDK
+    else
+        hmje_android_resolve "$ANDROID_KIND"
+    fi
+    PLATFORM=android
+    HOST_ARCH=aarch64
+    TRIPLE=aarch64-linux-android$HMJE_ANDROID_MIN_SDK
+elif [ "$PLATFORM" = darwin ]; then
+    if [ "$HOST_ARCH" = aarch64 ]; then
+        TRIPLE=arm64-apple-darwin
+    else
+        TRIPLE=x86_64-apple-darwin
+        # Intel Macs end at macOS 26, so the build host's SDK version (clang's
+        # default minos) must not leak into x86_64 products: an x86_64 binary
+        # cross-built on a newer Apple Silicon Mac would refuse to start on
+        # every Intel Mac. 12.0 is the oldest release the host runtime and
+        # Cocoa/Metal shims build for without unguarded API use. macOS app
+        # targets keep their manifest/-mmacosx-version-min value.
+        if [ -z "${MACOSX_DEPLOYMENT_TARGET:-}" ]; then
+            MACOSX_DEPLOYMENT_TARGET=${HMJE_MACOS_X86_64_DEPLOYMENT_TARGET:-12.0}
+            export MACOSX_DEPLOYMENT_TARGET
+        fi
+    fi
+else
+    if [ "$HOST_ARCH" = aarch64 ]; then TRIPLE=aarch64-unknown-linux-gnu; else TRIPLE=x86_64-unknown-linux-gnu; fi
+fi
+
+if [ "$MACOS_PRODUCT" -eq 1 ] && [ "$PLATFORM" != darwin ]; then
+    echo "error: $TARGET needs a Darwin host" >&2
+    exit 2
+fi
+
+# Apple native sources must use the selected Xcode toolchain, regardless of PATH.
+# An explicit HMJE_CLANG remains authoritative (including SDK selection).
+if [ "$PLATFORM" = darwin ] && [ -z "${HMJE_CLANG:-}" ]; then
+    HMJE_CLANG=$(/usr/bin/xcrun --sdk macosx --find clang) || exit 2
+    SDKROOT=$(/usr/bin/xcrun --sdk macosx --show-sdk-path) || exit 2
+    export SDKROOT
+fi
+
+COORDINATOR=${HMJE_COORDINATOR:-"$BOOTSTRAP_BIN/제품조정기"}
+# LLVM 22 emits the current HMIR coroutine intrinsic ABI. The host can
+# compile Windows COFF IR without the guest SDK; Windows still performs final
+# native compilation/linking. Explicit HMJE_WINDOWS_IR_CC=guest keeps the
+# historical VM-only route for diagnostics.
+if [ "$PLATFORM" = windows ] && [ -z "${HMJE_WINDOWS_IR_CC+x}" ]; then
+    for HMJE_IR_CANDIDATE in /opt/homebrew/opt/llvm/bin/clang /usr/local/opt/llvm/bin/clang; do
+        [ -x "$HMJE_IR_CANDIDATE" ] || continue
+        case "$("$HMJE_IR_CANDIDATE" --version)" in
+            *"version 22."*) HMJE_WINDOWS_IR_CC=$HMJE_IR_CANDIDATE; export HMJE_WINDOWS_IR_CC; break ;;
+        esac
+    done
+fi
+if [ "$PLATFORM" = windows ] && [ -n "${HMJE_WINDOWS_IR_CC:-}" ] && [ "$HMJE_WINDOWS_IR_CC" != guest ]; then
+    HMJE_WINDOWS_IR_CC=$(realpath "$HMJE_WINDOWS_IR_CC") || {
+        echo "Windows IR compiler path cannot be resolved: $HMJE_WINDOWS_IR_CC" >&2
+        exit 2
+    }
+    export HMJE_WINDOWS_IR_CC
+fi
+FRONTEND=${HMJE_FRONTEND:-"$BOOTSTRAP_BIN/컴파일러"}
+BACKEND=${HMJE_BACKEND:-"$BOOTSTRAP_BIN/hmir을llvm으로"}
+if [ "$PLATFORM" = windows ]; then
+    HOST_SUPPORT=${HMJE_HOST_SUPPORT:-"$COMPILER_ROOT/runtime/host_app_windows.c"}
+else
+    HOST_SUPPORT=${HMJE_HOST_SUPPORT:-"$COMPILER_ROOT/runtime/host_app.c"}
+fi
+for REQUIRED in "$COORDINATOR" "$FRONTEND" "$BACKEND"; do
+    [ -x "$REQUIRED" ] || { echo "error: missing self-hosted executable: $REQUIRED" >&2; exit 2; }
+done
+[ -f "$HOST_SUPPORT" ] || { echo "error: missing host runtime: $HOST_SUPPORT" >&2; exit 2; }
+
+if [ "$RUN_USER" -eq 1 ] && [ "$DUMP_DEPS" -eq 0 ]; then
+    # The interpreter target's contract executes top-level statements. Emit that
+    # program directly to HMIR, then execute it using the native hosted backend.
+    USER_HMIR=$USER_WORK/program.hmir
+    set -- "$FRONTEND" "$SOURCE" "$LIBRARY_ROOT" "$PLATFORM" \
+        "$COMPILER_ROOT/Sources/준비/기본동적배열.hmje" "$USER_HMIR"
+    [ -z "$MODULE_MAP" ] || set -- "$@" --module-map "$MODULE_MAP"
+    [ -z "$NATIVE_PLAN" ] || set -- "$@" --native-plan "$NATIVE_PLAN"
+    [ "$NO_CACHE" -eq 0 ] || set -- "$@" --캐시끄기
+    "$@"
+    SOURCE=$USER_HMIR
+fi
+if [ "$HMIR_ONLY" -eq 1 ] && [ "$DUMP_DEPS" -eq 0 ]; then
+    case "$SOURCE" in
+        *.hmir)
+            HMIR_COPY=$(mktemp "$OUTPUT.hmje-copy.XXXXXXXX")
+            cp "$SOURCE" "$HMIR_COPY"
+            mv -f "$HMIR_COPY" "$OUTPUT"
+            exit 0 ;;
+    esac
+    set -- "$FRONTEND" "$SOURCE" "$LIBRARY_ROOT" "$PLATFORM" \
+        "$COMPILER_ROOT/Sources/준비/기본동적배열.hmje" "$OUTPUT"
+    [ "$NO_CACHE" -eq 0 ] || set -- "$@" --캐시끄기
+    [ "$MEASURE" -eq 0 ] || set -- "$@" --계측
+    [ -z "$MODULE_MAP" ] || set -- "$@" --module-map "$MODULE_MAP"
+    [ -z "$NATIVE_PLAN" ] || set -- "$@" --native-plan "$NATIVE_PLAN"
+    [ -z "$OS_ROOT" ] || set -- "$@" --os-root "$OS_ROOT"
+    if [ -n "${USER_WORK:-}" ]; then
+        "$@"
+        exit $?
+    fi
+    "$@"
+    exit $?
+fi
+if [ "$DUMP_DEPS" -eq 1 ]; then
+    if [ "$RUN_USER" -eq 1 ]; then
+        : # user uses the same hosted platform as execution
+    fi
+    # 정본 _compile_file: .hmir 입력은 파서·준비를 건너뛰므로 의존 파일이 자기
+    # 자신뿐이다. 프론트엔드를 부르지 않고 절대 경로만 낸다.
+    case "$SOURCE" in
+        *.hmir)
+            SOURCE_DIR=$(CDPATH= cd -- "$(dirname -- "$SOURCE")" && pwd)
+            echo "$SOURCE_DIR/$(basename -- "$SOURCE")"
+            exit 0
+            ;;
+    esac
+    # 정본 --dump-deps: 적재한 파일 경로만 낸다. 프론트엔드 적재 단계로 충분하다.
+    set -- "$FRONTEND" "$SOURCE" "$LIBRARY_ROOT" "$PLATFORM" \
+        "$COMPILER_ROOT/Sources/준비/기본동적배열.hmje" "$OUTPUT" --dump-deps --캐시끄기
+    if [ -n "$MODULE_MAP" ]; then set -- "$@" --module-map "$MODULE_MAP"; fi
+    if [ "$SEMTLEOS_ELF" -eq 1 ] || [ "$SEMTLEOS_LLVM" -eq 1 ] || [ "$RUN_USER" -eq 1 ]; then set -- "$@" --os-root "$OS_ROOT"; fi
+    if [ -n "${USER_WORK:-}" ]; then
+        "$@"
+        exit $?
+    fi
+    "$@"
+    exit $?
+fi
+set -- "$COORDINATOR" "$FRONTEND" "$BACKEND" "$SOURCE" \
+    "$LIBRARY_ROOT" "$PLATFORM" "$COMPILER_ROOT/Sources/준비/기본동적배열.hmje" \
+    "$CACHE_ROOT" "$OUTPUT" "$TRIPLE" "$OUTPUT_KIND" \
+    "$TOOLCHAIN_ROOT" "$HOST_SUPPORT" "$HOST_ARCH" "${HMJE_CLANG:-clang}"
+if [ "$EMIT_IR_ONLY" -eq 1 ]; then set -- "$@" --emit-llvm-only; fi
+if [ "$MEASURE" -eq 1 ]; then set -- "$@" --계측; fi
+if [ "$NO_CACHE" -eq 1 ]; then set -- "$@" --캐시끄기; fi
+if [ -n "$MODULE_MAP" ]; then set -- "$@" --module-map "$MODULE_MAP"; fi
+if [ -n "$NATIVE_PLAN" ]; then set -- "$@" --native-plan "$NATIVE_PLAN"; fi
+if [ "$SEMTLEOS_LLVM" -eq 1 ]; then
+    set -- "$@" --os-root "$OS_ROOT"
+fi
+if [ "$OUTPUT_KIND" = ios-app ]; then
+    set -- "$@" --ios-sdk-path "$IOS_SDK_PATH" --ios-sdk-name "$IOS_SDK_NAME" \
+        --ios-deployment-target "$IOS_DEPLOYMENT"
+    if [ "$IOS_DEVICE" -eq 1 ]; then set -- "$@" --ios-device; fi
+    # 정본 require_external_fonts_dir: 자원을 선언하지 않는 단일 파일 빌드만
+    # HMJE_UI_ROOT/assets/fonts를 번들에 넣는다.
+    if [ -n "${HMJE_UI_ROOT:-}" ] && [ -d "$HMJE_UI_ROOT/assets/fonts" ]; then
+        set -- "$@" --ios-fonts-dir "$HMJE_UI_ROOT/assets/fonts"
+    fi
+fi
+if [ "$SEMTLEOS_ELF" -eq 1 ]; then
+    set -- "$@" --os-root "$OS_ROOT" --ld-lld "$HMJE_LD_LLD"
+    if [ -n "$LLVM_IR" ]; then set -- "$@" --llvm-ir "$LLVM_IR"; fi
+    # 정본 _compile_aarch64의 HMJE_AARCH64_MCPU: 배포 기종이 정해지면 clang
+    # -mcpu로 명령 선택·스케줄링을 연다. 기본은 폭넓은 AArch64 호환성.
+    if [ "$SEMTLEOS_ARCH" = aarch64 ] && [ -n "${HMJE_AARCH64_MCPU:-}" ]; then
+        set -- "$@" --aarch64-mcpu "$HMJE_AARCH64_MCPU"
+    fi
+fi
+if [ "$RUN_USER" -eq 1 ]; then
+    "$@" >&2
+    "$OUTPUT"
+else
+    if [ -n "${USER_WORK:-}" ]; then
+        "$@"
+        exit $?
+    fi
+    "$@"
+    case "$TARGET" in
+        android-*) [ -s "$OUTPUT" ] || { echo "error: Android compiler returned success without output: $OUTPUT" >&2; exit 1; } ;;
+    esac
+    exit 0
+fi
