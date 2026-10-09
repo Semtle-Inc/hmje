@@ -28,10 +28,18 @@ HMJE는 **한국어 문법을 쓰는 정적 타입 컴파일 언어**입니다. 
 | Windows 11 | ARM64, x64 |
 | Linux | x86_64, arm64 |
 
-각 호스트의 개발 도구·SDK가 필요합니다. macOS는 Xcode Command Line Tools와
-LLVM clang, Windows는 LLVM clang 및 Windows SDK/MSVC 도구, Linux는 clang과
-시스템 개발 패키지를 사용합니다. Linux GUI에는 X11 등 추가 의존성이 있습니다.
-지원 표는 모든 플랫폼 API의 동작이 같다는 뜻은 아닙니다.
+각 호스트의 개발 도구·SDK는 따로 설치해야 합니다. 패키지에는 HMJE 컴파일러와
+라이브러리만 들어 있습니다.
+
+| 호스트 | 필요한 것 |
+| --- | --- |
+| macOS | Xcode Command Line Tools(`xcode-select --install`). iOS 앱·`.xcassets` 아이콘·Metal(hmje-sem, hmje-llm)은 Xcode와 iOS 시뮬레이터 런타임 |
+| Windows | LLVM clang(`winget install LLVM.LLVM`), MSVC Build Tools와 Windows SDK |
+| Linux | glibc 2.38 이상(Ubuntu 24.04·Debian 13·Fedora 39 이상), clang, OpenSSL 3 개발 헤더, libX11 개발 헤더, X11 또는 XWayland |
+| Android | Android SDK·NDK·JDK(Android Studio). Linux arm64 호스트는 지원하지 않습니다 |
+
+설치 명령과 증상별 해결 방법은 [릴리스 노트의 설치 전 준비물](RELEASE_NOTES-1.0.0-beta.1.md#설치-전-준비물)에
+있습니다. 지원 표는 모든 플랫폼 API의 동작이 같다는 뜻은 아닙니다.
 
 ## 첫 프로그램
 

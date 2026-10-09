@@ -11,10 +11,13 @@ HMJE 소스에서 컴파일러와 명령줄 툴체인을 빌드합니다. 초기
 
 ## macOS·Linux
 
-Git, POSIX 셸, C 컴파일러, LLVM clang 및 운영체제 SDK/개발 헤더가 필요합니다.
-macOS는 Command Line Tools를 사용하며 배포 대상은 기본 macOS 14.0입니다.
-Linux GUI를 빌드할 때에는 X11·그래픽 개발 헤더와 라이브러리를 추가로 설치해야
-합니다. 환경 의존성은 시스템 패키지 관리자로 준비하십시오.
+Git, POSIX 셸, clang과 운영체제 SDK/개발 헤더가 필요합니다.
+macOS는 Command Line Tools의 Apple clang을 사용하며 배포 대상은 기본 macOS 14.0입니다.
+iOS 대상과 Metal 원본(hmje-sem, hmje-llm)에는 Xcode가 필요합니다.
+Linux는 clang, OpenSSL 3 개발 헤더, libX11 개발 헤더가 필요하고 Release 툴체인은
+glibc 2.38 이상에서 실행됩니다(Ubuntu/Debian: `sudo apt install clang build-essential libssl-dev libx11-dev`,
+Fedora: `sudo dnf install clang gcc openssl-devel libX11-devel`). 운영체제별 준비물은
+[릴리스 노트](../RELEASE_NOTES-1.0.0-beta.1.md#설치-전-준비물)에 정리되어 있습니다.
 
 Releases 툴체인을 원하는 별도 폴더에 설치하고 그 경로를 `RELEASE_PREFIX`로
 지정합니다. 기존 설치에 덮어쓰지 않습니다. 아래는 저장소 루트에서 실행합니다.
@@ -39,8 +42,10 @@ HMJEC="$PWD/build/install/bin/hmjec" sh tools/test.sh
 
 ## Windows 11
 
-LLVM clang, Windows SDK와 MSVC 개발 환경을 준비하고 호스트에 맞는 Release
-툴체인을 먼저 설치합니다. PowerShell에서 저장소 루트 기준으로 실행합니다.
+LLVM clang(`winget install LLVM.LLVM`), Windows SDK와 MSVC 개발 환경(Visual Studio
+Build Tools의 C++ 데스크톱 개발)을 준비하고 호스트에 맞는 Release 툴체인을 먼저 설치합니다.
+툴체인 설치 뒤에 LLVM을 설치했다면 `Install.cmd`를 다시 실행하거나 `HMJE_WINDOWS_CLANG`에
+`clang.exe` 경로를 지정합니다. PowerShell에서 저장소 루트 기준으로 실행합니다.
 
 ```powershell
 $env:HMJE_PLATFORM_PROFILE = 'public'
