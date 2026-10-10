@@ -15,4 +15,4 @@ HMJE 1.0.0-beta.1 SDK에 포함된 라이브러리입니다. 각 안내에서 �
 | [hmje-syntax](hmje-syntax/README.md) | HMJE 구문 강조 |
 | [hmje-ui](hmje-ui/README.md) | 선언형 화면과 그래픽 |
 
-이 트리의 라이브러리는 [프로젝트 파일](../docs/project.md)의 의존성으로 사용합니다. 정확한 소스 버전은 [SOURCES.md](../SOURCES.md), 설치한 SDK와 공개 소스의 대응·검사 범위는 [공개 준비 상태](../docs/publication-status.md)에 기록합니다.
+이 트리의 라이브러리는 [프로젝트 파일](../docs/project.md)의 의존성으로 사용합니다. 정확한 소스 버전은 [SOURCES.md](../SOURCES.md), 설치한 SDK와 공개 소스의 대응·검사 범위는 [배포 구성 및 검증 결과](../docs/publication-status.md)에 기록합니다.

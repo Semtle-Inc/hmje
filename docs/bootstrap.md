@@ -1,6 +1,6 @@
 # Swift 씨앗에서 시작하는 부트스트랩
 
-`hmje-swift-seed`는 Swift로 작성한 초기 컴파일러에서 HMJE 자체 호스팅 컴파일러로 이어지는 재현 절차를 제공합니다. 컴파일러 소스와 실행 절차, 입력 해시, 단계별 검증 보고서는 해당 저장소의 `README.md`와 `docs/bootstrap.md`에 있습니다.
+[hmje-swift-seed](https://github.com/Semtle-Inc/hmje-swift-seed)는 Swift로 작성한 초기 컴파일러에서 HMJE 자체 호스팅 컴파일러로 이어지는 재현 절차를 제공합니다. 컴파일러 소스와 실행 절차, 입력 해시, 단계별 검증 보고서는 해당 저장소의 [README](https://github.com/Semtle-Inc/hmje-swift-seed#readme)와 [부트스트랩 단계](https://github.com/Semtle-Inc/hmje-swift-seed/blob/main/docs/bootstrap.md)에 있습니다.
 
 ## 소스 빌드와 재현 검증
 
@@ -16,7 +16,7 @@ Swift 재현 절차의 확인 환경은 macOS ARM64입니다. 초기 도구의 �
 
 ## 실행
 
-두 저장소를 같은 상위 디렉터리에 체크아웃한 예입니다. `/path/to/beta1/libexec/bin`은 Beta 1 macOS ARM64 패키지에 포함된 네 도구의 실제 경로로 바꿉니다. 검증 출력 폴더는 새 경로여야 합니다.
+[HMJE 소스](https://github.com/Semtle-Inc/hmje)와 [Swift 씨앗](https://github.com/Semtle-Inc/hmje-swift-seed)을 같은 상위 디렉터리에 체크아웃한 예입니다. `/path/to/beta1/libexec/bin`은 Beta 1 macOS ARM64 패키지에 포함된 네 도구의 실제 경로로 바꿉니다. 검증 출력 폴더는 새 경로여야 합니다.
 
 ```sh
 cd ../hmje-swift-seed

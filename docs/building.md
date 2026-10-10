@@ -1,6 +1,6 @@
 # 소스 빌드
 
-HMJE 소스에서 컴파일러와 명령줄 툴체인을 빌드합니다. 초기 컴파일러는 호스트·아키텍처가 같은 **1.0.0-beta.1 Release 툴체인** 또는 별도 `hmje-swift-seed` 저장소에서 구축한 컴파일러를 사용합니다.
+HMJE 소스에서 컴파일러와 명령줄 툴체인을 빌드합니다. 초기 컴파일러는 호스트·아키텍처가 같은 **1.0.0-beta.1 Release 툴체인** 또는 [hmje-swift-seed](https://github.com/Semtle-Inc/hmje-swift-seed)에서 구축한 컴파일러를 사용합니다.
 
 | 시작 경로 | 용도 | 안내 |
 | --- | --- | --- |
@@ -19,7 +19,7 @@ glibc 2.38 이상에서 실행됩니다(Ubuntu/Debian: `sudo apt install clang b
 Fedora: `sudo dnf install clang gcc openssl-devel libX11-devel`). 운영체제별 준비물은
 [릴리스 노트](../RELEASE_NOTES-1.0.0-beta.1.md#설치-전-준비물)에 정리되어 있습니다.
 
-Releases 툴체인을 원하는 별도 폴더에 설치하고 그 경로를 `RELEASE_PREFIX`로
+[Beta 1 릴리스](https://github.com/Semtle-Inc/hmje/releases/tag/v1.0.0-beta.1)의 툴체인을 원하는 별도 폴더에 설치하고 그 경로를 `RELEASE_PREFIX`로
 지정합니다. 기존 설치에 덮어쓰지 않습니다. 아래는 저장소 루트에서 실행합니다.
 
 ```sh

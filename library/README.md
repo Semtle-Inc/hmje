@@ -31,4 +31,4 @@ HMJE 프로그램의 기본 어휘와 운영체제 경계, 데이터베이스·�
 
 ## 버전과 배포
 
-Beta 1에서는 API가 안정화 중입니다. 소스 기준과 공개용 조정은 [SOURCES.md](../SOURCES.md)에 기록합니다. 앱에 포함하는 배포에는 [런타임·라이브러리 라이선스](../LICENSE-RUNTIME)가 적용됩니다. 포함된 SQLite와 다른 제삼자 자료의 조건은 [제삼자 고지](../THIRD_PARTY_NOTICES.md)를 확인하십시오.
+Beta 1에서는 API가 안정화 중입니다. 소스 버전과 배포 소스의 구성은 [SOURCES.md](../SOURCES.md)에 기록합니다. 앱에 포함하는 배포에는 [런타임·라이브러리 라이선스](../LICENSE-RUNTIME)가 적용됩니다. 포함된 SQLite와 다른 제삼자 자료의 조건은 [제삼자 고지](../THIRD_PARTY_NOTICES.md)를 확인하십시오.

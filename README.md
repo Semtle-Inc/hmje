@@ -8,28 +8,27 @@ HMJE는 **한국어 문법을 쓰는 정적 타입 컴파일 언어**입니다. 
 **1.0.0-beta.1**은 첫 공개 Beta입니다. 문법·API·배포 계약은 안정화 중이며
 다음 Beta에서 호환성이 바뀔 수 있습니다. [알려진 제한과 릴리스 노트](RELEASE_NOTES-1.0.0-beta.1.md)를
 확인하십시오. 훈민정음 IDE도 HMJE로 작성했지만 **IDE 본체 소스는 비공개**이며
-바이너리만 Releases로 제공합니다.
+바이너리는 [Beta 1 릴리스](https://github.com/Semtle-Inc/hmje/releases/tag/v1.0.0-beta.1)에서 제공합니다.
 
-## 소스 기준 및 공개 준비 상태
+## 버전 및 소스
 
-이 트리의 컴파일러 소스 기준은 [SOURCE-REVISION](SOURCE-REVISION)에 기록된 `032483bd83c275837d0a277db125f651bf34b678`입니다. Beta 1 빌드 `2026100804`의 패키지 툴체인 `d2ce1c947dcc32ea40fd242a530e36bbf22a1790`과 같은 컴파일러·런타임·플랫폼·드라이버 소스를 포함합니다. HmjeUI는 최종 SDK `f86d7421e77349f4c053d25a836862dde89c1358`을 기준으로 합니다.
+이 저장소는 **HMJE 1.0.0-beta.1 · 빌드 `2026100804`**의 컴파일러·런타임·SDK 소스를 제공합니다. 릴리스 날짜는 **2026-10-09**입니다.
 
-공개용 경로·진단 안내의 조정과 제외 범위는 [소스 출처](SOURCES.md), 소스 동기화 검증은 [공개 준비 상태](docs/publication-status.md)에 기록합니다. 공개일은 2026-10-09이며, 라이선스는 Beta 1 버전 1.0을 적용합니다.
+구성요소별 원본 버전과 배포 소스의 차이는 [소스 출처](SOURCES.md), 확인한 환경과 결과는 [검증 결과](docs/publication-status.md)에서 확인할 수 있습니다.
 
 ## 설치
 
-이 저장소의 **Releases**에서 운영체제·아키텍처에 맞는 **IDE와 툴체인**을
-받아 각 자산의 설치 안내를 따르세요. IDE와 명령줄 툴체인은 별도로 제공됩니다.
-설치한 툴체인의 `bin` 폴더를 PATH에 추가하고 `hmjec --version`으로 확인합니다.
+운영체제와 아키텍처에 맞는 패키지를 내려받습니다. 패키지에는 **훈민정음 IDE와 툴체인**이 포함됩니다. 동봉된 설치 안내에 따라 설치한 뒤 `hmjec --version`으로 명령줄 툴체인을 확인합니다.
 
-| 호스트 | 아키텍처 |
-| --- | --- |
-| macOS 14 이상 | arm64, x86_64 |
-| Windows 11 | ARM64, x64 |
-| Linux | x86_64, arm64 |
+| 호스트 | ARM64 | x86_64 / x64 |
+| --- | --- | --- |
+| macOS 14 이상 | [DMG](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/Hunmin-1.0.0-beta.1-2026100804-macos-arm64.dmg) | [DMG](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/Hunmin-1.0.0-beta.1-2026100804-macos-x86_64.dmg) |
+| Windows 11 | [ZIP](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/Hunmin-1.0.0-beta.1-2026100804-windows-arm64.zip) | [ZIP](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/Hunmin-1.0.0-beta.1-2026100804-windows-x64.zip) |
+| Linux | [tar.gz](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/Hunmin-1.0.0-beta.1-2026100804-linux-arm64.tar.gz) | [tar.gz](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/Hunmin-1.0.0-beta.1-2026100804-linux-x86_64.tar.gz) |
 
-각 호스트의 개발 도구·SDK는 따로 설치해야 합니다. 패키지에는 HMJE 컴파일러와
-라이브러리만 들어 있습니다.
+파일 무결성 확인에는 릴리스의 [SHA256SUMS](https://github.com/Semtle-Inc/hmje/releases/download/v1.0.0-beta.1/SHA256SUMS)를 사용합니다.
+
+HMJE 앱을 빌드하는 데 필요한 운영체제 개발 도구와 SDK는 별도로 설치합니다.
 
 | 호스트 | 필요한 것 |
 | --- | --- |
@@ -66,8 +65,7 @@ hmjec.exe --target windows-exe examples/hello.hmje -o hello.exe
 
 ## 예제
 
-아래 예제는 `examples/`의 완전한 프로그램과 같습니다. Beta 1의 현재
-툴체인으로 모두 컴파일 확인하며, 화면 예제는 컴파일만 확인합니다.
+아래 예제의 전체 소스는 `examples/`에 있습니다. Beta 1 소스에서 빌드한 툴체인으로 컴파일을 확인했습니다. 화면 예제의 검증 범위는 앱 빌드입니다.
 
 ### 타입과 이름 붙인 호출
 
@@ -193,7 +191,7 @@ GitHub Linguist의 HMJE 자동 분류는 지원되지 않습니다. `.gitattribu
 
 ## 소스 빌드와 검사
 
-Release 툴체인을 초기 컴파일러로 사용하거나, 별도 `hmje-swift-seed` 저장소의
+Release 툴체인을 초기 컴파일러로 사용하거나, [hmje-swift-seed](https://github.com/Semtle-Inc/hmje-swift-seed)의
 Swift 씨앗에서 구축한 컴파일러로 현재 소스를 빌드할 수 있습니다.
 [빌드 안내](docs/building.md)와 [Swift 부트스트랩](docs/bootstrap.md)에
 요구 환경·실행 명령·검증 범위를 설명합니다. 공개 라이브러리는 이 트리에 포함되어
@@ -204,6 +202,11 @@ sh tools/build-from-release.sh "$RELEASE_PREFIX/lib/hmje/libexec/bin" "$PWD/buil
 HMJE_INSTALL_WARM=0 sh tools/install-native.sh "$PWD/build/install" "$PWD/build/native-bin"
 HMJEC="$PWD/build/install/bin/hmjec" sh tools/test.sh
 ```
+
+## 관련 저장소
+
+- [개발자 세션 예제](https://github.com/Semtle-Inc/hmje-developer-sessions): 문법·UI·서버·모델 학습·IDE 예제
+- [Swift 씨앗 재현 검증](https://github.com/Semtle-Inc/hmje-swift-seed): Swift 초기 컴파일러에서 Beta 1 도구를 구축하고 배포 파일과 비교하는 절차
 
 ## 라이선스와 상표
 
@@ -218,4 +221,4 @@ OSI 오픈 소스 라이선스가 아닙니다. [LICENSE](LICENSE)는 상용 앱
 “HMJE”와 “훈민정음 IDE”는 저작권자 오현우의 이름·상표이며 상표 권리를 부여하지
 않습니다. HMJE의 저작권은 오현우에게 있으며, Semtle Inc.가 공개 배포합니다. LLVM·SQLite와 포함된
 폰트의 저자에게 감사드립니다. 문제를 발견하면 이 저장소의 **Issues**에
-운영체제·아키텍처·`hmjec --version` 출력과 최소 재현 소스를 남겨주세요.
+운영체제·아키텍처·`hmjec --version` 출력과 최소 재현 소스를 첨부해 주십시오.
