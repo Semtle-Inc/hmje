@@ -54,7 +54,7 @@ UI의 의도적인 해시 넘침과 음수 좌표를 숫자 안전 검사에 맞
 - Beta 1 라이선스 버전 1.0을 적용합니다. 도구는 무료 사용이 가능하지만 재배포·
   경쟁 제공은 제한합니다. 앱에 포함한 런타임·라이브러리는 기여 표시를 해야 합니다.
 
-구성요소별 소스 버전은 [소스 출처](SOURCES.md), 검증한 환경과 결과는 [배포 구성 및 검증 결과](docs/publication-status.md)에서 확인할 수 있습니다.
+구성요소별 소스 버전은 [소스 출처](https://github.com/Semtle-Inc/hmje/blob/main/SOURCES.md), 검증한 환경과 결과는 [배포 구성 및 검증 결과](https://github.com/Semtle-Inc/hmje/blob/main/docs/publication-status.md)에서 확인할 수 있습니다.
 
 ## 설치 전 준비물
 
@@ -87,6 +87,10 @@ UI의 의도적인 해시 넘침과 음수 좌표를 숫자 안전 검사에 맞
 
 ## 시작하기
 
-[Beta 1 다운로드 안내](README.md#설치)에서 호스트에 맞는 패키지를 내려받고 동봉된 설치 안내를 따르십시오.
-[README](README.md), [언어](docs/language.md), [문법](docs/grammar.md),
-[릴리스 기반 소스 빌드](docs/building.md)를 이어서 읽을 수 있습니다.
+[Beta 1 다운로드 안내](https://github.com/Semtle-Inc/hmje/blob/main/README.md#설치)에서 호스트에 맞는 패키지를 내려받고 동봉된 설치 안내를 따르십시오.
+[README](https://github.com/Semtle-Inc/hmje/blob/main/README.md), [언어](https://github.com/Semtle-Inc/hmje/blob/main/docs/language.md), [문법](https://github.com/Semtle-Inc/hmje/blob/main/docs/grammar.md),
+[릴리스 기반 소스 빌드](https://github.com/Semtle-Inc/hmje/blob/main/docs/building.md)를 이어서 읽을 수 있습니다.
+
+## IDE 포함 자산
+
+IDE 패키지에 들어 있는 아이콘 글꼴·디자인 자료·이미지는 IDE 전용 자산으로, IDE 밖에서 재사용할 수 없습니다. 자세한 조건은 [IDE 포함 자산 고지](https://github.com/Semtle-Inc/hmje/blob/main/IDE-ASSETS-NOTICE.md)(첨부 `IDE-ASSETS-NOTICE.txt`)를 확인하십시오. 제삼자 글꼴과 새 프로젝트 템플릿, 앱에 들어가는 런타임은 여기에 해당하지 않습니다.
