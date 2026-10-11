@@ -217,6 +217,8 @@ OSI 오픈 소스 라이선스가 아닙니다. [LICENSE](LICENSE)는 상용 앱
 라이브러리를 상용 앱 안에 포함해 배포하는 것을 허용하며, 정보 화면이나
 문서에 **“훈민정음(HMJE)으로 만들었습니다” / “Built with HMJE”** 중 하나를
 표시해야 합니다. [제삼자 고지](THIRD_PARTY_NOTICES.md)도 확인하십시오.
+IDE 패키지에 들어 있는 아이콘 글꼴·디자인 자료·이미지는 IDE 전용 자산으로, IDE 밖에서
+재사용할 수 없습니다([IDE 포함 자산 고지](IDE-ASSETS-NOTICE.md)).
 
 “HMJE”와 “훈민정음 IDE”는 저작권자 오현우의 이름·상표이며 상표 권리를 부여하지
 않습니다. HMJE의 저작권은 오현우에게 있으며, Semtle Inc.가 공개 배포합니다. LLVM·SQLite와 포함된
