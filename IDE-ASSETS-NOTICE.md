@@ -8,8 +8,7 @@ LICENSE보다 우선합니다.
 
 패키지 안 `HunminIDE.assets/` 폴더의 다음 파일입니다(macOS는 앱 묶음 안의 같은 자산).
 
-- 아이콘 글꼴과 이름 자료: `fonts/EpicSemtle-Icons.ttf`, `fonts/SemtleUI-Icons.ttf`,
-  `fonts/epicsemtle-icon-names-ko.json`
+- 아이콘 글꼴과 이름 자료: `fonts/EpicSemtle-Icons.ttf`, `fonts/epicsemtle-icon-names-ko.json`
 - 디자인 자료: `figma/` 폴더의 모든 파일
 - 앱 아이콘·로고와 IDE 화면 이미지: `AppIcon.*`, `logo.png`, `cloud.png`, `dots*.png`,
   `file*.png`, `folder.png`
@@ -28,6 +27,8 @@ LICENSE보다 우선합니다.
 - 제삼자 글꼴과 자료(Pretendard, SUITE, D2Coding, Montserrat, Noto Color Emoji,
   Pretendard 비트맵 파생 글꼴, Unicode 데이터): 각 원래 라이선스와
   [제삼자 고지](THIRD_PARTY_NOTICES.md)를 따릅니다.
+- HmjeUI 아이콘 글꼴(`fonts/SemtleUI-Icons.ttf`): HmjeUI의 일부이며 HmjeUI와 같은 라이선스를
+  따릅니다(같은 폴더의 `SemtleUI-Icons-LICENSE.txt`).
 - 새 프로젝트 템플릿(`tpl-*.hmje`): 이 코드로 시작해 만든 앱은 다른 코드와 같이
   자유롭게 수정·배포할 수 있습니다.
 - 훈민정음으로 만든 앱에 들어가는 런타임·라이브러리: [LICENSE-RUNTIME](LICENSE-RUNTIME)을 따릅니다.
@@ -46,8 +47,7 @@ below and prevails over the LICENSE for them.
 The following files in the package's `HunminIDE.assets/` folder (on macOS, the same assets
 inside the application bundle):
 
-- Icon fonts and name data: `fonts/EpicSemtle-Icons.ttf`, `fonts/SemtleUI-Icons.ttf`,
-  `fonts/epicsemtle-icon-names-ko.json`
+- Icon font and name data: `fonts/EpicSemtle-Icons.ttf`, `fonts/epicsemtle-icon-names-ko.json`
 - Design data: all files under `figma/`
 - Application icon, logo, and IDE interface images: `AppIcon.*`, `logo.png`, `cloud.png`,
   `dots*.png`, `file*.png`, `folder.png`
@@ -66,6 +66,8 @@ inside the application bundle):
 - Third-party fonts and data (Pretendard, SUITE, D2Coding, Montserrat, Noto Color Emoji, the
   Pretendard bitmap derivative, Unicode data) follow their original licenses and the
   [third-party notices](THIRD_PARTY_NOTICES.md).
+- The HmjeUI icon font (`fonts/SemtleUI-Icons.ttf`) is part of HmjeUI and follows the same license
+  as HmjeUI (see `SemtleUI-Icons-LICENSE.txt` in the same folder).
 - New project templates (`tpl-*.hmje`): applications you build starting from this code may be
   modified and distributed freely like any other code.
 - Runtime and libraries embedded in applications built with HMJE follow
